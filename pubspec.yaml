@@ -35,18 +35,36 @@ flutter:
     - assets/
     - assets/images/
     - assets/icons/
+    - assets/font/Host_Grotesk/
+    - assets/font/
 
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
+  fonts:
+    # - family: HostGrotesk
+    #   fonts:
+    #     - asset: assets/font/Host_Grotesk/HostGrotesk-VariableFont_wght.ttf
+    #     - asset: assets/font/Host_Grotesk/HostGrotesk-Italic-VariableFont_wght.ttf
+    #       style: italic
+    - family: HostGrotesk
+      fonts:
+        - asset: assets/font/Host_Grotesk/static/HostGrotesk-Light.ttf
+          weight: 300
+        - asset: assets/font/Host_Grotesk/static/HostGrotesk-Regular.ttf
+          weight: 400
+        - asset: assets/font/Host_Grotesk/static/HostGrotesk-Medium.ttf
+          weight: 500
+        - asset: assets/font/Host_Grotesk/static/HostGrotesk-SemiBold.ttf
+          weight: 600
+        - asset: assets/font/Host_Grotesk/static/HostGrotesk-Bold.ttf
+          weight: 700
+        - asset: assets/font/Host_Grotesk/static/HostGrotesk-ExtraBold.ttf
+          weight: 800
+        - asset: assets/font/Host_Grotesk/static/HostGrotesk-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/font/Host_Grotesk/static/HostGrotesk-SemiBoldItalic.ttf
+          weight: 600
+          style: italic
+
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package

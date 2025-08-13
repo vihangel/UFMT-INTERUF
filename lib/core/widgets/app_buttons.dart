@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+import '../theme/app_colors.dart';
+import '../theme/app_icons.dart';
+import '../theme/app_styles.dart';
 
 enum AppButtonVariant { filled, outline, text }
 
@@ -14,6 +19,7 @@ class AppButton extends StatelessWidget {
   final Widget? trailing;
   final EdgeInsetsGeometry? padding;
   final BorderRadiusGeometry? borderRadius;
+  final bool hideTrailing;
 
   const AppButton({
     super.key,
@@ -28,6 +34,7 @@ class AppButton extends StatelessWidget {
     this.trailing,
     this.padding,
     this.borderRadius,
+    this.hideTrailing = false,
   });
 
   const AppButton.outline({
@@ -37,12 +44,13 @@ class AppButton extends StatelessWidget {
     this.loading = false,
     this.expand = false,
     this.minWidth = 120,
-    this.height = 52,
+    this.height = 40,
     this.variant = AppButtonVariant.outline,
     this.leading,
     this.trailing,
     this.padding,
     this.borderRadius,
+    this.hideTrailing = false,
   });
 
   const AppButton.text({
@@ -58,18 +66,26 @@ class AppButton extends StatelessWidget {
     this.trailing,
     this.padding,
     this.borderRadius,
+    this.hideTrailing = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final radius = borderRadius ?? BorderRadius.circular(10);
+    final radius = borderRadius ?? BorderRadius.circular(4);
 
     // conteúdo (loader ou label + ícones)
     final Color fgForLoader = switch (variant) {
-      AppButtonVariant.filled => cs.onPrimary,
+      AppButtonVariant.filled => cs.primary,
       _ => cs.primary,
     };
+
+    Widget? effectiveTrailing = trailing;
+    if (variant == AppButtonVariant.filled &&
+        !hideTrailing &&
+        trailing == null) {
+      effectiveTrailing = SvgPicture.asset(AppIcons.icArrowRight, height: 20);
+    }
 
     Widget content;
     if (loading) {
@@ -78,7 +94,8 @@ class AppButton extends StatelessWidget {
       content = _AppButtonContent(
         label: label,
         leading: leading,
-        trailing: trailing,
+        trailing: effectiveTrailing,
+        variant: variant,
       );
     }
 
@@ -88,15 +105,30 @@ class AppButton extends StatelessWidget {
         style = ElevatedButton.styleFrom(
           minimumSize: Size(minWidth, height),
           padding: padding ?? const EdgeInsets.symmetric(horizontal: 16),
-          backgroundColor: cs.primary,
-          foregroundColor: cs.onPrimary,
+          backgroundColor: AppColors.white,
+          foregroundColor: cs.primary,
           shape: RoundedRectangleBorder(borderRadius: radius),
           elevation: 0,
+          shadowColor: Colors.transparent,
         );
-        final btn = ElevatedButton(
-          onPressed: loading ? null : onPressed,
-          style: style,
-          child: content,
+        final btn = Container(
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: radius,
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primaryButtonShadow,
+                offset: const Offset(2, 2),
+                blurRadius: 5.2,
+                spreadRadius: -2,
+              ),
+            ],
+          ),
+          child: ElevatedButton(
+            onPressed: loading ? null : onPressed,
+            style: style,
+            child: content,
+          ),
         );
         return _AppButtonWrapper(
           expand: expand,
@@ -109,6 +141,7 @@ class AppButton extends StatelessWidget {
           minimumSize: Size(minWidth, height),
           padding: padding ?? const EdgeInsets.symmetric(horizontal: 16),
           foregroundColor: cs.primary,
+          backgroundColor: AppColors.white,
           side: BorderSide(color: Theme.of(context).dividerColor, width: 1.6),
           shape: RoundedRectangleBorder(borderRadius: radius),
         );
@@ -148,11 +181,25 @@ class _AppButtonContent extends StatelessWidget {
   final String label;
   final Widget? leading;
   final Widget? trailing;
+  final AppButtonVariant? variant;
 
-  const _AppButtonContent({required this.label, this.leading, this.trailing});
+  const _AppButtonContent({
+    required this.label,
+    this.leading,
+    this.trailing,
+    this.variant,
+  });
 
   @override
   Widget build(BuildContext context) {
+    TextStyle? style;
+    if (variant == AppButtonVariant.filled) {
+      style = AppStyles.buttonPrimary;
+    } else if (variant == AppButtonVariant.text) {
+      style = AppStyles.buttonText;
+    } else {
+      style = AppStyles.button;
+    }
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
@@ -163,9 +210,7 @@ class _AppButtonContent extends StatelessWidget {
             label,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
-            style: Theme.of(
-              context,
-            ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
+            style: style,
           ),
         ),
         if (trailing != null) ...[const SizedBox(width: 10), trailing!],

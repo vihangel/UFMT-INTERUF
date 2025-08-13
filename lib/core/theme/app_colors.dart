@@ -22,4 +22,6 @@ class AppColors {
 
   // inputBorder: cor da borda de campos de entrada
   static const Color inputBorder = Color(0xFFE3E3E3);
+  // Sombra para botões primários (preto 25% de opacidade)
+  static const Color primaryButtonShadow = Color.fromRGBO(0, 0, 0, 0.25);
 }

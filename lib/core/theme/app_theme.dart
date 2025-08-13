@@ -56,14 +56,13 @@ class AppTheme {
         ),
       ),
       cardTheme: CardThemeData(
-        color: AppColors.white,
+        color: AppColors.cardBackground,
         elevation: 2,
-        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
+
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: AppColors.cardBackground),
+          side: const BorderSide(color: AppColors.inputBorder, width: 2),
         ),
-        shadowColor: Colors.black.withValues(alpha: 0.05),
       ),
       checkboxTheme: CheckboxThemeData(
         fillColor: WidgetStateProperty.resolveWith<Color>(
@@ -72,9 +71,9 @@ class AppTheme {
         checkColor: WidgetStateProperty.resolveWith<Color>(
           (states) => AppColors.primaryText,
         ),
-        side: const BorderSide(color: AppColors.cardBackground, width: 2),
+        side: const BorderSide(color: Colors.black, width: 2),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-        splashRadius: 18,
+        splashRadius: 20,
       ),
       dividerTheme: DividerThemeData(
         color: AppColors.inputBorder,

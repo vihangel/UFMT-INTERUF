@@ -57,7 +57,7 @@ class HomePage extends StatelessWidget {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text('Entrar', style: AppStyles.title),
-                                      const SizedBox(height: 6),
+
                                       Text(
                                         'Faça login na sua conta.',
                                         style: AppStyles.body,
@@ -114,32 +114,35 @@ class HomePage extends StatelessWidget {
 
                                       // Lembrar + Esqueceu
                                       Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Checkbox(
-                                            visualDensity:
-                                                VisualDensity.compact,
-                                            materialTapTargetSize:
-                                                MaterialTapTargetSize
-                                                    .shrinkWrap,
-                                            value: state.remember,
-                                            onChanged: (v) =>
-                                                state.rememberSetter =
-                                                    v ?? false,
+                                          Row(
+                                            children: [
+                                              Checkbox(
+                                                visualDensity:
+                                                    VisualDensity.compact,
+                                                materialTapTargetSize:
+                                                    MaterialTapTargetSize
+                                                        .shrinkWrap,
+                                                value: state.remember,
+                                                onChanged: (v) =>
+                                                    state.rememberSetter =
+                                                        v ?? false,
 
-                                            splashRadius: 0,
+                                                splashRadius: 0,
+                                              ),
+
+                                              Text(
+                                                'Lembrar login',
+                                                style: AppStyles.body,
+                                              ),
+                                            ],
                                           ),
 
-                                          Text(
-                                            'Lembrar login',
-                                            style: AppStyles.body,
-                                          ),
-
-                                          TextButton(
+                                          AppButton.text(
+                                            label: 'Esqueceu a senha?',
                                             onPressed: state.onForgotPassword,
-                                            child: Text(
-                                              'Esqueceu a senha?',
-                                              style: AppStyles.link,
-                                            ),
                                           ),
                                         ],
                                       ),
@@ -150,9 +153,6 @@ class HomePage extends StatelessWidget {
                                         label: 'Entrar',
                                         onPressed: state.onSubmit,
                                         expand: true,
-                                        trailing: const Icon(
-                                          Icons.arrow_forward_rounded,
-                                        ),
                                       ),
                                       const SizedBox(height: 20),
 
@@ -166,7 +166,7 @@ class HomePage extends StatelessWidget {
                                             ),
                                             child: Text(
                                               'ou',
-                                              style: AppStyles.body,
+                                              style: AppStyles.labelButtonSmall,
                                             ),
                                           ),
                                           const Expanded(child: Divider()),
@@ -194,29 +194,29 @@ class HomePage extends StatelessWidget {
                                           height: 20,
                                         ),
                                       ),
+                                      const SizedBox(height: 16),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+
+                                        children: [
+                                          Text(
+                                            'Não possui uma conta?',
+                                            style: AppStyles.body,
+                                          ),
+                                          Expanded(
+                                            child: AppButton(
+                                              onPressed: state.onGoToRegister,
+                                              label: 'Registre-se aqui',
+                                              variant: AppButtonVariant.text,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ],
                                   ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: 16),
-
-                            // Registro
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Não possui uma conta?',
-                                  style: AppStyles.body,
-                                ),
-                                TextButton(
-                                  onPressed: state.onGoToRegister,
-                                  child: Text(
-                                    'Registre-se aqui',
-                                    style: AppStyles.link,
-                                  ),
-                                ),
-                              ],
                             ),
                           ],
                         );
