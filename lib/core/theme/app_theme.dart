@@ -76,6 +76,12 @@ class AppTheme {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
         splashRadius: 18,
       ),
+      dividerTheme: DividerThemeData(
+        color: AppColors.inputBorder,
+        thickness: 1,
+        indent: 20,
+        endIndent: 20,
+      ),
     );
   }
 }
