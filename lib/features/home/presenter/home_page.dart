@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:interufmt/core/theme/app_icons.dart';
+import 'package:interufmt/core/widgets/app_buttons.dart';
 import 'package:interufmt/features/home/presenter/home_state.dart';
 import 'package:provider/provider.dart';
 
@@ -144,15 +146,12 @@ class HomePage extends StatelessWidget {
                                       const SizedBox(height: 8),
 
                                       // CTA Entrar
-                                      SizedBox(
-                                        width: double.infinity,
-                                        height: 52,
-                                        child: ElevatedButton.icon(
-                                          onPressed: state.onSubmit,
-                                          icon: const Icon(
-                                            Icons.arrow_forward_rounded,
-                                          ),
-                                          label: const Text('Entrar'),
+                                      AppButton(
+                                        label: 'Entrar',
+                                        onPressed: state.onSubmit,
+                                        expand: true,
+                                        trailing: const Icon(
+                                          Icons.arrow_forward_rounded,
                                         ),
                                       ),
                                       const SizedBox(height: 20),
@@ -176,16 +175,24 @@ class HomePage extends StatelessWidget {
                                       const SizedBox(height: 16),
 
                                       // Social buttons
-                                      _SocialButton(
+                                      AppButton.outline(
                                         label: 'Continuar com o Google',
-                                        asset: 'google.svg',
                                         onPressed: state.onGoogleSignIn,
+                                        expand: true,
+                                        leading: SvgPicture.asset(
+                                          AppIcons.icGoogle,
+                                          height: 20,
+                                        ),
                                       ),
                                       const SizedBox(height: 12),
-                                      _SocialButton(
+                                      AppButton.outline(
                                         label: 'Continuar com a Apple',
-                                        asset: 'apple.svg',
                                         onPressed: state.onAppleSignIn,
+                                        expand: true,
+                                        leading: SvgPicture.asset(
+                                          AppIcons.icApple,
+                                          height: 20,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -220,42 +227,6 @@ class HomePage extends StatelessWidget {
               );
             },
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SocialButton extends StatelessWidget {
-  final String label;
-  final String asset;
-  final VoidCallback onPressed;
-
-  const _SocialButton({
-    required this.label,
-    required this.asset,
-    required this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onPressed,
-      borderRadius: BorderRadius.circular(4),
-      child: Container(
-        height: 50,
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.black, width: 2),
-          borderRadius: BorderRadius.circular(4),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgPicture.asset('assets/$asset', height: 20),
-            const SizedBox(width: 12),
-            Text(label, style: AppStyles.labelButtonSmall),
-          ],
         ),
       ),
     );

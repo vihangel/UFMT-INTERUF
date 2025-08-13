@@ -17,6 +17,8 @@
 - **Personalizar nome do projeto, ícone e splash screen**
 
   - Adicionar e configurar pacotes para alterar o nome do projeto, definir o ícone do app e personalizar a splash screen.
+    https://pub.dev/packages/flutter_launcher_icons
+    https://pub.dev/packages/flutter_native_splash
 
 - **Gerenciar fontes personalizadas**
   - Verificar o uso do pacote Google Fonts. Caso a fonte desejada não esteja disponível, adicionar os arquivos de fonte diretamente nos assets do projeto e configurar no `pubspec.yaml`.
