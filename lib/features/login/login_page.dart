@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:interufmt/features/login/login_state.dart';
+import 'package:interufmt/features/login/login_viewmodel.dart';
 import 'package:interufmt/features/login/widgets/login_form.dart';
 import 'package:interufmt/features/login/widgets/or_divider.dart';
 import 'package:interufmt/features/login/widgets/register_button.dart';
@@ -15,7 +15,7 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => LoginState(),
+      create: (_) => LoginViewModel(),
       child: GestureDetector(
         onTap: () {
           FocusScope.of(context).unfocus(); // Fecha o teclado ao tocar fora
@@ -29,7 +29,7 @@ class LoginPage extends StatelessWidget {
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 480),
-                  child: Consumer<LoginState>(
+                  child: Consumer<LoginViewModel>(
                     builder: (context, state, _) {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
