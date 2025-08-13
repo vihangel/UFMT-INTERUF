@@ -1,14 +1,15 @@
 import 'package:go_router/go_router.dart';
 
-import '../../features/home/presenter/home_page.dart';
+import '../../features/home/presenter/login_page.dart';
 
 class AppRoutes {
   static final router = GoRouter(
-    initialLocation: HomePage.routename,
+    initialLocation: LoginPage.routename,
     routes: [
       GoRoute(
-        path: HomePage.routename,
-        builder: (context, state) => const HomePage(),
+        name: LoginPage.routename,
+        path: '/',
+        builder: (context, state) => const LoginPage(),
       ),
     ],
   );

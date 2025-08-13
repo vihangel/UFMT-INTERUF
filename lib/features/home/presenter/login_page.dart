@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:interufmt/core/theme/app_icons.dart';
 import 'package:interufmt/core/widgets/app_buttons.dart';
-import 'package:interufmt/features/home/presenter/home_state.dart';
+import 'package:interufmt/features/home/presenter/login_state.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_styles.dart';
 
-class HomePage extends StatelessWidget {
-  static const String routename = '/';
-  const HomePage({super.key});
+class LoginPage extends StatelessWidget {
+  static const String routename = 'login';
+  const LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => HomeState(),
+      create: (_) => LoginState(),
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         body: SafeArea(
@@ -25,7 +25,7 @@ class HomePage extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 20),
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 480),
-                    child: Consumer<HomeState>(
+                    child: Consumer<LoginState>(
                       builder: (context, state, _) {
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
