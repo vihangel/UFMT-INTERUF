@@ -1,12 +1,25 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const Color primary = Color(0xFF007BFF);
-  static const Color secondary = Color(0xFF6C757D);
-  static const Color success = Color(0xFF28A745);
-  static const Color danger = Color(0xFFDC3545);
-  static const Color warning = Color(0xFFFFC107);
-  static const Color info = Color(0xFF17A2B8);
-  static const Color light = Color(0xFFF8F9FA);
-  static const Color dark = Color(0xFF343A40);
+  // background: fundo geral da aplicação
+  static const Color background = Color(0xFFEDEDED);
+  // cardBackground: borda e fundo de cards, campos, etc.
+  static const Color cardBackground = Color(0xFFF7F7F7);
+  // primaryText: textos principais
+  static const Color primaryText = Color(0xFF0D0D0D);
+  // secondaryText: textos secundários
+  static const Color secondaryText = Color(0xFF4D4D4D);
+  // white: fundo de componentes, AppBar, etc.
+  static const Color white = Color(0xFFFFFFFF);
+  // darkBackground: para temas escuros
+  static const Color darkBackground = Color(0xFF1F1F1F);
+  // primary: cor primária (botões, foco, etc.)
+  static const Color primary = Color(0xFF000443);
+  // darkBlue: cor primária (botões, foco, etc.)
+  static const Color darkBlue = Color(0xFF000443);
+  // darkGreen: cor secundária (se necessário)
+  static const Color darkGreen = Color(0xFF176138);
+
+  // inputBorder: cor da borda de campos de entrada
+  static const Color inputBorder = Color(0xFFE3E3E3);
 }
