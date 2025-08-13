@@ -1,16 +1,22 @@
-# interufmt
+<!-- @format -->
 
-A new Flutter project.
+## Tarefas a Realizar
 
-## Getting Started
+- **Configurar pacotes para abrir links externos**
 
-This project is a starting point for a Flutter application.
+  - Adicionar e configurar o pacote `openUrl` para suportar abertura de links externos em Android e iOS.
 
-A few resources to get you started if this is your first Flutter project:
+- **Gerenciar chaves do projeto Supabase**
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+  - Adicionar as chaves do projeto Supabase, incluindo configurações para autenticação via Google e Apple.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- **Implementar Notifier de Autenticação**
+
+  - Criar um notifier para autenticação, responsável por redirecionar o usuário para a rota de login ou home conforme o status de autenticação.
+
+- **Personalizar nome do projeto, ícone e splash screen**
+
+  - Adicionar e configurar pacotes para alterar o nome do projeto, definir o ícone do app e personalizar a splash screen.
+
+- **Gerenciar fontes personalizadas**
+  - Verificar o uso do pacote Google Fonts. Caso a fonte desejada não esteja disponível, adicionar os arquivos de fonte diretamente nos assets do projeto e configurar no `pubspec.yaml`.
