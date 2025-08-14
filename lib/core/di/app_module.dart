@@ -9,6 +9,7 @@ import '../data/services/auth_service.dart';
 import '../data/services/profile_service.dart';
 
 class AppModule {
+  /// Initializes .env/Supabase and returns the list of app providers.
   static Future<List<SingleChildWidget>> init() async {
     await dotenv.load(fileName: ".env");
 
