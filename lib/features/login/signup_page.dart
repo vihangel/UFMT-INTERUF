@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:interufmt/core/services/auth_service.dart';
-import 'package:interufmt/core/services/profile_service.dart';
+import 'package:interufmt/core/data/services/auth_service.dart';
+import 'package:interufmt/core/data/services/profile_service.dart';
 import 'package:interufmt/core/theme/app_styles.dart';
 import 'package:interufmt/core/widgets/app_buttons.dart';
 import 'package:interufmt/core/widgets/app_form_field.dart';

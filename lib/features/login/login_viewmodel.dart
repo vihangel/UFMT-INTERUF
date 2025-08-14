@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:interufmt/core/services/auth_service.dart';
+import 'package:interufmt/core/data/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginViewModel extends ChangeNotifier {

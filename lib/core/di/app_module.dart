@@ -4,9 +4,9 @@ import 'package:provider/single_child_widget.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../features/login/auth/auth_viewmodel.dart';
-import '../repositories/auth_repository.dart';
-import '../services/auth_service.dart';
-import '../services/profile_service.dart';
+import '../data/repositories/auth_repository.dart';
+import '../data/services/auth_service.dart';
+import '../data/services/profile_service.dart';
 
 class AppModule {
   static Future<List<SingleChildWidget>> init() async {

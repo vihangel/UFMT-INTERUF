@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:interufmt/core/services/auth_service.dart';
+import 'package:interufmt/core/data/services/auth_service.dart';
 import 'package:interufmt/features/login/login_viewmodel.dart';
 import 'package:interufmt/features/login/widgets/or_divider.dart';
 import 'package:interufmt/features/login/widgets/register_button.dart';
