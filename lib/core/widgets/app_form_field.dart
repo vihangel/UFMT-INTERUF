@@ -13,6 +13,7 @@ class AppFormField extends StatefulWidget {
   final AutovalidateMode autovalidateMode;
   final void Function(String)? onFieldSubmitted;
   final VoidCallback? onEditingComplete;
+  final void Function(String)? onChanged;
 
   const AppFormField({
     super.key,
@@ -26,6 +27,7 @@ class AppFormField extends StatefulWidget {
     this.autovalidateMode = AutovalidateMode.onUserInteraction,
     this.onFieldSubmitted,
     this.onEditingComplete,
+    this.onChanged,
   });
 
   @override
@@ -45,6 +47,7 @@ class _AppFormFieldState extends State<AppFormField> {
         TextFormField(
           controller: widget.controller,
           keyboardType: widget.keyboardType,
+          onChanged: widget.onChanged,
           validator: widget.validator,
           obscureText: widget.isPassword ? _obscureText : false,
           autovalidateMode: widget.autovalidateMode,

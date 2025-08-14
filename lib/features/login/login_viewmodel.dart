@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:interufmt/features/auth/auth_viewmodel.dart';
 
 class LoginViewModel extends ChangeNotifier {
+  final AuthViewModel _authViewModel;
   final formKey = GlobalKey<FormState>();
   String email = '';
   String password = '';
   bool remember = false;
   bool obscure = true;
+
+  LoginViewModel(this._authViewModel);
 
   void toggleObscure() {
     obscure = !obscure;
@@ -32,9 +36,9 @@ class LoginViewModel extends ChangeNotifier {
     // TODO: navegar para fluxo de recuperação
   }
 
-  void onSubmit() {
+  Future<void> onSubmit() async {
     if (formKey.currentState?.validate() ?? false) {
-      // TODO: autenticar
+      await _authViewModel.signInWithPassword(email, password);
     }
   }
 

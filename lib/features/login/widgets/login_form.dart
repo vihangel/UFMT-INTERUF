@@ -26,6 +26,7 @@ class LoginForm extends StatelessWidget {
             label: 'E-mail',
             hintText: 'exemplo@email.com',
             keyboardType: TextInputType.emailAddress,
+            onChanged: (v) => state.emailSetter = v,
             validator: (v) {
               if (v == null || v.trim().isEmpty) {
                 return 'Informe o e-mail';
@@ -43,6 +44,7 @@ class LoginForm extends StatelessWidget {
             label: 'Senha',
             hintText: 'Digite sua senha',
             isPassword: true,
+            onChanged: (v) => state.passwordSetter = v,
             validator: (v) =>
                 (v == null || v.isEmpty) ? 'Informe a senha' : null,
           ),
