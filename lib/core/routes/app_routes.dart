@@ -10,9 +10,13 @@ import 'package:interufmt/features/login/update_password_page.dart';
 import 'package:provider/provider.dart';
 
 class AppRoutes {
-  static GoRouter getRouter(BuildContext context) {
+  static GoRouter getRouter(
+    BuildContext context,
+    GlobalKey<NavigatorState> navigatorKey,
+  ) {
     final authViewModel = context.read<AuthViewModel>();
     return GoRouter(
+      navigatorKey: navigatorKey,
       refreshListenable: authViewModel,
       initialLocation: '/',
       routes: [

@@ -1,57 +1,69 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:interufmt/core/repositories/auth_repository.dart';
-import 'package:interufmt/core/services/auth_service.dart';
-import 'package:interufmt/core/services/profile_service.dart';
-import 'package:interufmt/features/login/auth/auth_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'core/di/app_module.dart';
 import 'core/routes/app_routes.dart';
 import 'core/theme/app_theme.dart';
 
-void main() async {
+final navigatorKey = GlobalKey<NavigatorState>();
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
-
-  await Supabase.initialize(
-    url: dotenv.env['SUPABASE_URL']!,
-    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
-  );
-
-  final supabaseClient = Supabase.instance.client;
-  final authService = AuthService(supabaseClient);
-  final authRepository = AuthRepository(authService);
-  final profileService = ProfileService(supabaseClient);
-
-  runApp(
-    MultiProvider(
-      providers: [
-        Provider.value(value: authService),
-        Provider.value(value: profileService),
-        ChangeNotifierProvider(create: (_) => AuthViewModel(authRepository)),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  final providers = await AppModule.init();
+  runApp(MultiProvider(providers: providers, child: const MyApp()));
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Flutter App',
-      theme: AppTheme.theme,
-      routerConfig: AppRoutes.getRouter(context),
+    final router = AppRoutes.getRouter(context, navigatorKey);
+    return AuthEventsListener(
+      child: MaterialApp.router(
+        title: 'InterUFMT',
+        theme: AppTheme.theme,
+        routerConfig: router,
+      ),
     );
   }
 }
 
-final supabase = Supabase.instance.client;
+class AuthEventsListener extends StatefulWidget {
+  final Widget child;
+  const AuthEventsListener({super.key, required this.child});
+
+  @override
+  State<AuthEventsListener> createState() => _AuthEventsListenerState();
+}
+
+class _AuthEventsListenerState extends State<AuthEventsListener> {
+  StreamSubscription<AuthState>? _sub;
+
+  @override
+  void initState() {
+    super.initState();
+    final auth = Supabase.instance.client.auth;
+    _sub = auth.onAuthStateChange.listen((data) {
+      if (data.event == AuthChangeEvent.passwordRecovery) {
+        navigatorKey.currentState?.pushNamedAndRemoveUntil(
+          '/update-password',
+          (route) => false,
+        );
+      }
+      // Se quiser tratar signedIn/signedOut aqui também, é o lugar.
+    });
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
+}
