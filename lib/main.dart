@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -16,36 +17,20 @@ Future<void> main() async {
   runApp(MultiProvider(providers: providers, child: const MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final router = AppRoutes.getRouter(context, navigatorKey);
-    return AuthEventsListener(
-      child: MaterialApp.router(
-        title: 'InterUFMT',
-        theme: AppTheme.theme,
-        routerConfig: router,
-      ),
-    );
-  }
+  State<MyApp> createState() => _MyAppState();
 }
 
-class AuthEventsListener extends StatefulWidget {
-  final Widget child;
-  const AuthEventsListener({super.key, required this.child});
-
-  @override
-  State<AuthEventsListener> createState() => _AuthEventsListenerState();
-}
-
-class _AuthEventsListenerState extends State<AuthEventsListener> {
+class _MyAppState extends State<MyApp> {
   StreamSubscription<AuthState>? _sub;
-
+  late GoRouter appRoutes;
   @override
   void initState() {
     super.initState();
+    appRoutes = AppRoutes.getRouter(context, navigatorKey);
     final auth = Supabase.instance.client.auth;
     _sub = auth.onAuthStateChange.listen((data) {
       if (data.event == AuthChangeEvent.passwordRecovery) {
@@ -54,16 +39,15 @@ class _AuthEventsListenerState extends State<AuthEventsListener> {
           (route) => false,
         );
       }
-      // Se quiser tratar signedIn/signedOut aqui também, é o lugar.
     });
   }
 
   @override
-  void dispose() {
-    _sub?.cancel();
-    super.dispose();
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      title: 'InterUFMT',
+      theme: AppTheme.theme,
+      routerConfig: appRoutes,
+    );
   }
-
-  @override
-  Widget build(BuildContext context) => widget.child;
 }
