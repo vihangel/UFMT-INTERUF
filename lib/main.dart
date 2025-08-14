@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:interufmt/core/repositories/auth_repository.dart';
 import 'package:interufmt/core/services/auth_service.dart';
+import 'package:interufmt/core/services/profile_service.dart';
 import 'package:interufmt/features/auth/auth_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -18,12 +19,18 @@ void main() async {
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
-  final authService = AuthService(Supabase.instance.client.auth);
+  final supabaseClient = Supabase.instance.client;
+  final authService = AuthService(supabaseClient);
   final authRepository = AuthRepository(authService);
+  final profileService = ProfileService(supabaseClient);
 
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => AuthViewModel(authRepository),
+    MultiProvider(
+      providers: [
+        Provider.value(value: authService),
+        Provider.value(value: profileService),
+        ChangeNotifierProvider(create: (_) => AuthViewModel(authRepository)),
+      ],
       child: const MyApp(),
     ),
   );

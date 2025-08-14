@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:interufmt/core/services/profile_service.dart';
 import 'package:interufmt/core/widgets/app_buttons.dart';
 import 'package:interufmt/core/widgets/app_form_field.dart';
 import 'package:interufmt/features/login/login_viewmodel.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/theme/app_styles.dart';
 
@@ -68,14 +71,35 @@ class LoginForm extends StatelessWidget {
               ),
               AppButton.text(
                 label: 'Esqueceu a senha?',
-                onPressed: state.onForgotPassword,
+                onPressed: () => context.push('/forgot-password'),
               ),
             ],
           ),
           const SizedBox(height: 8),
 
           // CTA Entrar
-          AppButton(label: 'Entrar', onPressed: state.onSubmit, expand: true),
+          AppButton(
+            label: 'Entrar',
+            loading: state.loading,
+            expand: true,
+            trailing: const Icon(Icons.arrow_forward_rounded),
+            onPressed: () async {
+              if (state.formKey.currentState?.validate() ?? false) {
+                final ok = await state.login(state.email, state.password);
+                if (ok && context.mounted) {
+                  // Se ainda não escolheu atlética, redirecione para o fluxo
+                  final profile = await ProfileService(
+                    Supabase.instance.client,
+                  ).getMyProfile();
+                  if (profile?['selected_athletic_id'] == null) {
+                    context.go('/choose-athletic');
+                  } else {
+                    context.go('/home');
+                  }
+                }
+              }
+            },
+          ),
         ],
       ),
     );

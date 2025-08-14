@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:interufmt/features/auth/auth_viewmodel.dart';
+import 'package:interufmt/core/services/auth_service.dart';
 import 'package:interufmt/features/login/login_viewmodel.dart';
 import 'package:interufmt/features/login/widgets/or_divider.dart';
 import 'package:interufmt/features/login/widgets/register_button.dart';
@@ -16,14 +16,14 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => LoginViewModel(context.read<AuthViewModel>()),
-      child: Consumer<AuthViewModel>(
-        builder: (context, auth, child) {
+      create: (_) => LoginViewModel(context.read<AuthService>()),
+      child: Consumer<LoginViewModel>(
+        builder: (context, vm, child) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (auth.error != null) {
+            if (vm.error != null) {
               ScaffoldMessenger.of(
                 context,
-              ).showSnackBar(SnackBar(content: Text(auth.error!)));
+              ).showSnackBar(SnackBar(content: Text(vm.error!)));
             }
           });
           return child!;

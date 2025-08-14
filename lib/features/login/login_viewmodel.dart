@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:interufmt/features/auth/auth_viewmodel.dart';
+import 'package:interufmt/core/services/auth_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginViewModel extends ChangeNotifier {
-  final AuthViewModel _authViewModel;
+  final AuthService _auth;
   final formKey = GlobalKey<FormState>();
   String email = '';
   String password = '';
   bool remember = false;
   bool obscure = true;
+  bool loading = false;
+  String? error;
 
-  LoginViewModel(this._authViewModel);
+  LoginViewModel(this._auth);
 
   void toggleObscure() {
     obscure = !obscure;
@@ -31,6 +34,22 @@ class LoginViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<bool> login(String email, String password) async {
+    loading = true;
+    error = null;
+    notifyListeners();
+    try {
+      await _auth.signInWithPassword(email, password);
+      return true;
+    } on AuthException catch (e) {
+      error = e.message;
+      return false;
+    } finally {
+      loading = false;
+      notifyListeners();
+    }
+  }
+
   // Ações (plugue com seu backend)
   void onForgotPassword() {
     // TODO: navegar para fluxo de recuperação
@@ -38,7 +57,7 @@ class LoginViewModel extends ChangeNotifier {
 
   Future<void> onSubmit() async {
     if (formKey.currentState?.validate() ?? false) {
-      await _authViewModel.signInWithPassword(email, password);
+      await login(email, password);
     }
   }
 
