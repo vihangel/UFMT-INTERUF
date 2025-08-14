@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:interufmt/core/data/services/auth_service.dart';
+import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/widgets/app_buttons.dart';
 import 'package:interufmt/core/widgets/app_form_field.dart';
+import 'package:interufmt/features/login/auth/auth_viewmodel.dart';
 import 'package:provider/provider.dart';
 
 class UpdatePasswordPage extends StatefulWidget {
-  static const String routename = 'update-password';
+  static const routename = 'update-password';
   const UpdatePasswordPage({super.key});
 
   @override
@@ -13,65 +14,60 @@ class UpdatePasswordPage extends StatefulWidget {
 }
 
 class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
-  final _formKey = GlobalKey<FormState>();
   final _passwordController = TextEditingController();
-  bool _loading = false;
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    final authService = context.read<AuthService>();
+    final authViewModel = context.watch<AuthViewModel>();
     return Scaffold(
-      appBar: AppBar(title: const Text('Criar Nova Senha')),
-      body: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              AppFormField(
-                label: 'Nova Senha',
-                controller: _passwordController,
-                isPassword: true,
-                validator: (v) =>
-                    (v == null || v.isEmpty) ? 'Informe a nova senha' : null,
-              ),
-              const SizedBox(height: 24),
-              AppButton(
-                label: 'Salvar Nova Senha',
-                loading: _loading,
-                expand: true,
-                onPressed: () async {
-                  if (_formKey.currentState?.validate() ?? false) {
-                    setState(() => _loading = true);
-                    try {
-                      await authService.updatePassword(
-                        _passwordController.text,
-                      );
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Senha atualizada com sucesso!'),
-                          ),
-                        );
-                        Navigator.of(
-                          context,
-                        ).popUntil((route) => route.isFirst);
-                      }
-                    } catch (e) {
-                      if (mounted) {
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(SnackBar(content: Text(e.toString())));
-                      }
-                    } finally {
-                      if (mounted) {
-                        setState(() => _loading = false);
-                      }
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                AppFormField(
+                  controller: _passwordController,
+                  label: "Nova senha",
+                  isPassword: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, insira sua nova senha';
                     }
-                  }
-                },
-              ),
-            ],
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 24),
+                AppButton(
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      await authViewModel.updatePassword(
+                        _passwordController.text,
+                        onSuccess: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Senha atualizada com sucesso!'),
+                            ),
+                          );
+                          context.go('/');
+                        },
+                        onError: (message) {
+                          ScaffoldMessenger.of(
+                            context,
+                          ).showSnackBar(SnackBar(content: Text(message)));
+                        },
+                      );
+                    }
+                  },
+                  label: "Atualizar senha",
+                  loading: authViewModel.isLoading,
+                ),
+              ],
+            ),
           ),
         ),
       ),

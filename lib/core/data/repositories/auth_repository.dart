@@ -31,4 +31,14 @@ class AuthRepository {
       throw AuthException('An unknown error occurred.');
     }
   }
+
+  Future<void> updatePassword(String password) async {
+    try {
+      await _authService.updatePassword(password);
+    } on AuthException catch (e) {
+      throw AuthException(e.message);
+    } catch (e) {
+      throw AuthException('An unknown error occurred.');
+    }
+  }
 }

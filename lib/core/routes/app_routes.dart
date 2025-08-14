@@ -63,7 +63,9 @@ class AppRoutes {
         ];
         final isUnprotected = unprotectedRoutes.contains(state.matchedLocation);
 
-        if (loggedIn && isUnprotected) {
+        if (loggedIn &&
+            isUnprotected &&
+            state.matchedLocation != '/update-password') {
           return '/home';
         }
 

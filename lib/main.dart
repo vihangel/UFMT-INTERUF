@@ -34,10 +34,7 @@ class _MyAppState extends State<MyApp> {
     final auth = Supabase.instance.client.auth;
     _sub = auth.onAuthStateChange.listen((data) {
       if (data.event == AuthChangeEvent.passwordRecovery) {
-        navigatorKey.currentState?.pushNamedAndRemoveUntil(
-          '/update-password',
-          (route) => false,
-        );
+        appRoutes.go('/update-password');
       }
     });
   }
