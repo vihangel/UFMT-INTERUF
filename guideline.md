@@ -25,6 +25,37 @@ A camada de dados é responsável por obter e manipular os dados do aplicativo. 
 
 Para o gerenciamento de estado, utilizamos a abordagem de **ViewModel** (também conhecida como `ChangeNotifier`), conforme recomendado pela equipe do Flutter. Cada tela ou widget complexo terá seu próprio `ViewModel` para gerenciar seu estado e a lógica de UI. O `login_viewmodel.dart` é um exemplo dessa abordagem.
 
+### AuthViewModel
+
+O `AuthViewModel` é um `ChangeNotifier` global responsável por gerenciar o estado de autenticação do usuário em todo o aplicativo. Ele é injetado na árvore de widgets usando um `ChangeNotifierProvider` no `main.dart` e pode ser acessado de qualquer parte do aplicativo para verificar se o usuário está logado, obter informações do usuário atual ou executar ações como `signIn`, `signOut` e `updatePassword`.
+
+Ele encapsula a lógica de interação com o `AuthRepository`, tratando o estado de carregamento (`isLoading`) e os erros (`error`), e notificando os widgets sobre as mudanças de estado.
+
+**Exemplo de uso em um widget:**
+
+```dart
+final authViewModel = Provider.of<AuthViewModel>(context);
+
+if (authViewModel.isLoading) {
+  // Exibe um indicador de carregamento
+}
+
+if (authViewModel.error != null) {
+  // Exibe uma mensagem de erro
+}
+
+// Chama a função de atualização de senha
+authViewModel.updatePassword(
+  'nova-senha',
+  onSuccess: () {
+    // Lógica para quando a senha for atualizada com sucesso
+  },
+  onError: (errorMessage) {
+    // Lógica para lidar com o erro
+  },
+);
+```
+
 ## Estrutura de Pastas
 
 ### `lib/core`
