@@ -53,7 +53,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     try {
                       await authService.sendPasswordResetEmail(
                         _emailController.text.trim(),
-                        redirectTo: 'io.interufmt://reset-password',
+                        redirectTo: 'io.interufmt://auth-callback',
                       );
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
