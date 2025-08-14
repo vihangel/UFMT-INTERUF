@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ChooseAthleticPage extends StatelessWidget {
+  static const String routename = 'choose-athletic';
   const ChooseAthleticPage({super.key});
 
   @override

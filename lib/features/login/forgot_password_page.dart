@@ -5,6 +5,7 @@ import 'package:interufmt/core/widgets/app_form_field.dart';
 import 'package:provider/provider.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
+  static const String routename = 'forgot-password';
   const ForgotPasswordPage({super.key});
 
   @override

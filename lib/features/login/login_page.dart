@@ -52,7 +52,7 @@ class LoginPage extends StatelessWidget {
                                 // SvgPicture.asset('assets/logo.svg', height: 72),
                                 const SizedBox(height: 12),
                                 Text(
-                                  'LOGO \nNTERUFMT',
+                                  'LOGO \nINTERUFMT',
                                   style: AppStyles.title2,
                                   textAlign: TextAlign.center,
                                 ),
@@ -72,7 +72,11 @@ class LoginPage extends StatelessWidget {
                                     const SizedBox(height: 20),
                                     const OrDivider(),
                                     const SizedBox(height: 16),
-                                    const SocialButtons(),
+
+                                    SocialButtons(
+                                      onGoogleSignIn: state.onGoogleSignIn,
+                                      onAppleSignIn: state.onAppleSignIn,
+                                    ),
                                     const SizedBox(height: 16),
                                     const RegisterButton(),
                                   ],

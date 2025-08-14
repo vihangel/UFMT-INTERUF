@@ -3,7 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:interufmt/core/repositories/auth_repository.dart';
 import 'package:interufmt/core/services/auth_service.dart';
 import 'package:interufmt/core/services/profile_service.dart';
-import 'package:interufmt/features/auth/auth_viewmodel.dart';
+import 'package:interufmt/features/login/auth/auth_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

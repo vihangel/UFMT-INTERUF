@@ -75,14 +75,14 @@ class LoginForm extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
 
+          const SizedBox(height: 8),
           // CTA Entrar
           AppButton(
             label: 'Entrar',
             loading: state.loading,
             expand: true,
-            trailing: const Icon(Icons.arrow_forward_rounded),
+
             onPressed: () async {
               if (state.formKey.currentState?.validate() ?? false) {
                 final ok = await state.login(state.email, state.password);

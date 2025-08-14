@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:interufmt/features/auth/auth_viewmodel.dart';
-import 'package:interufmt/features/auth/choose_athletic_page.dart';
-import 'package:interufmt/features/auth/forgot_password_page.dart';
-import 'package:interufmt/features/auth/signup_page.dart';
-import 'package:interufmt/features/auth/update_password_page.dart';
 import 'package:interufmt/features/home/home_page.dart';
+import 'package:interufmt/features/login/auth/auth_viewmodel.dart';
+import 'package:interufmt/features/login/choose_athletic_page.dart';
+import 'package:interufmt/features/login/forgot_password_page.dart';
 import 'package:interufmt/features/login/login_page.dart';
+import 'package:interufmt/features/login/signup_page.dart';
+import 'package:interufmt/features/login/update_password_page.dart';
 import 'package:provider/provider.dart';
 
 class AppRoutes {
@@ -22,42 +22,49 @@ class AppRoutes {
           builder: (context, state) => const LoginPage(),
         ),
         GoRoute(
-          name: 'home',
+          name: HomePage.routename,
           path: '/home',
           builder: (context, state) => const HomePage(),
         ),
         GoRoute(
-          name: 'signup',
+          name: SignUpPage.routename,
           path: '/signup',
           builder: (context, state) => const SignUpPage(),
         ),
         GoRoute(
-          name: 'choose-athletic',
+          name: ChooseAthleticPage.routename,
           path: '/choose-athletic',
           builder: (context, state) => const ChooseAthleticPage(),
         ),
         GoRoute(
-          name: 'forgot-password',
+          name: ForgotPasswordPage.routename,
           path: '/forgot-password',
           builder: (context, state) => const ForgotPasswordPage(),
         ),
         GoRoute(
-          name: 'update-password',
+          name: UpdatePasswordPage.routename,
           path: '/update-password',
           builder: (context, state) => const UpdatePasswordPage(),
         ),
       ],
       redirect: (BuildContext context, GoRouterState state) {
         final loggedIn = authViewModel.currentUser != null;
-        final loggingIn = state.matchedLocation == '/';
-        final creatingAccount = state.matchedLocation == '/signup';
+        // Rotas que não precisam de autenticação
+        final unprotectedRoutes = [
+          '/',
+          '/signup',
+          '/forgot-password',
+          '/update-password',
+          '/choose-athletic',
+        ];
+        final isUnprotected = unprotectedRoutes.contains(state.matchedLocation);
 
-        if (!loggedIn) {
-          return loggingIn || creatingAccount ? null : '/';
+        if (loggedIn && isUnprotected) {
+          return '/home';
         }
 
-        if (loggingIn) {
-          return '/home';
+        if (!loggedIn && !isUnprotected) {
+          return '/';
         }
 
         return null;

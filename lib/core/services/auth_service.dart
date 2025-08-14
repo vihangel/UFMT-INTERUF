@@ -52,4 +52,18 @@ class AuthService {
       token: token,
     );
   }
+
+  Future<bool> signInWithGoogle() {
+    return _c.auth.signInWithOAuth(
+      OAuthProvider.google,
+      redirectTo: 'io.supabase.flutterquickstart://login-callback/',
+    );
+  }
+
+  Future<bool> signInWithApple() {
+    return _c.auth.signInWithOAuth(
+      OAuthProvider.apple,
+      redirectTo: 'io.supabase.flutterquickstart://login-callback/',
+    );
+  }
 }

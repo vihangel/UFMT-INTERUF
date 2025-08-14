@@ -5,6 +5,7 @@ import 'package:interufmt/core/widgets/app_form_field.dart';
 import 'package:provider/provider.dart';
 
 class UpdatePasswordPage extends StatefulWidget {
+  static const String routename = 'update-password';
   const UpdatePasswordPage({super.key});
 
   @override

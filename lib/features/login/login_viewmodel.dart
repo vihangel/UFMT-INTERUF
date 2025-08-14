@@ -61,12 +61,32 @@ class LoginViewModel extends ChangeNotifier {
     }
   }
 
-  void onGoogleSignIn() {
-    // TODO
+  Future<void> onGoogleSignIn() async {
+    loading = true;
+    error = null;
+    notifyListeners();
+    try {
+      await _auth.signInWithGoogle();
+    } on AuthException catch (e) {
+      error = e.message;
+    } finally {
+      loading = false;
+      notifyListeners();
+    }
   }
 
-  void onAppleSignIn() {
-    // TODO
+  Future<void> onAppleSignIn() async {
+    loading = true;
+    error = null;
+    notifyListeners();
+    try {
+      await _auth.signInWithApple();
+    } on AuthException catch (e) {
+      error = e.message;
+    } finally {
+      loading = false;
+      notifyListeners();
+    }
   }
 
   void onGoToRegister() {
