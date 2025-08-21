@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/data/services/profile_service.dart';
 import 'package:interufmt/core/widgets/app_buttons.dart';
 import 'package:interufmt/core/widgets/app_form_field.dart';
+import 'package:interufmt/features/users/home/home_page.dart';
+import 'package:interufmt/features/users/login/choose_athletic_page.dart';
 import 'package:interufmt/features/users/login/forgot_password_page.dart';
 import 'package:interufmt/features/users/login/login_viewmodel.dart';
 import 'package:provider/provider.dart';
@@ -93,9 +95,9 @@ class LoginForm extends StatelessWidget {
                     Supabase.instance.client,
                   ).getMyProfile();
                   if (profile?['selected_athletic_id'] == null) {
-                    context.go('/choose-athletic');
+                    context.go(ChooseAthleticPage.routename);
                   } else {
-                    context.go('/home');
+                    context.go(HomePage.routename);
                   }
                 }
               }
@@ -106,7 +108,7 @@ class LoginForm extends StatelessWidget {
 
           Center(
             child: TextButton(
-              onPressed: () => context.go('/home'),
+              onPressed: () => context.go(HomePage.routename),
               child: const Text(
                 'Pular login',
                 style: TextStyle(decoration: TextDecoration.underline),
