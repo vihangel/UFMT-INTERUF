@@ -83,7 +83,7 @@ class LoginPage extends StatelessWidget {
                                     const RegisterButton(),
                                     TextButton(
                                       onPressed: () {
-                                        context.pushNamed(
+                                        context.goNamed(
                                           AdminLoginPage.routename,
                                         );
                                       },

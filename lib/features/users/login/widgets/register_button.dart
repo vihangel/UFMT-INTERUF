@@ -15,7 +15,7 @@ class RegisterButton extends StatelessWidget {
         Text('Não possui uma conta?', style: AppStyles.body),
         Expanded(
           child: AppButton(
-            onPressed: () => context.push('/signup'),
+            onPressed: () => context.goNamed('/signup'),
             label: 'Registre-se aqui',
             variant: AppButtonVariant.text,
           ),

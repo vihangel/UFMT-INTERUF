@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/data/services/profile_service.dart';
 import 'package:interufmt/core/widgets/app_buttons.dart';
 import 'package:interufmt/core/widgets/app_form_field.dart';
+import 'package:interufmt/features/users/login/forgot_password_page.dart';
 import 'package:interufmt/features/users/login/login_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -71,7 +72,7 @@ class LoginForm extends StatelessWidget {
               ),
               AppButton.text(
                 label: 'Esqueceu a senha?',
-                onPressed: () => context.push('/forgot-password'),
+                onPressed: () => context.goNamed(ForgotPasswordPage.routename),
               ),
             ],
           ),
