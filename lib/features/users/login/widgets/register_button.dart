@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/widgets/app_buttons.dart';
 
-import '../../../core/theme/app_styles.dart';
+import '../../../../core/theme/app_styles.dart';
 
 class RegisterButton extends StatelessWidget {
   const RegisterButton({super.key});

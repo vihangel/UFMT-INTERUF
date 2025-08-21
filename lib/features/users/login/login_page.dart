@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/data/services/auth_service.dart';
-import 'package:interufmt/features/login/login_viewmodel.dart';
-import 'package:interufmt/features/login/widgets/or_divider.dart';
-import 'package:interufmt/features/login/widgets/register_button.dart';
-import 'package:interufmt/features/login/widgets/social_buttons.dart';
+import 'package:interufmt/features/admin/admin_login_page.dart';
+import 'package:interufmt/features/users/login/login_viewmodel.dart';
+import 'package:interufmt/features/users/login/widgets/or_divider.dart';
+import 'package:interufmt/features/users/login/widgets/register_button.dart';
+import 'package:interufmt/features/users/login/widgets/social_buttons.dart';
 import 'package:provider/provider.dart';
 
-import '../../core/theme/app_styles.dart';
+import '../../../core/theme/app_styles.dart';
 import 'widgets/login_form.dart';
 
 class LoginPage extends StatelessWidget {
@@ -79,6 +81,14 @@ class LoginPage extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 16),
                                     const RegisterButton(),
+                                    TextButton(
+                                      onPressed: () {
+                                        context.pushNamed(
+                                          AdminLoginPage.routename,
+                                        );
+                                      },
+                                      child: const Text('Sou administrador'),
+                                    ),
                                   ],
                                 ),
                               ),

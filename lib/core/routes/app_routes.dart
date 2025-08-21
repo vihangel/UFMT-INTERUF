@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:interufmt/features/home/home_page.dart';
-import 'package:interufmt/features/login/auth/auth_viewmodel.dart';
-import 'package:interufmt/features/login/choose_athletic_page.dart';
-import 'package:interufmt/features/login/forgot_password_page.dart';
-import 'package:interufmt/features/login/login_page.dart';
-import 'package:interufmt/features/login/signup_page.dart';
-import 'package:interufmt/features/login/update_password_page.dart';
+import 'package:interufmt/features/admin/admin_home_page.dart';
+import 'package:interufmt/features/admin/admin_login_page.dart';
+import 'package:interufmt/features/users/home/home_page.dart';
+import 'package:interufmt/features/users/login/auth/auth_viewmodel.dart';
+import 'package:interufmt/features/users/login/choose_athletic_page.dart';
+import 'package:interufmt/features/users/login/forgot_password_page.dart';
+import 'package:interufmt/features/users/login/login_page.dart';
+import 'package:interufmt/features/users/login/signup_page.dart';
+import 'package:interufmt/features/users/login/update_password_page.dart';
 import 'package:provider/provider.dart';
 
 class AppRoutes {
@@ -20,6 +22,7 @@ class AppRoutes {
       refreshListenable: authViewModel,
       initialLocation: '/',
       routes: [
+        // Rotas públicas
         GoRoute(
           name: LoginPage.routename,
           path: '/',
@@ -50,29 +53,34 @@ class AppRoutes {
           path: '/update-password',
           builder: (context, state) => const UpdatePasswordPage(),
         ),
+        // Rotas admin
+        GoRoute(
+          name: AdminLoginPage.routename,
+          path: '/admin/login',
+          builder: (context, state) => const AdminLoginPage(),
+        ),
+        GoRoute(
+          name: AdminHomePage.routename,
+          path: '/admin/home',
+          builder: (context, state) => const AdminHomePage(),
+        ),
       ],
       redirect: (BuildContext context, GoRouterState state) {
-        final loggedIn = authViewModel.currentUser != null;
-        // Rotas que não precisam de autenticação
-        final unprotectedRoutes = [
-          '/',
-          '/signup',
-          '/forgot-password',
-          '/update-password',
-          '/choose-athletic',
-        ];
-        final isUnprotected = unprotectedRoutes.contains(state.matchedLocation);
+        final isAdminLoggedIn = authViewModel.currentAdmin != null;
+        final isAdminRoute = state.matchedLocation.startsWith('/admin');
+        final isAdminLogin = state.matchedLocation == '/admin/login';
 
-        if (loggedIn &&
-            isUnprotected &&
-            state.matchedLocation != '/update-password') {
-          return '/home';
+        // Se for rota admin e não estiver logado como admin, redireciona para login admin
+        if (isAdminRoute && !isAdminLoggedIn && !isAdminLogin) {
+          return '/admin/login';
         }
 
-        if (!loggedIn && !isUnprotected) {
-          return '/';
+        // Se já estiver logado como admin e tentar acessar login admin, redireciona para home admin
+        if (isAdminLoggedIn && isAdminLogin) {
+          return '/admin/home';
         }
 
+        // Usuário comum não precisa estar logado para acessar rotas públicas
         return null;
       },
     );

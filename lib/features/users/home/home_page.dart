@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:interufmt/features/login/auth/auth_viewmodel.dart';
+import 'package:interufmt/features/users/login/auth/auth_viewmodel.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatelessWidget {

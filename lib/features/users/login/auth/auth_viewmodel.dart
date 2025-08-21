@@ -27,6 +27,8 @@ class AuthViewModel extends ChangeNotifier {
 
   User? get currentUser => _authRepository.currentUser;
 
+  User? get currentAdmin => _authRepository.currentUser;
+
   Future<void> signOut() async {
     try {
       _error = null;

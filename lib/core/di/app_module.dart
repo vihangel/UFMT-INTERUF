@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../features/login/auth/auth_viewmodel.dart';
+import '../../features/users/login/auth/auth_viewmodel.dart';
 import '../data/repositories/auth_repository.dart';
 import '../data/services/auth_service.dart';
 import '../data/services/profile_service.dart';
