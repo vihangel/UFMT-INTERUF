@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/theme/app_styles.dart';
 import 'package:interufmt/core/widgets/app_buttons.dart';
 import 'package:interufmt/core/widgets/app_form_field.dart';
 import 'package:interufmt/features/admin/auth/admin_login_viewmodel.dart';
+import 'package:interufmt/features/users/login/login_page.dart';
 import 'package:provider/provider.dart';
 
 class AdminLoginPage extends StatefulWidget {
@@ -95,6 +97,11 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                         loading: viewModel.loading,
                         expand: true,
                         onPressed: () => viewModel.login(context),
+                      ),
+                      const SizedBox(height: 16),
+                      TextButton(
+                        onPressed: () => context.goNamed(LoginPage.routename),
+                        child: const Text('Voltar ao login de usuário'),
                       ),
                     ],
                   ),
