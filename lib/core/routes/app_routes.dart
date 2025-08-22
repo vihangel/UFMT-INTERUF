@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:interufmt/features/admin/admin_home_page.dart';
-import 'package:interufmt/features/admin/admin_login_page.dart';
+import 'package:interufmt/features/admin/auth/admin_login_page.dart';
+import 'package:interufmt/features/admin/home/admin_home_page.dart';
 import 'package:interufmt/features/users/home/home_page.dart';
 import 'package:interufmt/features/users/login/auth/auth_viewmodel.dart';
 import 'package:interufmt/features/users/login/choose_athletic_page.dart';

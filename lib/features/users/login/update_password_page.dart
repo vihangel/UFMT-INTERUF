@@ -53,7 +53,7 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
                               content: Text('Senha atualizada com sucesso!'),
                             ),
                           );
-                          context.go('/');
+                          context.goNamed('/');
                         },
                         onError: (message) {
                           ScaffoldMessenger.of(

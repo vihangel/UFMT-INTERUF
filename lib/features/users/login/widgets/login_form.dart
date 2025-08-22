@@ -90,10 +90,10 @@ class LoginForm extends StatelessWidget {
                 if (context.mounted) {
                   switch (result) {
                     case LoginResult.successHome:
-                      context.go(HomePage.routename);
+                      context.goNamed(HomePage.routename);
                       break;
                     case LoginResult.successChooseAthletic:
-                      context.go(ChooseAthleticPage.routename);
+                      context.goNamed(ChooseAthleticPage.routename);
                       break;
                     case LoginResult.failure:
                       break;
@@ -107,7 +107,7 @@ class LoginForm extends StatelessWidget {
 
           Center(
             child: TextButton(
-              onPressed: () => context.go(HomePage.routename),
+              onPressed: () => context.goNamed(HomePage.routename),
               child: const Text(
                 'Pular login',
                 style: TextStyle(decoration: TextDecoration.underline),

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/di/app_module.dart';
 import 'core/routes/app_routes.dart';
@@ -27,18 +26,11 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  StreamSubscription<AuthState>? _sub;
   late GoRouter appRoutes;
   @override
   void initState() {
     super.initState();
     appRoutes = AppRoutes.getRouter(context, navigatorKey);
-    final auth = Supabase.instance.client.auth;
-    _sub = auth.onAuthStateChange.listen((data) {
-      if (data.event == AuthChangeEvent.passwordRecovery) {
-        appRoutes.go('/update-password');
-      }
-    });
   }
 
   @override

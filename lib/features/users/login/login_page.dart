@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/data/services/auth_service.dart';
 import 'package:interufmt/core/data/services/profile_service.dart';
-import 'package:interufmt/features/admin/admin_login_page.dart';
+import 'package:interufmt/features/admin/auth/admin_login_page.dart';
 import 'package:interufmt/features/users/login/login_viewmodel.dart';
 import 'package:interufmt/features/users/login/widgets/or_divider.dart';
 import 'package:interufmt/features/users/login/widgets/register_button.dart';

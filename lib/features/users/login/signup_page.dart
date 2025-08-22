@@ -153,7 +153,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                             acceptedTerms: _termsAccepted,
                                           );
                                           if (ok && mounted) {
-                                            context.go(
+                                            context.goNamed(
                                               ChooseAthleticPage.routename,
                                             );
                                           } else if (vm.error == null &&
