@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:interufmt/core/data/services/profile_service.dart';
 import 'package:interufmt/core/widgets/app_buttons.dart';
 import 'package:interufmt/core/widgets/app_form_field.dart';
 import 'package:interufmt/features/users/home/home_page.dart';
@@ -8,7 +7,6 @@ import 'package:interufmt/features/users/login/choose_athletic_page.dart';
 import 'package:interufmt/features/users/login/forgot_password_page.dart';
 import 'package:interufmt/features/users/login/login_viewmodel.dart';
 import 'package:provider/provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/theme/app_styles.dart';
 
@@ -88,16 +86,17 @@ class LoginForm extends StatelessWidget {
 
             onPressed: () async {
               if (state.formKey.currentState?.validate() ?? false) {
-                final ok = await state.login(state.email, state.password);
-                if (ok && context.mounted) {
-                  // Se ainda não escolheu atlética, redirecione para o fluxo
-                  final profile = await ProfileService(
-                    Supabase.instance.client,
-                  ).getMyProfile();
-                  if (profile?['selected_athletic_id'] == null) {
-                    context.go(ChooseAthleticPage.routename);
-                  } else {
-                    context.go(HomePage.routename);
+                final result = await state.login(state.email, state.password);
+                if (context.mounted) {
+                  switch (result) {
+                    case LoginResult.successHome:
+                      context.go(HomePage.routename);
+                      break;
+                    case LoginResult.successChooseAthletic:
+                      context.go(ChooseAthleticPage.routename);
+                      break;
+                    case LoginResult.failure:
+                      break;
                   }
                 }
               }

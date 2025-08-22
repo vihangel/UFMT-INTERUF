@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/data/services/auth_service.dart';
+import 'package:interufmt/core/data/services/profile_service.dart';
 import 'package:interufmt/features/admin/admin_login_page.dart';
 import 'package:interufmt/features/users/login/login_viewmodel.dart';
 import 'package:interufmt/features/users/login/widgets/or_divider.dart';
@@ -18,7 +19,10 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => LoginViewModel(context.read<AuthService>()),
+      create: (_) => LoginViewModel(
+        context.read<AuthService>(),
+        context.read<ProfileService>(),
+      ),
       child: Consumer<LoginViewModel>(
         builder: (context, vm, child) {
           WidgetsBinding.instance.addPostFrameCallback((_) {

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:interufmt/core/data/services/auth_service.dart';
+import 'package:interufmt/core/data/services/profile_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+enum LoginResult { successHome, successChooseAthletic, failure }
 
 class LoginViewModel extends ChangeNotifier {
   final AuthService _auth;
+  final ProfileService _profileService;
   final formKey = GlobalKey<FormState>();
   String email = '';
   String password = '';
@@ -12,7 +16,7 @@ class LoginViewModel extends ChangeNotifier {
   bool loading = false;
   String? error;
 
-  LoginViewModel(this._auth);
+  LoginViewModel(this._auth, this._profileService);
 
   void toggleObscure() {
     obscure = !obscure;
@@ -34,16 +38,21 @@ class LoginViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> login(String email, String password) async {
+  Future<LoginResult> login(String email, String password) async {
     loading = true;
     error = null;
     notifyListeners();
     try {
       await _auth.signInWithPassword(email, password);
-      return true;
+      final profile = await _profileService.getMyProfile();
+      if (profile?['selected_athletic_id'] == null) {
+        return LoginResult.successChooseAthletic;
+      } else {
+        return LoginResult.successHome;
+      }
     } on AuthException catch (e) {
       error = e.message;
-      return false;
+      return LoginResult.failure;
     } finally {
       loading = false;
       notifyListeners();
@@ -55,10 +64,11 @@ class LoginViewModel extends ChangeNotifier {
     // TODO: navegar para fluxo de recuperação
   }
 
-  Future<void> onSubmit() async {
+  Future<LoginResult> onSubmit() async {
     if (formKey.currentState?.validate() ?? false) {
-      await login(email, password);
+      return await login(email, password);
     }
+    return LoginResult.failure;
   }
 
   Future<void> onGoogleSignIn() async {
