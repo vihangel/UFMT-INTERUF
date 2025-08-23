@@ -5,8 +5,8 @@
 Crie um arquivo `.env` na raiz do projeto com o seguinte conteúdo:
 
 ```env
-SUPABASE_URL=https://sgjgzthvtikvwpwqouqc.supabase.co
-SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNnamd6dGh2dGlrdndwd3FvdXFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUxMjc0MDUsImV4cCI6MjA3MDcwMzQwNX0.g05SKWeMgNLna-mOuMcEG2C7LpqpNAu71nrITYG557s
+SUPABASE_URL=https://cipsznaudjkrpzzruhvp.supabase.co
+SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpcHN6bmF1ZGprcnB6enJ1aHZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU5NjE4ODEsImV4cCI6MjA3MTUzNzg4MX0.4JyOWdbuI4Bf8Fk3DGt71bbWep0OqWhbrlblcIAhC7k
 ```
 
 ## Tarefas a Realizar

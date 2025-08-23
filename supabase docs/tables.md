@@ -36,6 +36,9 @@ end $$;
 -- 1) CATÁLOGO: ATLÉTICAS, MODALIDADES, LOCAIS
 -- (vem primeiro para permitir FKs em profiles/athletes/games)
 -- =========================================
+
+do $$ begin if not exists ( select 1 from pg_type t join pg_namespace n on n.oid = t.typnamespace where t.typname = 'naipe' and n.nspname = 'public' ) then create type public.naipe as enum ('Feminino','Masculino','Misto'); end if;end $$;
+
 create table if not exists public.athletics (
 id uuid primary key default gen_random_uuid(),
 name text not null,
@@ -57,7 +60,7 @@ for each row execute function public.set_updated_at();
 create table if not exists public.modalities (
 id uuid primary key default gen_random_uuid(),
 name text not null, -- ex.: Futsal
-gender text not null, -- Masculino/Feminino/Misto
+gender public.naipe not null, -- Masculino/Feminino/Misto
 icon text,
 created_at timestamptz not null default now(),
 updated_at timestamptz not null default now()
@@ -81,193 +84,130 @@ before update on public.venues
 for each row execute function public.set_updated_at();
 
 -- =========================================
--- 2) PROFILES (1:1 com auth.users) – agora pode referenciar athletics
+-- 2) ATLETAS E VÍNCULOS COM MODALIDADES
 -- =========================================
-create table if not exists public.profiles (
-id uuid primary key references auth.users(id) on delete cascade,
-email text not null unique,
-full_name text,
-avatar_url text,
-role public.user_role not null default 'user',
+create table if not exists public.athletes ( id uuid primary key default gen_random_uuid(), athletic_id uuid not null references public.athletics(id) on delete cascade, full_name text not null, rga text, course text, birthdate date, created_at timestamptz not null default now(), updated_at timestamptz not null default now() ); create index if not exists idx_athletes_athletic on public.athletes(athletic_id); create trigger trg_athletes_updated before update on public.athletes for each row execute function public.set_updated_at();
 
-selected_athletic_id uuid references public.athletics(id)
-on update cascade on delete set null,
 
-accepted_terms_at timestamptz,
-notifications_enabled boolean not null default false,
-marketing_opt_in boolean not null default false,
 
-disabled boolean not null default false,
-metadata jsonb not null default '{}',
-
-created_at timestamptz not null default now(),
-updated_at timestamptz not null default now()
-);
-create index if not exists idx_profiles_selected_athletic
-on public.profiles (selected_athletic_id);
-create trigger trg_profiles_updated
-before update on public.profiles
-for each row execute function public.set_updated_at();
-
--- Auto-criação do profile quando nasce um usuário no auth
-create or replace function public.handle_new_user()
-returns trigger
-language plpgsql
-security definer
-set search_path = public as $$
-begin
-  insert into public.profiles (id, email, full_name, avatar_url, metadata)
-  values (
-    new.id,
-    new.email,
-    coalesce(new.raw_user_meta_data ->> 'full_name', null),
-    coalesce(new.raw_user_meta_data ->> 'avatar_url', null),
-    coalesce(new.raw_user_meta_data, '{}'::jsonb)
-  )
-  on conflict (id) do nothing;
-  return new;
-end $$;
-
-drop trigger if exists on_auth_user_created on auth.users;
-create trigger on_auth_user_created
-after insert on auth.users
-for each row execute function public.handle_new_user();
-
--- =========================================
--- 3) ATLETAS E VÍNCULOS COM MODALIDADES
--- =========================================
-create table if not exists public.athletes (
-id uuid primary key default gen_random_uuid(),
-athletic_id uuid not null references public.athletics(id) on delete cascade,
-full_name text not null,
-rga text,
-course text,
-birthdate date,
-photo_url text,
-created_at timestamptz not null default now(),
-updated_at timestamptz not null default now()
-);
-create index if not exists idx_athletes_athletic on public.athletes(athletic_id);
-create trigger trg_athletes_updated
-before update on public.athletes
-for each row execute function public.set_updated_at();
-
-create table if not exists public.athlete_modalities (
-athlete_id uuid references public.athletes(id) on delete cascade,
-modality_id uuid references public.modalities(id) on delete cascade,
-jersey_number int,
-position text,
-primary key (athlete_id, modality_id)
-);
 
 -- Catálogo de métricas
-create table if not exists public.stat_definitions (
-code text primary key, -- ex.: 'GOL','CHT','DEF','CA','CV'
-name text not null,
-description text,
-unit text,
-sort_order int not null default 0
-);
+create table if not exists public.stat_definitions ( code text primary key, name text not null, description text, unit text, sort_order int not null default 0 );
 
-insert into public.stat_definitions(code, name, description, unit, sort_order) values
-('GOL','Gols', null, null, 10),
-('CHT','Chutes', null, null, 20),
-('DEF','Defesas', null, null, 30),
-('CA','Cartões Amarelos', null, null, 40),
-('CV','Cartões Vermelhos', null, null, 50)
-on conflict (code) do nothing;
+
+insert into public.stat_definitions(code, name, description, unit, sort_order) values ('GOL','Gols', null, null, 10), ('CHT','Chutes', null, null, 20), ('DEF','Defesas', null, null, 30), ('CA','Cartões Amarelos', null, null, 40), ('CV','Cartões Vermelhos', null, null, 50) on conflict (code) do nothing;
+
+create table if not exists public.brackets  ( id uuid primary key default gen_random_uuid(), modality_id uuid not null references public.modalities(id) on delete cascade, series public.series_type not null, year int, heap_brackeat text array, created_at timestamptz not null default now(), updated_at timestamptz not null default now() );
 
 -- =========================================
--- 4) JOGOS / CALENDÁRIO / CLASSIFICAÇÃO / CHAVEAMENTO
+-- 3) JOGOS / CALENDÁRIO / CLASSIFICAÇÃO / CHAVEAMENTO
 -- =========================================
-create table if not exists public.games (
-id uuid primary key default gen_random_uuid(),
-modality_id uuid not null references public.modalities(id),
-series public.series_type not null,
-start_at timestamptz not null,
-venue_id uuid references public.venues(id),
-home_athletic_id uuid not null references public.athletics(id),
-away_athletic_id uuid not null references public.athletics(id),
-score_home int default 0,
-score_away int default 0,
-partials jsonb default '[]',
-winner_athletic_id uuid references public.athletics(id),
-status text not null default 'scheduled', -- scheduled|finished|postponed
-created_at timestamptz not null default now(),
-updated_at timestamptz not null default now(),
-check (home_athletic_id <> away_athletic_id)
-);
-create index if not exists idx_games_mod_series_start
-on public.games(modality_id, series, start_at);
-create trigger trg_games_updated
-before update on public.games
-for each row execute function public.set_updated_at();
+create table if not exists public.games ( id uuid primary key default gen_random_uuid(), modality_id uuid not null references public.modalities(id), series public.series_type not null, start_at timestamptz not null, venue_id uuid references public.venues(id), a_athletic_id uuid not null references public.athletics(id), b_athletic_id uuid not null references public.athletics(id), score_a int default 0, score_b int default 0, partials jsonb default '[]', athletics_standings jsonb default '[]', winner_athletic_id uuid references public.athletics(id), status text not null default 'scheduled', -- scheduled|finished|postponed
+created_at timestamptz not null default now(), updated_at timestamptz not null default now(), check (a_athletic_id <> b_athletic_id) ); create index if not exists idx_games_mod_series_start on public.games(modality_id, series, start_at); create trigger trg_games_updated before update on public.games for each row execute function public.set_updated_at();
 
--- Estatística de atleta NO JOGO (depende de games, então vem depois)
-create table if not exists public.athlete_game_stats (
-game_id uuid references public.games(id) on delete cascade,
-athlete_id uuid references public.athletes(id) on delete cascade,
-stat_code text references public.stat_definitions(code) on delete cascade,
-value numeric not null default 0,
-primary key (game_id, athlete_id, stat_code)
-);
 
--- Snapshot simples de classificação
-create table if not exists public.standings (
-series public.series_type not null,
-athletic_id uuid not null references public.athletics(id) on delete cascade,
-points int not null default 0,
-games_played int not null default 0,
-wins int not null default 0,
-draws int not null default 0,
-losses int not null default 0,
-goals_for int not null default 0,
-goals_against int not null default 0,
-primary key (series, athletic_id)
-);
+create table if not exists public.athlete_game_stats ( game_id uuid references public.games(id) on delete cascade, athlete_id uuid references public.athletes(id) on delete cascade, stat_code text references public.stat_definitions(code) on delete cascade, value numeric not null default 0, primary key (game_id, athlete_id, stat_code) );
 
--- Chaveamento por fase
-create table if not exists public.brackets (
-id uuid primary key default gen_random_uuid(),
-modality_id uuid not null references public.modalities(id) on delete cascade,
-series public.series_type not null,
-stage text not null, -- round_of_16 | quarterfinal | semifinal | final
-game_id uuid references public.games(id) on delete set null,
-seed_home int,
-seed_away int,
-created_at timestamptz not null default now(),
-updated_at timestamptz not null default now()
-);
-create trigger trg_brackets_updated
-before update on public.brackets
-for each row execute function public.set_updated_at();
+
+create table if not exists public.game_stats ( game_id uuid references public.games(id) on delete cascade, stat_code text references public.stat_definitions(code) on delete cascade, value numeric not null default 0, primary key (game_id, stat_code) );
 
 -- =========================================
--- 5) CONTEÚDO (Notícias) e Social
+-- 4) CONTEÚDO (Notícias) e Social
 -- =========================================
-create table if not exists public.news (
-id uuid primary key default gen_random_uuid(),
-title text not null,
-summary text,
-body text,
-image_url text,
-published_at timestamptz,
-source_url text,
-created_at timestamptz not null default now(),
-updated_at timestamptz not null default now()
-);
-create index if not exists idx_news_published_at on public.news(published_at desc);
-create trigger trg_news_updated
-before update on public.news
-for each row execute function public.set_updated_at();
+create table if not exists public.news ( id uuid primary key default gen_random_uuid(), title text not null, summary text, body text, image_url text, published_at timestamptz, source_url text, created_at timestamptz not null default now(), updated_at timestamptz not null default now() ); create index if not exists idx_news_published_at on public.news(published_at desc); create trigger trg_news_updated before update on public.news for each row execute function public.set_updated_at();
 
-create table if not exists public.league_socials (
-id text primary key, -- 'instagram' | 'twitter' | 'youtube'
-url text not null
-);
+
+create table if not exists public.league_socials ( id text primary key, -- 'instagram' | 'twitter' | 'youtube'
+url text not null );
+
 
 -- Índices adicionais úteis
-create index if not exists idx_profiles_email on public.profiles(email);
-create index if not exists idx_games_start_at on public.games(start_at);
+create index if not exists idx_profiles_email on public.profiles(email); create index if not exists idx_games_start_at on public.games(start_at);
+
+
+-- =========================================
+-- 5) Roles
+-- =========================================
+
+create table if not exists public.roles (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  role text not null check (role in ('admin','moderator','user')),
+  created_at timestamptz default now()
+);
+
+
+-- Um papel por usuário (ajuste se quiser permitir múltiplos)
+create unique index if not exists roles_user_id_idx on public.roles(user_id);
+
+
+-- ===== 2) Permissões base (necessárias além do RLS) =====
+grant usage on schema public to anon, authenticated;
+grant select, insert, update, delete on public.roles to authenticated;
+
+
+-- ===== 3) RLS ON =====
+alter table public.roles enable row level security;
+
+
+-- Limpa policies antigas (evita conflito/loop)
+drop policy if exists "Users can view their own role" on public.roles;
+drop policy if exists "Admins can view all roles" on public.roles;
+drop policy if exists "Admins can manage roles" on public.roles;
+drop policy if exists roles_select_self_or_admin on public.roles;
+drop policy if exists roles_write_admin_only on public.roles;
+
+
+-- ===== 4) Função helper sem recursão =====
+-- Observações:
+-- - SECURITY DEFINER: executa com o dono da função (normalmente 'postgres'),
+--   que não é afetado por RLS (logo, não recursa).
+-- - SET search_path: evita ataques de shadowing de objetos.
+create or replace function public.is_admin(p_uid uuid)
+returns boolean
+language sql
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.roles
+    where user_id = p_uid and role = 'admin'
+  );
+$$;
+
+
+-- Permitir que clientes autenticados chamem a função
+revoke all on function public.is_admin(uuid) from public;
+grant execute on function public.is_admin(uuid) to authenticated;
+
+
+-- ===== 5) Policies da tabela roles (sem recursão) =====
+
+
+-- SELECT: o usuário vê o próprio registro OU, se for admin, vê todos
+create policy roles_select_self_or_admin
+on public.roles
+for select
+to authenticated
+using (
+  user_id = auth.uid() OR public.is_admin(auth.uid())
+);
+
+
+-- INSERT/UPDATE/DELETE: apenas admins podem gerenciar
+create policy roles_write_admin_only
+on public.roles
+for all
+to authenticated
+using ( public.is_admin(auth.uid()) )         -- controla UPDATE/DELETE
+with check ( public.is_admin(auth.uid()) );   -- controla INSERT/UPDATE
+
+create table if not exists public.athletic_vote (
+  id uuid primary key default gen_random_uuid(),
+  athletic_id uuid not null references public.athletics(id) on delete cascade,
+  votante_id text not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
 
 -- FIM
