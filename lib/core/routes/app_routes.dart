@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/features/admin/auth/admin_login_page.dart';
 import 'package:interufmt/features/admin/home/admin_home_page.dart';
+import 'package:interufmt/features/escolha_atletica_page.dart';
 import 'package:interufmt/features/users/home/home_page.dart';
 import 'package:interufmt/features/users/login/auth/auth_viewmodel.dart';
 import 'package:interufmt/features/users/login/choose_athletic_page.dart';
@@ -9,6 +10,8 @@ import 'package:interufmt/features/users/login/forgot_password_page.dart';
 import 'package:interufmt/features/users/login/login_page.dart';
 import 'package:interufmt/features/users/login/signup_page.dart';
 import 'package:interufmt/features/users/login/update_password_page.dart';
+import 'package:interufmt/features/pagina_noticias.dart';
+import 'package:interufmt/features/classificacao_page.dart';
 import 'package:provider/provider.dart';
 
 class AppRoutes {
@@ -24,15 +27,38 @@ class AppRoutes {
       routes: [
         // Rotas públicas
         GoRoute(
+          name: 'escolha_atletica', // Nome da rota para navegação
+          path: '/', // Caminho da rota
+          builder: (context, state) => const EscolhaAtleticaPage(),
+        ),
+        GoRoute(
           name: LoginPage.routename,
-          path: '/',
+          path: '/login',
           builder: (context, state) => const LoginPage(),
         ),
         GoRoute(
-          name: HomePage.routename,
+          name: 'home',
           path: '/home',
           builder: (context, state) => const HomePage(),
         ),
+        GoRoute(
+          name: 'noticias',
+          path: '/noticias',
+          builder: (context, state) => const PaginaNoticias(),
+        ),
+        GoRoute(
+          name: 'classificacao',
+          path: '/classificacao',
+          builder: (context, state) {
+            final Map<String, dynamic> extras =
+                state.extra as Map<String, dynamic>;
+            return ClassificacaoPage(
+              title: extras['title'],
+              data: extras['data'],
+            );
+          },
+        ),
+
         GoRoute(
           name: SignUpPage.routename,
           path: '/signup',
