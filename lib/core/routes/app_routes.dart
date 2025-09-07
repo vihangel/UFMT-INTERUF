@@ -13,6 +13,7 @@ import 'package:interufmt/features/users/login/update_password_page.dart';
 import 'package:interufmt/features/pagina_noticias.dart';
 import 'package:interufmt/features/classificacao_page.dart';
 import 'package:provider/provider.dart';
+import 'package:interufmt/core/data/atletica_model.dart';
 
 class AppRoutes {
   static GoRouter getRouter(
@@ -52,13 +53,15 @@ class AppRoutes {
           builder: (context, state) {
             final Map<String, dynamic> extras =
                 state.extra as Map<String, dynamic>;
+            final List<Atletica> dataAtletica = (extras['data'] as List)
+                .map((e) => Atletica.fromJson(e))
+                .toList();
             return ClassificacaoPage(
               title: extras['title'],
-              data: extras['data'],
+              data: dataAtletica,
             );
           },
         ),
-
         GoRoute(
           name: SignUpPage.routename,
           path: '/signup',

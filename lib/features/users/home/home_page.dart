@@ -4,7 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/features/pagina_noticias.dart';
 import 'package:interufmt/core/widgets/tabela_classificacao.dart';
-// Importe a classe Noticias
+import 'package:interufmt/core/widgets/noticias.dart';
+import 'package:interufmt/core/widgets/icone_socialmidia.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:interufmt/core/data/atletica_model.dart'; // Importa a classe Atletica
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,10 +18,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0; // Índice da aba selecionada
+  int _selectedIndex = 0;
 
   static const List<Widget> _widgetOptions = <Widget>[
-    _HomeContent(), // Página de Início agora é um widget separado
+    _HomeContent(),
     Center(child: Text('Página de Atléticas')),
     Center(child: Text('Página do Calendário')),
     Center(child: Text('Página de Classificação')),
@@ -59,199 +63,193 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-// O conteúdo da Home agora está em um widget separado para melhor organização
-// lib/features/users/home_page.dart
-
-// ... imports e classes HomePage, _HomePageState
-
 class _HomeContent extends StatelessWidget {
   const _HomeContent({Key? key}) : super(key: key);
 
+  static Future<void> _launchURL(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (!await launchUrl(uri)) {
+      throw Exception('Não foi possível abrir o link $url');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Dados fictícios para a Classificação Geral - Série A
-    final List<Map<String, dynamic>> classificacaoSerieA = [
-      {
-        'posicao': 1,
-        'nome': 'Trojan',
-        'ouro': 12,
-        'prata': 4,
-        'bronze': 2,
-        'pontos': 452,
-      },
-      {
-        'posicao': 2,
-        'nome': 'Pintada',
-        'ouro': 2,
-        'prata': 6,
-        'bronze': 7,
-        'pontos': 256,
-      },
-      {
-        'posicao': 3,
-        'nome': 'Guará',
-        'ouro': 1,
-        'prata': 4,
-        'bronze': 10,
-        'pontos': 142,
-      },
-      {
-        'posicao': 4,
-        'nome': 'Turuna',
-        'ouro': 0,
-        'prata': 0,
-        'bronze': 0,
-        'pontos': 0,
-      },
-      {
-        'posicao': 5,
-        'nome': 'Outra',
-        'ouro': 0,
-        'prata': 0,
-        'bronze': 0,
-        'pontos': 0,
-      },
-      {
-        'posicao': 6,
-        'nome': 'Mais',
-        'ouro': 0,
-        'prata': 0,
-        'bronze': 0,
-        'pontos': 0,
-      },
-      {
-        'posicao': 7,
-        'nome': 'Uma',
-        'ouro': 0,
-        'prata': 0,
-        'bronze': 0,
-        'pontos': 0,
-      },
+    // Agora as listas de dados são do tipo List<Atletica>
+    final List<Atletica> classificacaoSerieA = [
+      const Atletica(
+        posicao: 1,
+        nome: 'Trojan',
+        ouro: 12,
+        prata: 4,
+        bronze: 2,
+        pontos: 452,
+      ),
+      const Atletica(
+        posicao: 2,
+        nome: 'Pintada',
+        ouro: 2,
+        prata: 6,
+        bronze: 7,
+        pontos: 256,
+      ),
+      const Atletica(
+        posicao: 3,
+        nome: 'Guará',
+        ouro: 1,
+        prata: 4,
+        bronze: 10,
+        pontos: 142,
+      ),
+      const Atletica(
+        posicao: 4,
+        nome: 'Turuna',
+        ouro: 0,
+        prata: 0,
+        bronze: 0,
+        pontos: 0,
+      ),
+      const Atletica(
+        posicao: 5,
+        nome: 'Outra',
+        ouro: 0,
+        prata: 0,
+        bronze: 0,
+        pontos: 0,
+      ),
+      const Atletica(
+        posicao: 6,
+        nome: 'Mais',
+        ouro: 0,
+        prata: 0,
+        bronze: 0,
+        pontos: 0,
+      ),
+      const Atletica(
+        posicao: 7,
+        nome: 'Uma',
+        ouro: 0,
+        prata: 0,
+        bronze: 0,
+        pontos: 0,
+      ),
     ];
 
-    // Dados fictícios para a Classificação Geral - Série B
-    final List<Map<String, dynamic>> classificacaoSerieB = [
-      {
-        'posicao': 1,
-        'nome': 'Gato Preto',
-        'ouro': 12,
-        'prata': 4,
-        'bronze': 2,
-        'pontos': 452,
-      },
-      {
-        'posicao': 2,
-        'nome': 'Admafia',
-        'ouro': 2,
-        'prata': 6,
-        'bronze': 7,
-        'pontos': 256,
-      },
-      {
-        'posicao': 3,
-        'nome': 'Macabra',
-        'ouro': 1,
-        'prata': 4,
-        'bronze': 10,
-        'pontos': 142,
-      },
-      {
-        'posicao': 4,
-        'nome': 'Metralha',
-        'ouro': 0,
-        'prata': 0,
-        'bronze': 0,
-        'pontos': 0,
-      },
-      {
-        'posicao': 5,
-        'nome': 'Outra B',
-        'ouro': 0,
-        'prata': 0,
-        'bronze': 0,
-        'pontos': 0,
-      },
-      {
-        'posicao': 6,
-        'nome': 'Mais B',
-        'ouro': 0,
-        'prata': 0,
-        'bronze': 0,
-        'pontos': 0,
-      },
-      {
-        'posicao': 7,
-        'nome': 'Uma B',
-        'ouro': 0,
-        'prata': 0,
-        'bronze': 0,
-        'pontos': 0,
-      },
+    final List<Atletica> classificacaoSerieB = [
+      const Atletica(
+        posicao: 1,
+        nome: 'Gato Preto',
+        ouro: 12,
+        prata: 4,
+        bronze: 2,
+        pontos: 452,
+      ),
+      const Atletica(
+        posicao: 2,
+        nome: 'Admafia',
+        ouro: 2,
+        prata: 6,
+        bronze: 7,
+        pontos: 256,
+      ),
+      const Atletica(
+        posicao: 3,
+        nome: 'Macabra',
+        ouro: 1,
+        prata: 4,
+        bronze: 10,
+        pontos: 142,
+      ),
+      const Atletica(
+        posicao: 4,
+        nome: 'Metralha',
+        ouro: 0,
+        prata: 0,
+        bronze: 0,
+        pontos: 0,
+      ),
+      const Atletica(
+        posicao: 5,
+        nome: 'Outra B',
+        ouro: 0,
+        prata: 0,
+        bronze: 0,
+        pontos: 0,
+      ),
+      const Atletica(
+        posicao: 6,
+        nome: 'Mais B',
+        ouro: 0,
+        prata: 0,
+        bronze: 0,
+        pontos: 0,
+      ),
+      const Atletica(
+        posicao: 7,
+        nome: 'Uma B',
+        ouro: 0,
+        prata: 0,
+        bronze: 0,
+        pontos: 0,
+      ),
     ];
 
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Links para Redes Sociais
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Icon(Icons.camera_alt), // Ícone de Instagram
-                Icon(Icons.flutter_dash), // Placeholder para Twitter
-                Icon(Icons.play_circle_fill), // Ícone de YouTube
+                GestureDetector(
+                  onTap: () =>
+                      _launchURL('https://www.instagram.com/interufmt'),
+                  child: const FaIcon(FontAwesomeIcons.instagram, size: 40),
+                ),
+                GestureDetector(
+                  onTap: () => _launchURL('https://twitter.com/interufmt'),
+                  child: const FaIcon(FontAwesomeIcons.x, size: 40),
+                ),
+                GestureDetector(
+                  onTap: () => _launchURL('https://www.youtube.com/interufmt'),
+                  child: const FaIcon(FontAwesomeIcons.youtube, size: 40),
+                ),
               ],
             ),
           ),
           const SizedBox(height: 16),
           Card(
             margin: const EdgeInsets.symmetric(horizontal: 16),
-
             child: Padding(
               padding: const EdgeInsets.all(16),
-
               child: Row(
                 children: [
-                  // Ícone/Imagem
-                  const Icon(Icons.article),
-
+                  const FaIcon(FontAwesomeIcons.newspaper, size: 24),
                   const SizedBox(width: 16),
-
-                  // Título e Descrição
                   const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-
                       children: [
                         Text(
                           'Notícias',
-
                           style: TextStyle(
                             fontSize: 18,
-
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-
                         Text(
                           'Acompanhe as novidades mais recentes...',
-
                           style: TextStyle(fontSize: 14),
                         ),
                       ],
                     ),
                   ),
-
-                  // Botão "Ver"
                   TextButton(
                     onPressed: () {
-                      context.go(
-                        '/noticias',
-                      ); // Navega para a página de notícias
+                      context.go('/noticias');
                     },
-
                     child: const Row(
                       children: [Text('Ver'), Icon(Icons.arrow_forward)],
                     ),
@@ -262,7 +260,6 @@ class _HomeContent extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // --- Seção de Classificação ---
           const Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(
@@ -271,35 +268,35 @@ class _HomeContent extends StatelessWidget {
             ),
           ),
 
-          // Tabela de Classificação da Série A (resumo)
           GestureDetector(
             onTap: () {
               context.go(
                 '/classificacao',
-                extra: {'title': 'Série A', 'data': classificacaoSerieA},
+                extra: {
+                  'title': 'Série A',
+                  'data': classificacaoSerieA.map((a) => a.toMap()).toList(),
+                },
               );
             },
             child: TabelaClassificacao(
               title: 'Série A',
-              data: classificacaoSerieA
-                  .take(4)
-                  .toList(), // Exibe apenas as 4 primeiras posições
+              data: classificacaoSerieA.take(4).toList(),
             ),
           ),
 
-          // Tabela de Classificação da Série B (resumo)
           GestureDetector(
             onTap: () {
               context.go(
                 '/classificacao',
-                extra: {'title': 'Série B', 'data': classificacaoSerieB},
+                extra: {
+                  'title': 'Série B',
+                  'data': classificacaoSerieB.map((a) => a.toMap()).toList(),
+                },
               );
             },
             child: TabelaClassificacao(
               title: 'Série B',
-              data: classificacaoSerieB
-                  .take(4)
-                  .toList(), // Exibe apenas as 4 primeiras posições
+              data: classificacaoSerieB.take(4).toList(),
             ),
           ),
         ],

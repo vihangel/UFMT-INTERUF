@@ -28,6 +28,8 @@ dependencies:
   flutter_dotenv: ^5.1.0
   dotenv: ^4.2.0
   json_annotation: ^4.9.0
+  url_launcher: ^6.3.2
+  font_awesome_flutter: ^10.9.1
 
 dev_dependencies:
   flutter_test:
@@ -55,6 +57,7 @@ flutter:
     #     - asset: assets/font/Host_Grotesk/HostGrotesk-VariableFont_wght.ttf
     #     - asset: assets/font/Host_Grotesk/HostGrotesk-Italic-VariableFont_wght.ttf
     #       style: italic
+    
     - family: HostGrotesk
       fonts:
         - asset: assets/font/Host_Grotesk/static/HostGrotesk-Light.ttf
