@@ -3,168 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-// Listas separadas para as duas séries
-final List<Map<String, String>> serieA = [
-  {
-    'name': 'Atlética Trojan',
-    'description': 'Descrição da Atlética Trojan',
-    'image': 'assets/images/Atlética Trojan.png',
-  },
-  {
-    'name': 'Atlética Tormenta',
-    'description': 'Descrição da Atlética Tormenta',
-    'image': 'assets/images/Atlética Tormenta.png',
-  },
-  {
-    'name': 'Atlética Pintada',
-    'description': 'Descrição da Atlética Pintada',
-    'image': 'assets/images/Atlética Pintada.png',
-  },
-  {
-    'name': 'Atlética Metralha',
-    'description': 'Descrição da Atlética Metralha',
-    'image': 'assets/images/Atlética Metralha.png',
-  },
-  {
-    'name': 'Atlética Ampère',
-    'description': 'Descrição da Atlética Ampère',
-    'image': 'assets/images/Atlética Ampère.png',
-  },
-  {
-    'name': 'Atlética Devora',
-    'description': 'Descrição da Atlética Devora',
-    'image': 'assets/images/Atlética Devora.png',
-  },
-  {
-    'name': 'Atlética Armada',
-    'description': 'Descrição da Atlética Armada',
-    'image': 'assets/images/Atlética Armada.png',
-  },
-  {
-    'name': 'Atlética Hydra',
-    'description': 'Descrição da Atlética Hydra',
-    'image': 'assets/images/Atlética Hydra.png',
-  },
-  {
-    'name': 'Atlética Macabra',
-    'description': 'Descrição da Atlética Macabra',
-    'image': 'assets/images/Atlética Macabra.png',
-  },
-  {
-    'name': 'Atlética Búfalos',
-    'description': 'Descrição da Atlética Búfalos',
-    'image': 'assets/images/Atlética Búfalos.png',
-  },
-  {
-    'name': 'Atlética Sísmica',
-    'description': 'Descrição da Atlética Sísmica',
-    'image': 'assets/images/Atlética Sísmica.png',
-  },
-  {
-    'name': 'Atlética Rústica',
-    'description': 'Descrição da Atlética Rústica',
-    'image': 'assets/images/Atlética Rústica.png',
-  },
-  {
-    'name': 'Atlética Enfúria',
-    'description': 'Descrição da Atlética Enfúria',
-    'image': 'assets/images/Atlética Enfúria.png',
-  },
-  {
-    'name': 'Atlética Infernal',
-    'description': 'Descrição da Atlética Infernal',
-    'image': 'assets/images/Atlética Infernal.png',
-  },
-  {
-    'name': 'Atlética Monopólio',
-    'description': 'Descrição da Atlética Monopólio',
-    'image': 'assets/images/Atlética Monopólio.png',
-  },
-];
-
-final List<Map<String, String>> serieB = [
-  {
-    'name': 'Atlética Tempesta',
-    'description': 'Descrição da Atlética Tempesta',
-    'image': 'assets/images/Atlética Tempesta.png',
-  },
-  {
-    'name': 'Atlética Compila',
-    'description': 'Descrição da Atlética Compila',
-    'image': 'assets/images/Atlética Compila.png',
-  },
-  {
-    'name': 'Atlética Detona',
-    'description': 'Descrição da Atlética Detona',
-    'image': 'assets/images/Atlética Detona.png',
-  },
-  {
-    'name': 'Atlética Rochedo',
-    'description': 'Descrição da Atlética Rochedo',
-    'image': 'assets/images/Atlética Rochedo.png',
-  },
-  {
-    'name': 'Atlética Transtorna',
-    'description': 'Descrição da Atlética Transtorna',
-    'image': 'assets/images/Atlética Transtorna.png',
-  },
-  {
-    'name': 'Atlética Caiman',
-    'description': 'Descrição da Atlética Caiman',
-    'image': 'assets/images/Atlética Caiman.png',
-  },
-  {
-    'name': 'Atlética Admafia',
-    'description': 'Descrição da Atlética Admafia',
-    'image': 'assets/images/Atlética Admafia.png',
-  },
-  {
-    'name': 'Atlética Arcaica',
-    'description': 'Descrição da Atlética Arcaica',
-    'image': 'assets/images/Atlética Arcaica.png',
-  },
-  {
-    'name': 'Atlética Caótica',
-    'description': 'Descrição da Atlética Caótica',
-    'image': 'assets/images/Atlética Caótica.png',
-  },
-  {
-    'name': 'Atlética Gato Preto',
-    'description': 'Descrição da Atlética Gato Preto',
-    'image': 'assets/images/Atlética Gato Preto.png',
-  },
-  {
-    'name': 'Atlética Sumaúma',
-    'description': 'Descrição da Atlética Sumaúma',
-    'image': 'assets/images/Atlética Sumaúma.png',
-  },
-  {
-    'name': 'Atlética Guará',
-    'description': 'Descrição da Atlética Guará',
-    'image': 'assets/images/Atlética Guará.png',
-  },
-  {
-    'name': 'Atlética CACIC',
-    'description': 'Descrição da Atlética CACIC',
-    'image': 'assets/images/Atlética CACIC.png',
-  },
-  {
-    'name': 'Atlética Deltas',
-    'description': 'Descrição da Atlética Deltas',
-    'image': 'assets/images/Atlética Deltas.png',
-  },
-  {
-    'name': 'Atlética Atômica',
-    'description': 'Descrição da Atlética Atômica',
-    'image': 'assets/images/Atlética Atômica.png',
-  },
-  {
-    'name': 'Atlética Quântica',
-    'description': 'Descrição da Atlética Quântica',
-    'image': 'assets/images/Atlética Quântica.png',
-  },
-];
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EscolhaAtleticaPage extends StatefulWidget {
   const EscolhaAtleticaPage({Key? key}) : super(key: key);
@@ -177,35 +16,81 @@ class _EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _currentPageIndex = 0;
-  List<Map<String, String>> _currentSeries = serieA;
+  List<Map<String, dynamic>> _currentSeries = [];
   String _currentSeriesName = 'Série A';
   double _pageOffset = 0.0;
 
+  List<Map<String, dynamic>> _serieA = [];
+  List<Map<String, dynamic>> _serieB = [];
+  bool _isLoading = true;
+  String? _errorMessage;
+
   final Map<int, PageController> _tabPageControllers = {};
+
+  // Helper function to get the correct asset path for athletic logos
+  String? _getAtleticAssetPath(String? logoUrl) {
+    if (logoUrl == null || logoUrl.isEmpty) return null;
+    return 'assets/images/$logoUrl';
+  }
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _loadAthletics();
 
     _tabController.addListener(() {
       setState(() {
         if (_tabController.index == 0) {
-          _currentSeries = serieA;
+          _currentSeries = _serieA;
           _currentSeriesName = 'Série A';
         } else {
-          _currentSeries = serieB;
+          _currentSeries = _serieB;
           _currentSeriesName = 'Série B';
         }
         _currentPageIndex =
             _tabPageControllers[_tabController.index]?.page?.round() ?? 0;
         _pageOffset =
             _tabPageControllers[_tabController.index]?.page ??
-            _tabPageControllers[_tabController.index]?.initialPage
-                ?.toDouble() ??
+            _tabPageControllers[_tabController.index]?.initialPage.toDouble() ??
             0.0;
       });
     });
+  }
+
+  Future<void> _loadAthletics() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+      });
+
+      final serieAResponse = await Supabase.instance.client
+          .from('athletics')
+          .select('id, nickname, name, logo_url, series')
+          .eq('series', 'A')
+          .order('nickname');
+
+      final serieBResponse = await Supabase.instance.client
+          .from('athletics')
+          .select('id, nickname, name, logo_url, series')
+          .eq('series', 'B')
+          .order('nickname');
+
+      setState(() {
+        _serieA = List<Map<String, dynamic>>.from(serieAResponse);
+        _serieB = List<Map<String, dynamic>>.from(serieBResponse);
+        _currentSeries = _serieA;
+        _isLoading = false;
+      });
+
+    } catch (error, stackTrace) {
+
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Erro ao carregar atléticas: $error';
+      });
+    }
   }
 
   @override
@@ -216,10 +101,13 @@ class _EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
   }
 
   void _saveAndNavigate() async {
+    if (_currentSeries.isEmpty) return;
+
     final prefs = await SharedPreferences.getInstance();
     final chosenAtletica = _currentSeries[_currentPageIndex];
 
-    await prefs.setString('chosen_athletic_name', chosenAtletica['name']!);
+    await prefs.setString('chosen_athletic_name', chosenAtletica['nickname']!);
+    await prefs.setString('chosen_athletic_id', chosenAtletica['id']!);
     await prefs.setString('chosen_athletic_series', _currentSeriesName);
 
     context.go('/home');
@@ -227,70 +115,139 @@ class _EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Text(
-                'Escolha uma Atlética',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 20),
-              TabBar(
-                controller: _tabController,
-                tabs: const [
-                  Tab(text: 'Série A'),
-                  Tab(text: 'Série B'),
-                ],
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                height: MediaQuery.of(context).size.width * 0.7,
-                child: TabBarView(
-                  controller: _tabController,
+    
+    if (_isLoading) {
+      return Scaffold(
+        body: Column(
+          children: [
+            Expanded(child: Center(child: CircularProgressIndicator())),
+          ],
+        ),
+      );
+    }
+
+    if (_errorMessage != null) {
+      return Scaffold(
+        body: Column(
+          children: [
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _buildCarousel(serieA, 0),
-                    _buildCarousel(serieB, 1),
+                    Text(
+                      _errorMessage!,
+                      style: const TextStyle(color: Colors.red),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: _loadAthletics,
+                      child: const Text('Tentar novamente'),
+                    ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
-              Text(
-                _currentSeries[_currentPageIndex]['name']!,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_serieA.isEmpty && _serieB.isEmpty) {
+      return Scaffold(
+        body: Column(
+          children: [
+            Expanded(child: Center(child: Text('Nenhuma atlética encontrada'))),
+          ],
+        ),
+      );
+    }
+
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Text(
+                      'Escolha uma Atlética',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 20),
+                    TabBar(
+                      controller: _tabController,
+                      tabs: const [
+                        Tab(text: 'Série A'),
+                        Tab(text: 'Série B'),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.width * 0.7,
+                      child: TabBarView(
+                        controller: _tabController,
+                        children: [
+                          _buildCarousel(_serieA, 0),
+                          _buildCarousel(_serieB, 1),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    if (_currentSeries.isNotEmpty) ...[
+                      Text(
+                        _currentSeries[_currentPageIndex]['nickname']!,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        _currentSeries[_currentPageIndex]['name'] ??
+                            'Sem nome',
+                        style: const TextStyle(fontSize: 16),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                    const Spacer(),
+                    ElevatedButton(
+                      onPressed: _currentSeries.isNotEmpty
+                          ? _saveAndNavigate
+                          : null,
+                      child: const Text('Escolher'),
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Você poderá mudar no futuro. Sua escolha influencia no Torcidômetro',
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
-                textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 5),
-              Text(
-                _currentSeries[_currentPageIndex]['description']!,
-                style: const TextStyle(fontSize: 16),
-                textAlign: TextAlign.center,
-              ),
-              const Spacer(),
-              ElevatedButton(
-                onPressed: _saveAndNavigate,
-                child: const Text('Escolher'),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                'Você poderá mudar no futuro. Sua escolha influencia no Torcidômetro',
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildCarousel(List<Map<String, String>> series, int tabIndex) {
+  Widget _buildCarousel(List<Map<String, dynamic>> series, int tabIndex) {
+    if (series.isEmpty) {
+      return const Center(
+        child: Text('Nenhuma atlética encontrada nesta série'),
+      );
+    }
+
     if (!_tabPageControllers.containsKey(tabIndex)) {
       _tabPageControllers[tabIndex] = PageController(viewportFraction: 0.6);
       _tabPageControllers[tabIndex]!.addListener(() {
@@ -319,12 +276,49 @@ class _EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
         opacity = 1.0 - (diff * 0.5);
         opacity = opacity.clamp(0.5, 1.0);
 
+        final logoUrl = series[index]['logo_url'] as String?;
+        final assetPath = _getAtleticAssetPath(logoUrl);
+
+
         return Center(
           child: Transform.scale(
             scale: scale,
             child: Opacity(
               opacity: opacity,
-              child: Image.asset(series[index]['image']!, fit: BoxFit.contain),
+              child: assetPath != null
+                  ? Image.asset(
+                      assetPath,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        print('❌ Error loading asset $assetPath: $error');
+                        return Container(
+                          width: 150,
+                          height: 150,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.image_not_supported,
+                            size: 50,
+                            color: Colors.grey,
+                          ),
+                        );
+                      },
+                    )
+                  : Container(
+                      width: 150,
+                      height: 150,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.sports,
+                        size: 50,
+                        color: Colors.grey,
+                      ),
+                    ),
             ),
           ),
         );

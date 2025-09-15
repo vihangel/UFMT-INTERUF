@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +15,9 @@ final navigatorKey = GlobalKey<NavigatorState>();
 Future<void> main() async {
   usePathUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Load environment variables first
+  await dotenv.load(fileName: ".env");
   final providers = await AppModule.init();
   runApp(MultiProvider(providers: providers, child: const MyApp()));
 }
