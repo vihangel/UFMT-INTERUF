@@ -2,13 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:interufmt/features/pagina_noticias.dart';
+import 'package:provider/provider.dart';
 import 'package:interufmt/core/widgets/tabela_classificacao.dart';
-import 'package:interufmt/core/widgets/noticias.dart';
-import 'package:interufmt/core/widgets/icone_socialmidia.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:interufmt/core/data/atletica_model.dart'; // Importa a classe Atletica
+import 'package:interufmt/core/data/services/athletics_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -75,124 +74,7 @@ class _HomeContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Agora as listas de dados são do tipo List<Atletica>
-    final List<Atletica> classificacaoSerieA = [
-      const Atletica(
-        posicao: 1,
-        nome: 'Trojan',
-        ouro: 12,
-        prata: 4,
-        bronze: 2,
-        pontos: 452,
-      ),
-      const Atletica(
-        posicao: 2,
-        nome: 'Pintada',
-        ouro: 2,
-        prata: 6,
-        bronze: 7,
-        pontos: 256,
-      ),
-      const Atletica(
-        posicao: 3,
-        nome: 'Guará',
-        ouro: 1,
-        prata: 4,
-        bronze: 10,
-        pontos: 142,
-      ),
-      const Atletica(
-        posicao: 4,
-        nome: 'Turuna',
-        ouro: 0,
-        prata: 0,
-        bronze: 0,
-        pontos: 0,
-      ),
-      const Atletica(
-        posicao: 5,
-        nome: 'Outra',
-        ouro: 0,
-        prata: 0,
-        bronze: 0,
-        pontos: 0,
-      ),
-      const Atletica(
-        posicao: 6,
-        nome: 'Mais',
-        ouro: 0,
-        prata: 0,
-        bronze: 0,
-        pontos: 0,
-      ),
-      const Atletica(
-        posicao: 7,
-        nome: 'Uma',
-        ouro: 0,
-        prata: 0,
-        bronze: 0,
-        pontos: 0,
-      ),
-    ];
-
-    final List<Atletica> classificacaoSerieB = [
-      const Atletica(
-        posicao: 1,
-        nome: 'Gato Preto',
-        ouro: 12,
-        prata: 4,
-        bronze: 2,
-        pontos: 452,
-      ),
-      const Atletica(
-        posicao: 2,
-        nome: 'Admafia',
-        ouro: 2,
-        prata: 6,
-        bronze: 7,
-        pontos: 256,
-      ),
-      const Atletica(
-        posicao: 3,
-        nome: 'Macabra',
-        ouro: 1,
-        prata: 4,
-        bronze: 10,
-        pontos: 142,
-      ),
-      const Atletica(
-        posicao: 4,
-        nome: 'Metralha',
-        ouro: 0,
-        prata: 0,
-        bronze: 0,
-        pontos: 0,
-      ),
-      const Atletica(
-        posicao: 5,
-        nome: 'Outra B',
-        ouro: 0,
-        prata: 0,
-        bronze: 0,
-        pontos: 0,
-      ),
-      const Atletica(
-        posicao: 6,
-        nome: 'Mais B',
-        ouro: 0,
-        prata: 0,
-        bronze: 0,
-        pontos: 0,
-      ),
-      const Atletica(
-        posicao: 7,
-        nome: 'Uma B',
-        ouro: 0,
-        prata: 0,
-        bronze: 0,
-        pontos: 0,
-      ),
-    ];
+    final athleticsService = context.read<AthleticsService>();
 
     return SingleChildScrollView(
       child: Column(
@@ -268,36 +150,116 @@ class _HomeContent extends StatelessWidget {
             ),
           ),
 
-          GestureDetector(
-            onTap: () {
-              context.go(
-                '/classificacao',
-                extra: {
-                  'title': 'Série A',
-                  'data': classificacaoSerieA.map((a) => a.toMap()).toList(),
+          // Série A with FutureBuilder
+          FutureBuilder<List<Atletica>>(
+            future: athleticsService.getAthleticsStandings('A'),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Card(
+                  margin: EdgeInsets.all(16),
+                  child: Padding(
+                    padding: EdgeInsets.all(32),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                );
+              }
+
+              if (snapshot.hasError) {
+                return Card(
+                  margin: const EdgeInsets.all(16),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        const Icon(Icons.error, color: Colors.red),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Erro ao carregar Série A: ${snapshot.error}',
+                          style: const TextStyle(color: Colors.red),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+
+              final classificacaoSerieA = snapshot.data ?? [];
+
+              return GestureDetector(
+                onTap: () {
+                  context.go(
+                    '/classificacao',
+                    extra: {
+                      'title': 'Série A',
+                      'data': classificacaoSerieA
+                          .map((a) => a.toMap())
+                          .toList(),
+                    },
+                  );
                 },
+                child: TabelaClassificacao(
+                  title: 'Série A',
+                  data: classificacaoSerieA.take(4).toList(),
+                ),
               );
             },
-            child: TabelaClassificacao(
-              title: 'Série A',
-              data: classificacaoSerieA.take(4).toList(),
-            ),
           ),
 
-          GestureDetector(
-            onTap: () {
-              context.go(
-                '/classificacao',
-                extra: {
-                  'title': 'Série B',
-                  'data': classificacaoSerieB.map((a) => a.toMap()).toList(),
+          // Série B with FutureBuilder
+          FutureBuilder<List<Atletica>>(
+            future: athleticsService.getAthleticsStandings('B'),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Card(
+                  margin: EdgeInsets.all(16),
+                  child: Padding(
+                    padding: EdgeInsets.all(32),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                );
+              }
+
+              if (snapshot.hasError) {
+                return Card(
+                  margin: const EdgeInsets.all(16),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        const Icon(Icons.error, color: Colors.red),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Erro ao carregar Série B: ${snapshot.error}',
+                          style: const TextStyle(color: Colors.red),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+
+              final classificacaoSerieB = snapshot.data ?? [];
+
+              return GestureDetector(
+                onTap: () {
+                  context.go(
+                    '/classificacao',
+                    extra: {
+                      'title': 'Série B',
+                      'data': classificacaoSerieB
+                          .map((a) => a.toMap())
+                          .toList(),
+                    },
+                  );
                 },
+                child: TabelaClassificacao(
+                  title: 'Série B',
+                  data: classificacaoSerieB.take(4).toList(),
+                ),
               );
             },
-            child: TabelaClassificacao(
-              title: 'Série B',
-              data: classificacaoSerieB.take(4).toList(),
-            ),
           ),
         ],
       ),

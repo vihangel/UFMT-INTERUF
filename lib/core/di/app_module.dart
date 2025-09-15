@@ -7,6 +7,7 @@ import '../../features/users/login/auth/auth_viewmodel.dart';
 import '../data/repositories/auth_repository.dart';
 import '../data/services/auth_service.dart';
 import '../data/services/profile_service.dart';
+import '../data/services/athletics_service.dart';
 
 class AppModule {
   /// Initializes .env/Supabase and returns the list of app providers.
@@ -28,6 +29,7 @@ class AppModule {
       // Leaf services receive the client
       Provider<AuthService>(create: (_) => AuthService(client)),
       Provider<ProfileService>(create: (_) => ProfileService(client)),
+      Provider<AthleticsService>(create: (_) => AthleticsService(client)),
 
       // Repository depends on the service
       Provider<AuthRepository>(
