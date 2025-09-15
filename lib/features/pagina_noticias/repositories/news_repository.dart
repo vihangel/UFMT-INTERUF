@@ -1,4 +1,5 @@
 import '../models/news_model.dart';
+import '../models/news_detail_model.dart';
 import '../services/news_service.dart';
 
 class NewsRepository {
@@ -13,6 +14,16 @@ class NewsRepository {
     } catch (e) {
       // Log the error if needed
       throw Exception('Failed to load news: ${e.toString()}');
+    }
+  }
+
+  /// Fetches individual news details with error handling
+  Future<NewsDetailModel?> getNewsDetails(String newsId) async {
+    try {
+      return await _newsService.getNewsDetails(newsId);
+    } catch (e) {
+      // Log the error if needed
+      throw Exception('Failed to load news details: ${e.toString()}');
     }
   }
 }

@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'pagina_noticias/models/news_model.dart';
 import 'pagina_noticias/services/news_service.dart';
 import 'pagina_noticias/repositories/news_repository.dart';
+import 'pagina_noticias/pagina_noticia_detalhes.dart';
 
 class PaginaNoticias extends StatefulWidget {
   const PaginaNoticias({super.key});
@@ -110,6 +111,15 @@ class _PaginaNoticiasState extends State<PaginaNoticias> {
                   imageUrl: news.imageUrl,
                   title: news.title,
                   summary: news.summary,
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => PaginaNoticiaDetalhes(
+                          newsId: news.id,
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
             ),

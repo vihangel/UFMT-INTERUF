@@ -6,22 +6,26 @@ class Noticias extends StatelessWidget {
   final String imageUrl;
   final String title;
   final String summary;
+  final VoidCallback? onTap;
 
   const Noticias({
     Key? key,
     required this.imageUrl,
     required this.title,
     required this.summary,
+    this.onTap,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        elevation: 4,
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
           // Imagem da notícia
           imageUrl.isNotEmpty
               ? Image.network(
@@ -83,6 +87,6 @@ class Noticias extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ));
   }
 }
