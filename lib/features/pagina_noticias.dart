@@ -3,58 +3,116 @@
 import 'package:flutter/material.dart';
 import 'package:interufmt/core/widgets/noticias.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'pagina_noticias/models/news_model.dart';
+import 'pagina_noticias/services/news_service.dart';
+import 'pagina_noticias/repositories/news_repository.dart';
 
-class PaginaNoticias extends StatelessWidget {
+class PaginaNoticias extends StatefulWidget {
   const PaginaNoticias({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Dados fictícios das notícias (pode ser substituído por dados do Supabase)
-    final List<Map<String, String>> newsData = [
-      {
-        'imageUrl': 'assets/images/blankimg.png',
-        'title': 'Equipe de Futsal Vence o Campeonato!',
-        'description':
-            'Em uma partida emocionante, a equipe de futsal da Atlética X conquistou o título...',
-      },
-      {
-        'imageUrl': 'assets/images/blankimg.png',
-        'title': 'Início das Vendas de Ingressos do JUCO',
-        'description':
-            'Garanta já seu lugar no maior evento esportivo universitário da região! As vendas...',
-      },
-      {
-        'imageUrl': 'assets/images/blankimg.png',
-        'title': 'Nova Pista de Atletismo Inaugurada na UFMT',
-        'description':
-            'A nova pista de atletismo promete melhorar o desempenho dos atletas...',
-      },
-      {
-        'imageUrl': 'assets/images/blankimg.png',
-        'title': 'Torcida da Atlética Compila Fica em Primeiro Lugar',
-        'description':
-            'Com um apoio incondicional, a torcida da Atlética Compila demonstra sua força...',
-      },
-    ];
+  State<PaginaNoticias> createState() => _PaginaNoticiasState();
+}
 
+class _PaginaNoticiasState extends State<PaginaNoticias> {
+  late NewsRepository _newsRepository;
+  late Future<List<NewsModel>> _newsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    final newsService = NewsService(Supabase.instance.client);
+    _newsRepository = NewsRepository(newsService);
+    _newsFuture = _newsRepository.getPublishedNews();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Notícias'),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back), // O ícone de seta para voltar
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            // Usa o GoRouter para voltar para a página inicial
             context.go('/home');
           },
         ),
       ),
-      body: ListView.builder(
-        itemCount: newsData.length,
-        itemBuilder: (context, index) {
-          return Noticias(
-            imageUrl: newsData[index]['imageUrl']!,
-            title: newsData[index]['title']!,
-            description: newsData[index]['description']!,
+      body: FutureBuilder<List<NewsModel>>(
+        future: _newsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Erro ao carregar notícias',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    snapshot.error.toString(),
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _newsFuture = _newsRepository.getPublishedNews();
+                      });
+                    },
+                    child: const Text('Tentar novamente'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          final newsList = snapshot.data ?? [];
+
+          if (newsList.isEmpty) {
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.article_outlined, size: 64, color: Colors.grey),
+                  SizedBox(height: 16),
+                  Text(
+                    'Nenhuma notícia encontrada',
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return RefreshIndicator(
+            onRefresh: () async {
+              setState(() {
+                _newsFuture = _newsRepository.getPublishedNews();
+              });
+              await _newsFuture;
+            },
+            child: ListView.builder(
+              itemCount: newsList.length,
+              itemBuilder: (context, index) {
+                final news = newsList[index];
+                return Noticias(
+                  imageUrl: news.imageUrl,
+                  title: news.title,
+                  summary: news.summary,
+                );
+              },
+            ),
           );
         },
       ),

@@ -5,13 +5,13 @@ import 'package:flutter/material.dart';
 class Noticias extends StatelessWidget {
   final String imageUrl;
   final String title;
-  final String description;
+  final String summary;
 
   const Noticias({
     Key? key,
     required this.imageUrl,
     required this.title,
-    required this.description,
+    required this.summary,
   }) : super(key: key);
 
   @override
@@ -23,12 +23,40 @@ class Noticias extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Imagem da notícia
-          Image.asset(
-            imageUrl,
-            fit: BoxFit.cover,
-            height: 200,
-            width: double.infinity,
-          ),
+          imageUrl.isNotEmpty
+              ? Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  height: 200,
+                  width: double.infinity,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      height: 200,
+                      width: double.infinity,
+                      color: Colors.grey[300],
+                      child: const Icon(
+                        Icons.image_not_supported,
+                        size: 50,
+                        color: Colors.grey,
+                      ),
+                    );
+                  },
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      height: 200,
+                      width: double.infinity,
+                      color: Colors.grey[300],
+                      child: const Center(child: CircularProgressIndicator()),
+                    );
+                  },
+                )
+              : Container(
+                  height: 200,
+                  width: double.infinity,
+                  color: Colors.grey[300],
+                  child: const Icon(Icons.image, size: 50, color: Colors.grey),
+                ),
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -45,7 +73,7 @@ class Noticias extends StatelessWidget {
                 const SizedBox(height: 8),
                 // Descrição da notícia
                 Text(
-                  description,
+                  summary,
                   style: const TextStyle(fontSize: 14, color: Colors.grey),
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
