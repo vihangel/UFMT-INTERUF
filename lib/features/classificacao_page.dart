@@ -16,9 +16,8 @@ class ClassificacaoPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(title),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back), // O ícone de seta
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            // Usa o GoRouter para voltar para a página inicial
             context.go('/home');
           },
         ),
