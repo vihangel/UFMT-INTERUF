@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:interufmt/features/admin/auth/admin_login_page.dart';
 import 'package:interufmt/features/admin/home/admin_home_page.dart';
 import 'package:interufmt/features/choose_athletic_page.dart';
-import 'package:interufmt/features/news_page.dart';
 import 'package:interufmt/features/rating_page.dart';
 import 'package:interufmt/features/users/home/home_page.dart';
 import 'package:interufmt/features/users/login/auth/auth_viewmodel.dart';
@@ -11,6 +10,7 @@ import 'package:interufmt/features/users/login/forgot_password_page.dart';
 import 'package:interufmt/features/users/login/login_page.dart';
 import 'package:interufmt/features/users/login/signup_page.dart';
 import 'package:interufmt/features/users/login/update_password_page.dart';
+import 'package:interufmt/features/users/news/news_page.dart';
 import 'package:provider/provider.dart';
 
 class AppRoutes {
