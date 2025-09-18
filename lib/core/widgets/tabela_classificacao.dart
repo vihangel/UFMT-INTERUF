@@ -1,6 +1,7 @@
 // lib/core/widgets/tabela_classificacao.dart
 
 import 'package:flutter/material.dart';
+import 'package:interufmt/core/data/models/athletics_model.dart';
 
 class TabelaClassificacao extends StatelessWidget {
   final String title;
@@ -64,7 +65,7 @@ class TabelaClassificacao extends StatelessWidget {
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Text(atletica['nome']),
+                        child: Text((atletica['atletica'] as Athletics).name),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
