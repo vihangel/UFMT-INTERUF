@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:interufmt/features/pagina_noticias.dart';
 import 'package:interufmt/core/widgets/tabela_classificacao.dart';
 // Importe a classe Noticias
 
@@ -65,7 +64,7 @@ class _HomePageState extends State<HomePage> {
 // ... imports e classes HomePage, _HomePageState
 
 class _HomeContent extends StatelessWidget {
-  const _HomeContent({Key? key}) : super(key: key);
+  const _HomeContent();
 
   @override
   Widget build(BuildContext context) {

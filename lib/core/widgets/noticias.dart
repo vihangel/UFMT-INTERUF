@@ -8,11 +8,11 @@ class Noticias extends StatelessWidget {
   final String description;
 
   const Noticias({
-    Key? key,
+    super.key,
     required this.imageUrl,
     required this.title,
     required this.description,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

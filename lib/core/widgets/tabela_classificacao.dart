@@ -84,7 +84,7 @@ class TabelaClassificacao extends StatelessWidget {
                       ),
                     ],
                   );
-                }).toList(),
+                }),
               ],
             ),
           ],

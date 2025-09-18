@@ -167,13 +167,13 @@ final List<Map<String, String>> serieB = [
 ];
 
 class EscolhaAtleticaPage extends StatefulWidget {
-  const EscolhaAtleticaPage({Key? key}) : super(key: key);
+  const EscolhaAtleticaPage({super.key});
 
   @override
-  _EscolhaAtleticaPageState createState() => _EscolhaAtleticaPageState();
+  EscolhaAtleticaPageState createState() => EscolhaAtleticaPageState();
 }
 
-class _EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
+class EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _currentPageIndex = 0;
@@ -201,8 +201,7 @@ class _EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
             _tabPageControllers[_tabController.index]?.page?.round() ?? 0;
         _pageOffset =
             _tabPageControllers[_tabController.index]?.page ??
-            _tabPageControllers[_tabController.index]?.initialPage
-                ?.toDouble() ??
+            _tabPageControllers[_tabController.index]?.initialPage.toDouble() ??
             0.0;
       });
     });
