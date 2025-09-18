@@ -25,7 +25,18 @@ class NewsWidget extends StatelessWidget {
             fit: BoxFit.cover,
             height: 200,
             width: double.infinity,
+            errorBuilder: (context, error, stackTrace) => Container(
+              height: 200,
+              width: double.infinity,
+              color: Colors.grey[300],
+              child: const Icon(
+                Icons.broken_image,
+                size: 60,
+                color: Colors.grey,
+              ),
+            ),
           ),
+
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(

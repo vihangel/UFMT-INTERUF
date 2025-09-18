@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/data/mocks/classificacao_mock.dart';
 import 'package:interufmt/core/widgets/tabela_classificacao.dart';
 import 'package:interufmt/features/rating_page.dart';
+import 'package:interufmt/features/users/news/news_page.dart';
 // Importe a classe Noticias
 
 class HomePage extends StatefulWidget {
@@ -129,9 +130,7 @@ class _HomeContent extends StatelessWidget {
                   // Botão "Ver"
                   TextButton(
                     onPressed: () {
-                      context.go(
-                        '/noticias',
-                      ); // Navega para a página de notícias
+                      context.goNamed(NewsPage.routename);
                     },
 
                     child: const Row(
@@ -156,7 +155,7 @@ class _HomeContent extends StatelessWidget {
           // Tabela de Classificação da Série A (resumo)
           GestureDetector(
             onTap: () {
-              context.go(
+              context.goNamed(
                 RatingPage.routename,
                 extra: {'title': 'Série A', 'data': classificacaoSerieA},
               );
@@ -170,7 +169,7 @@ class _HomeContent extends StatelessWidget {
           // Tabela de Classificação da Série B (resumo)
           GestureDetector(
             onTap: () {
-              context.go(
+              context.goNamed(
                 RatingPage.routename,
                 extra: {'title': 'Série B', 'data': classificacaoSerieB},
               );

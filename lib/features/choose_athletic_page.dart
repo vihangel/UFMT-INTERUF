@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/data/mocks/atleticas_mock.dart';
 import 'package:interufmt/core/data/models/atletica_model.dart';
+import 'package:interufmt/features/users/home/home_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ChooseAthleticPage extends StatefulWidget {
@@ -60,7 +61,7 @@ class ChooseAthleticPageState extends State<ChooseAthleticPage>
     await prefs.setString('chosen_athletic_name', chosenAtletica.name);
     await prefs.setString('chosen_athletic_series', _currentSeriesName);
 
-    context.go('/home');
+    context.goNamed(HomePage.routename);
   }
 
   @override
