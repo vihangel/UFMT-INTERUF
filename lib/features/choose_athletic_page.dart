@@ -4,14 +4,15 @@ import 'package:interufmt/core/data/mocks/atleticas_mock.dart';
 import 'package:interufmt/core/data/models/atletica_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class EscolhaAtleticaPage extends StatefulWidget {
-  const EscolhaAtleticaPage({super.key});
+class ChooseAthleticPage extends StatefulWidget {
+  static const String routename = 'escolha_atletica';
+  const ChooseAthleticPage({super.key});
 
   @override
-  EscolhaAtleticaPageState createState() => EscolhaAtleticaPageState();
+  ChooseAthleticPageState createState() => ChooseAthleticPageState();
 }
 
-class EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
+class ChooseAthleticPageState extends State<ChooseAthleticPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _currentPageIndex = 0;

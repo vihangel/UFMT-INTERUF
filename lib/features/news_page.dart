@@ -1,11 +1,12 @@
 // lib/features/users/pagina_noticias.dart
 
 import 'package:flutter/material.dart';
-import 'package:interufmt/core/widgets/noticias.dart';
 import 'package:go_router/go_router.dart';
+import 'package:interufmt/core/widgets/noticias.dart';
 
-class PaginaNoticias extends StatelessWidget {
-  const PaginaNoticias({super.key});
+class NewsPage extends StatelessWidget {
+  static const String routename = 'noticias';
+  const NewsPage({super.key});
 
   @override
   Widget build(BuildContext context) {

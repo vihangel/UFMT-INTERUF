@@ -6,6 +6,7 @@ import 'package:interufmt/core/widgets/tabela_classificacao.dart';
 // Importe a classe Noticias
 
 class HomePage extends StatefulWidget {
+  static const String routename = 'home';
   const HomePage({super.key});
 
   @override

@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/widgets/tabela_classificacao.dart';
 
-class ClassificacaoPage extends StatelessWidget {
+class RatingPage extends StatelessWidget {
+  static const String routename = 'classificacao';
   final String title;
   final List<Map<String, dynamic>> data;
 
-  const ClassificacaoPage({super.key, required this.title, required this.data});
+  const RatingPage({super.key, required this.title, required this.data});
 
   @override
   Widget build(BuildContext context) {
