@@ -8,6 +8,7 @@ import '../../features/users/news/viewmodel/news_viewmodel.dart';
 import '../data/repositories/auth_repository.dart';
 import '../data/repositories/news_repository.dart';
 import '../data/services/auth_service.dart';
+import '../data/services/local_storage_service.dart';
 import '../data/services/news_service.dart';
 import '../data/services/profile_service.dart';
 
@@ -32,6 +33,7 @@ class AppModule {
       Provider<AuthService>(create: (_) => AuthService(client)),
       Provider<ProfileService>(create: (_) => ProfileService(client)),
       Provider<NewsService>(create: (_) => NewsService(client)),
+      Provider<LocalStorageService>(create: (_) => LocalStorageService()),
 
       // Repository depends on the service
       Provider<AuthRepository>(

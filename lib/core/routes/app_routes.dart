@@ -17,12 +17,13 @@ class AppRoutes {
   static GoRouter getRouter(
     BuildContext context,
     GlobalKey<NavigatorState> navigatorKey,
+    String initialLocation,
   ) {
     final authViewModel = context.read<AuthViewModel>();
     return GoRouter(
       navigatorKey: navigatorKey,
       refreshListenable: authViewModel,
-      initialLocation: '/',
+      initialLocation: initialLocation,
       routes: [
         GoRoute(
           name: ChooseAthleticPage.routename,

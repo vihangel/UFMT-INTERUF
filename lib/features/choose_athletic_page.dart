@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/data/mocks/atleticas_mock.dart';
 import 'package:interufmt/core/data/models/atletica_model.dart';
+import 'package:interufmt/core/data/services/local_storage_service.dart';
 import 'package:interufmt/features/users/home/home_page.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 class ChooseAthleticPage extends StatefulWidget {
   static const String routename = 'escolha_atletica';
@@ -55,11 +56,13 @@ class ChooseAthleticPageState extends State<ChooseAthleticPage>
   }
 
   void _saveAndNavigate() async {
-    final prefs = await SharedPreferences.getInstance();
+    final localStorageService = context.read<LocalStorageService>();
     final chosenAtletica = _currentSeries[_currentPageIndex];
 
-    await prefs.setString('chosen_athletic_name', chosenAtletica.name);
-    await prefs.setString('chosen_athletic_series', _currentSeriesName);
+    await localStorageService.saveChosenAthletic(
+      chosenAtletica.name,
+      _currentSeriesName,
+    );
 
     context.goNamed(HomePage.routename);
   }
