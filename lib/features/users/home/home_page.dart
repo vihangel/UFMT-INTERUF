@@ -2,11 +2,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:interufmt/features/pagina_noticias.dart';
+import 'package:interufmt/core/data/mocks/classificacao_mock.dart';
 import 'package:interufmt/core/widgets/tabela_classificacao.dart';
+import 'package:interufmt/features/rating_page.dart';
+import 'package:interufmt/features/users/news/news_page.dart';
 // Importe a classe Noticias
 
 class HomePage extends StatefulWidget {
+  static const String routename = 'home';
   const HomePage({super.key});
 
   @override
@@ -65,130 +68,10 @@ class _HomePageState extends State<HomePage> {
 // ... imports e classes HomePage, _HomePageState
 
 class _HomeContent extends StatelessWidget {
-  const _HomeContent({Key? key}) : super(key: key);
+  const _HomeContent();
 
   @override
   Widget build(BuildContext context) {
-    // Dados fictícios para a Classificação Geral - Série A
-    final List<Map<String, dynamic>> classificacaoSerieA = [
-      {
-        'posicao': 1,
-        'nome': 'Trojan',
-        'ouro': 12,
-        'prata': 4,
-        'bronze': 2,
-        'pontos': 452,
-      },
-      {
-        'posicao': 2,
-        'nome': 'Pintada',
-        'ouro': 2,
-        'prata': 6,
-        'bronze': 7,
-        'pontos': 256,
-      },
-      {
-        'posicao': 3,
-        'nome': 'Guará',
-        'ouro': 1,
-        'prata': 4,
-        'bronze': 10,
-        'pontos': 142,
-      },
-      {
-        'posicao': 4,
-        'nome': 'Turuna',
-        'ouro': 0,
-        'prata': 0,
-        'bronze': 0,
-        'pontos': 0,
-      },
-      {
-        'posicao': 5,
-        'nome': 'Outra',
-        'ouro': 0,
-        'prata': 0,
-        'bronze': 0,
-        'pontos': 0,
-      },
-      {
-        'posicao': 6,
-        'nome': 'Mais',
-        'ouro': 0,
-        'prata': 0,
-        'bronze': 0,
-        'pontos': 0,
-      },
-      {
-        'posicao': 7,
-        'nome': 'Uma',
-        'ouro': 0,
-        'prata': 0,
-        'bronze': 0,
-        'pontos': 0,
-      },
-    ];
-
-    // Dados fictícios para a Classificação Geral - Série B
-    final List<Map<String, dynamic>> classificacaoSerieB = [
-      {
-        'posicao': 1,
-        'nome': 'Gato Preto',
-        'ouro': 12,
-        'prata': 4,
-        'bronze': 2,
-        'pontos': 452,
-      },
-      {
-        'posicao': 2,
-        'nome': 'Admafia',
-        'ouro': 2,
-        'prata': 6,
-        'bronze': 7,
-        'pontos': 256,
-      },
-      {
-        'posicao': 3,
-        'nome': 'Macabra',
-        'ouro': 1,
-        'prata': 4,
-        'bronze': 10,
-        'pontos': 142,
-      },
-      {
-        'posicao': 4,
-        'nome': 'Metralha',
-        'ouro': 0,
-        'prata': 0,
-        'bronze': 0,
-        'pontos': 0,
-      },
-      {
-        'posicao': 5,
-        'nome': 'Outra B',
-        'ouro': 0,
-        'prata': 0,
-        'bronze': 0,
-        'pontos': 0,
-      },
-      {
-        'posicao': 6,
-        'nome': 'Mais B',
-        'ouro': 0,
-        'prata': 0,
-        'bronze': 0,
-        'pontos': 0,
-      },
-      {
-        'posicao': 7,
-        'nome': 'Uma B',
-        'ouro': 0,
-        'prata': 0,
-        'bronze': 0,
-        'pontos': 0,
-      },
-    ];
-
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -247,9 +130,7 @@ class _HomeContent extends StatelessWidget {
                   // Botão "Ver"
                   TextButton(
                     onPressed: () {
-                      context.go(
-                        '/noticias',
-                      ); // Navega para a página de notícias
+                      context.goNamed(NewsPage.routename);
                     },
 
                     child: const Row(
@@ -274,32 +155,28 @@ class _HomeContent extends StatelessWidget {
           // Tabela de Classificação da Série A (resumo)
           GestureDetector(
             onTap: () {
-              context.go(
-                '/classificacao',
+              context.goNamed(
+                RatingPage.routename,
                 extra: {'title': 'Série A', 'data': classificacaoSerieA},
               );
             },
             child: TabelaClassificacao(
               title: 'Série A',
-              data: classificacaoSerieA
-                  .take(4)
-                  .toList(), // Exibe apenas as 4 primeiras posições
+              data: classificacaoSerieA.take(4).toList(),
             ),
           ),
 
           // Tabela de Classificação da Série B (resumo)
           GestureDetector(
             onTap: () {
-              context.go(
-                '/classificacao',
+              context.goNamed(
+                RatingPage.routename,
                 extra: {'title': 'Série B', 'data': classificacaoSerieB},
               );
             },
             child: TabelaClassificacao(
               title: 'Série B',
-              data: classificacaoSerieB
-                  .take(4)
-                  .toList(), // Exibe apenas as 4 primeiras posições
+              data: classificacaoSerieB.take(4).toList(),
             ),
           ),
         ],
