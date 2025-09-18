@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/widgets/tabela_classificacao.dart';
+import 'package:interufmt/features/rating_page.dart';
 // Importe a classe Noticias
 
 class HomePage extends StatefulWidget {
@@ -275,15 +276,13 @@ class _HomeContent extends StatelessWidget {
           GestureDetector(
             onTap: () {
               context.go(
-                '/classificacao',
+                RatingPage.routename,
                 extra: {'title': 'Série A', 'data': classificacaoSerieA},
               );
             },
             child: TabelaClassificacao(
               title: 'Série A',
-              data: classificacaoSerieA
-                  .take(4)
-                  .toList(), // Exibe apenas as 4 primeiras posições
+              data: classificacaoSerieA.take(4).toList(),
             ),
           ),
 
@@ -291,15 +290,13 @@ class _HomeContent extends StatelessWidget {
           GestureDetector(
             onTap: () {
               context.go(
-                '/classificacao',
+                RatingPage.routename,
                 extra: {'title': 'Série B', 'data': classificacaoSerieB},
               );
             },
             child: TabelaClassificacao(
               title: 'Série B',
-              data: classificacaoSerieB
-                  .take(4)
-                  .toList(), // Exibe apenas as 4 primeiras posições
+              data: classificacaoSerieB.take(4).toList(),
             ),
           ),
         ],
