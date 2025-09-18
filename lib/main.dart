@@ -1,18 +1,21 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:go_router/go_router.dart';
+import 'package:interufmt/core/config/url_strategy_mobile.dart';
 import 'package:provider/provider.dart';
 
 import 'core/di/app_module.dart';
 import 'core/routes/app_routes.dart';
 import 'core/theme/app_theme.dart';
 
+export 'package:interufmt/core/config/url_strategy_mobile.dart'
+    if (dart.library.html) 'package:interufmt/core/config/url_strategy_web.dart';
+
 final navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
-  usePathUrlStrategy();
+  configureUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
   final providers = await AppModule.init();
   runApp(MultiProvider(providers: providers, child: const MyApp()));
