@@ -49,9 +49,9 @@ class _NewsPageState extends State<NewsPage> {
               itemBuilder: (context, index) {
                 final news = viewModel.news[index];
                 return NewsWidget(
-                  imageUrl: news.imageUrl!,
+                  imageUrl: news.imageUrl ?? '',
                   title: news.title,
-                  description: news.summary!,
+                  description: news.summary ?? 'Sem resumo disponível',
                 );
               },
             ),
