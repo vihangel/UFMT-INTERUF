@@ -2,14 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:interufmt/core/data/mocks/classificacao_mock.dart';
 import 'package:interufmt/core/widgets/tabela_classificacao.dart';
-import 'package:interufmt/core/widgets/noticias.dart';
-import 'package:interufmt/core/widgets/icone_socialmidia.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:interufmt/core/data/atletica_model.dart'; 
-import 'package:interufmt/features/rating_page.dart';
+
 import 'package:interufmt/features/users/news/news_page.dart';
 // Importa a classe Atletica
 
