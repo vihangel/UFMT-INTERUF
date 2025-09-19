@@ -12,6 +12,7 @@ import 'package:interufmt/features/users/login/signup_page.dart';
 import 'package:interufmt/features/users/login/update_password_page.dart';
 import 'package:interufmt/features/pagina_noticias.dart';
 import 'package:interufmt/features/classificacao_page.dart';
+import 'package:interufmt/features/users/athletics/athletics_page.dart';
 import 'package:provider/provider.dart';
 import 'package:interufmt/core/data/atletica_model.dart';
 
@@ -46,6 +47,11 @@ class AppRoutes {
           name: 'noticias',
           path: '/noticias',
           builder: (context, state) => const PaginaNoticias(),
+        ),
+        GoRoute(
+          name: 'athletics',
+          path: '/athletics',
+          builder: (context, state) => const AthleticsPage(),
         ),
         GoRoute(
           name: 'classificacao',

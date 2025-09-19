@@ -23,14 +23,19 @@ class _HomePageState extends State<HomePage> {
     _HomeContent(),
     Center(child: Text('Página de Atléticas')),
     Center(child: Text('Página do Calendário')),
-    Center(child: Text('Página de Classificação')),
+    Center(child: Text('Página de Modalidades')),
     Center(child: Text('Página de Local')),
   ];
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (index == 1) {
+      // Navigate to athletics page
+      context.go('/athletics');
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
   }
 
   @override
@@ -47,8 +52,8 @@ class _HomePageState extends State<HomePage> {
             label: 'Calendário',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.group),
-            label: 'Classificação',
+            icon: Icon(Icons.emoji_events),
+            label: 'Modalidade',
           ),
           BottomNavigationBarItem(icon: Icon(Icons.place), label: 'Local'),
         ],
