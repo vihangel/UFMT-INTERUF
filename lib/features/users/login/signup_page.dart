@@ -5,7 +5,7 @@ import 'package:interufmt/core/data/services/profile_service.dart';
 import 'package:interufmt/core/theme/app_styles.dart';
 import 'package:interufmt/core/widgets/app_buttons.dart';
 import 'package:interufmt/core/widgets/app_form_field.dart';
-import 'package:interufmt/features/users/login/choose_athletic_page.dart';
+import 'package:interufmt/features/choose_athletic_page.dart';
 import 'package:interufmt/features/users/login/signup_viewmodel.dart';
 import 'package:interufmt/features/users/login/widgets/or_divider.dart';
 import 'package:interufmt/features/users/login/widgets/social_buttons.dart';

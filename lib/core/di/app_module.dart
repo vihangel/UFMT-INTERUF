@@ -4,8 +4,12 @@ import 'package:provider/single_child_widget.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../features/users/login/auth/auth_viewmodel.dart';
+import '../../features/users/news/viewmodel/news_viewmodel.dart';
 import '../data/repositories/auth_repository.dart';
+import '../data/repositories/news_repository.dart';
 import '../data/services/auth_service.dart';
+import '../data/services/local_storage_service.dart';
+import '../data/services/news_service.dart';
 import '../data/services/profile_service.dart';
 
 class AppModule {
@@ -28,15 +32,23 @@ class AppModule {
       // Leaf services receive the client
       Provider<AuthService>(create: (_) => AuthService(client)),
       Provider<ProfileService>(create: (_) => ProfileService(client)),
+      Provider<NewsService>(create: (_) => NewsService(client)),
+      Provider<LocalStorageService>(create: (_) => LocalStorageService()),
 
       // Repository depends on the service
       Provider<AuthRepository>(
         create: (ctx) => AuthRepository(ctx.read<AuthService>()),
       ),
+      Provider<NewsRepository>(
+        create: (ctx) => NewsRepository(ctx.read<NewsService>()),
+      ),
 
       // ViewModel depends on the repository
       ChangeNotifierProvider<AuthViewModel>(
         create: (ctx) => AuthViewModel(ctx.read<AuthRepository>()),
+      ),
+      ChangeNotifierProvider<NewsViewModel>(
+        create: (ctx) => NewsViewModel(ctx.read<NewsRepository>()),
       ),
     ];
   }

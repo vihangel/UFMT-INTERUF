@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/data/atletica_model.dart';
 import 'package:interufmt/core/widgets/tabela_classificacao.dart';
+import 'package:interufmt/features/users/home/home_page.dart';
 
-class ClassificacaoPage extends StatelessWidget {
+class RatingPage extends StatelessWidget {
+  static const String routename = 'classificacao';
   final String title;
   final List<Atletica> data; // Agora aceita uma lista de objetos Atletica
 
-  const ClassificacaoPage({super.key, required this.title, required this.data});
+  const RatingPage({super.key, required this.title, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +21,7 @@ class ClassificacaoPage extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            context.go('/home');
+            context.goNamed(HomePage.routename);
           },
         ),
       ),

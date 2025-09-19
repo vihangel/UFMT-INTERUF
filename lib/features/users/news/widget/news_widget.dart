@@ -1,18 +1,16 @@
-// lib/widgets/news_card.dart
-
 import 'package:flutter/material.dart';
 
-class Noticias extends StatelessWidget {
+class NewsWidget extends StatelessWidget {
   final String imageUrl;
   final String title;
   final String description;
 
-  const Noticias({
-    Key? key,
+  const NewsWidget({
+    super.key,
     required this.imageUrl,
     required this.title,
     required this.description,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,13 +20,23 @@ class Noticias extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Imagem da notícia
-          Image.asset(
+          Image.network(
             imageUrl,
             fit: BoxFit.cover,
             height: 200,
             width: double.infinity,
+            errorBuilder: (context, error, stackTrace) => Container(
+              height: 200,
+              width: double.infinity,
+              color: Colors.grey[300],
+              child: const Icon(
+                Icons.broken_image,
+                size: 60,
+                color: Colors.grey,
+              ),
+            ),
           ),
+
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(

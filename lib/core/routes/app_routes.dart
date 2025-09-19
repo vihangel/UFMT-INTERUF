@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/features/admin/auth/admin_login_page.dart';
 import 'package:interufmt/features/admin/home/admin_home_page.dart';
-import 'package:interufmt/features/escolha_atletica_page.dart';
+import 'package:interufmt/features/choose_athletic_page.dart';
+import 'package:interufmt/features/rating_page.dart';
 import 'package:interufmt/features/users/home/home_page.dart';
 import 'package:interufmt/features/users/login/auth/auth_viewmodel.dart';
-import 'package:interufmt/features/users/login/choose_athletic_page.dart';
 import 'package:interufmt/features/users/login/forgot_password_page.dart';
 import 'package:interufmt/features/users/login/login_page.dart';
 import 'package:interufmt/features/users/login/signup_page.dart';
 import 'package:interufmt/features/users/login/update_password_page.dart';
-import 'package:interufmt/features/pagina_noticias.dart';
-import 'package:interufmt/features/classificacao_page.dart';
+import 'package:interufmt/features/users/news/news_page.dart';
 import 'package:provider/provider.dart';
 import 'package:interufmt/core/data/atletica_model.dart';
 
@@ -19,18 +18,18 @@ class AppRoutes {
   static GoRouter getRouter(
     BuildContext context,
     GlobalKey<NavigatorState> navigatorKey,
+    String initialLocation,
   ) {
     final authViewModel = context.read<AuthViewModel>();
     return GoRouter(
       navigatorKey: navigatorKey,
       refreshListenable: authViewModel,
-      initialLocation: '/',
+      initialLocation: initialLocation,
       routes: [
-        // Rotas públicas
         GoRoute(
-          name: 'escolha_atletica', // Nome da rota para navegação
-          path: '/', // Caminho da rota
-          builder: (context, state) => const EscolhaAtleticaPage(),
+          name: ChooseAthleticPage.routename,
+          path: '/',
+          builder: (context, state) => const ChooseAthleticPage(),
         ),
         GoRoute(
           name: LoginPage.routename,
@@ -38,17 +37,17 @@ class AppRoutes {
           builder: (context, state) => const LoginPage(),
         ),
         GoRoute(
-          name: 'home',
+          name: HomePage.routename,
           path: '/home',
           builder: (context, state) => const HomePage(),
         ),
         GoRoute(
-          name: 'noticias',
+          name: NewsPage.routename,
           path: '/noticias',
-          builder: (context, state) => const PaginaNoticias(),
+          builder: (context, state) => const NewsPage(),
         ),
         GoRoute(
-          name: 'classificacao',
+          name: RatingPage.routename,
           path: '/classificacao',
           builder: (context, state) {
             final Map<String, dynamic> extras =
@@ -67,11 +66,7 @@ class AppRoutes {
           path: '/signup',
           builder: (context, state) => const SignUpPage(),
         ),
-        GoRoute(
-          name: ChooseAthleticPage.routename,
-          path: '/choose-athletic',
-          builder: (context, state) => const ChooseAthleticPage(),
-        ),
+
         GoRoute(
           name: ForgotPasswordPage.routename,
           path: '/forgot-password',
