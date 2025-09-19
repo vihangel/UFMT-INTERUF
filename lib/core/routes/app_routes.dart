@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/features/admin/auth/admin_login_page.dart';
 import 'package:interufmt/features/admin/home/admin_home_page.dart';
-import 'package:interufmt/features/choose_athletic_page.dart';
+import 'package:interufmt/features/escolha_atletica_page.dart';
+import 'package:interufmt/features/pagina_noticias.dart';
 import 'package:interufmt/features/rating_page.dart';
 import 'package:interufmt/features/users/home/home_page.dart';
 import 'package:interufmt/features/users/login/auth/auth_viewmodel.dart';
@@ -10,7 +11,7 @@ import 'package:interufmt/features/users/login/forgot_password_page.dart';
 import 'package:interufmt/features/users/login/login_page.dart';
 import 'package:interufmt/features/users/login/signup_page.dart';
 import 'package:interufmt/features/users/login/update_password_page.dart';
-import 'package:interufmt/features/users/news/news_page.dart';
+import 'package:interufmt/features/users/athletics/athletics_page.dart';
 import 'package:provider/provider.dart';
 import 'package:interufmt/core/data/atletica_model.dart';
 
@@ -27,9 +28,9 @@ class AppRoutes {
       initialLocation: initialLocation,
       routes: [
         GoRoute(
-          name: ChooseAthleticPage.routename,
+          name: EscolhaAtleticaPage.routename,
           path: '/',
-          builder: (context, state) => const ChooseAthleticPage(),
+          builder: (context, state) => const EscolhaAtleticaPage(),
         ),
         GoRoute(
           name: LoginPage.routename,
@@ -42,9 +43,14 @@ class AppRoutes {
           builder: (context, state) => const HomePage(),
         ),
         GoRoute(
-          name: NewsPage.routename,
+          name: PaginaNoticias.routename,
           path: '/noticias',
-          builder: (context, state) => const NewsPage(),
+          builder: (context, state) => const PaginaNoticias(),
+        ),
+        GoRoute(
+          name: 'athletics',
+          path: '/athletics',
+          builder: (context, state) => const AthleticsPage(),
         ),
         GoRoute(
           name: RatingPage.routename,
@@ -55,7 +61,7 @@ class AppRoutes {
             final List<Atletica> dataAtletica = (extras['data'] as List)
                 .map((e) => Atletica.fromJson(e))
                 .toList();
-            return ClassificacaoPage(
+            return RatingPage(
               title: extras['title'],
               data: dataAtletica,
             );

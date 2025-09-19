@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/widgets/app_buttons.dart';
 import 'package:interufmt/core/widgets/app_form_field.dart';
-import 'package:interufmt/features/choose_athletic_page.dart';
+import 'package:interufmt/features/escolha_atletica_page.dart';
 import 'package:interufmt/features/users/home/home_page.dart';
 import 'package:interufmt/features/users/login/forgot_password_page.dart';
 import 'package:interufmt/features/users/login/login_viewmodel.dart';
@@ -93,7 +93,7 @@ class LoginForm extends StatelessWidget {
                       context.goNamed(HomePage.routename);
                       break;
                     case LoginResult.successChooseAthletic:
-                      context.goNamed(ChooseAthleticPage.routename);
+                      context.goNamed(EscolhaAtleticaPage.routename);
                       break;
                     case LoginResult.failure:
                       break;

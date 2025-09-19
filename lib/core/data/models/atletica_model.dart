@@ -1,11 +1,11 @@
 class Atletica {
   final String name;
   final String description;
-  final String image;
+  final String logo_url;
 
   Atletica({
     required this.name,
     required this.description,
-    required this.image,
+    required this.logo_url,
   });
 }
