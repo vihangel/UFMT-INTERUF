@@ -12,6 +12,7 @@ import 'package:interufmt/features/users/login/login_page.dart';
 import 'package:interufmt/features/users/login/signup_page.dart';
 import 'package:interufmt/features/users/login/update_password_page.dart';
 import 'package:interufmt/features/users/athletics/athletics_page.dart';
+import 'package:interufmt/features/users/venues/venues_page.dart';
 import 'package:provider/provider.dart';
 import 'package:interufmt/core/data/atletica_model.dart';
 
@@ -53,6 +54,11 @@ class AppRoutes {
           builder: (context, state) => const AthleticsPage(),
         ),
         GoRoute(
+          name: 'venues',
+          path: '/venues',
+          builder: (context, state) => const VenuesPage(),
+        ),
+        GoRoute(
           name: RatingPage.routename,
           path: '/classificacao',
           builder: (context, state) {
@@ -61,10 +67,7 @@ class AppRoutes {
             final List<Atletica> dataAtletica = (extras['data'] as List)
                 .map((e) => Atletica.fromJson(e))
                 .toList();
-            return RatingPage(
-              title: extras['title'],
-              data: dataAtletica,
-            );
+            return RatingPage(title: extras['title'], data: dataAtletica);
           },
         ),
         GoRoute(

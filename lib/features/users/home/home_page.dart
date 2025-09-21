@@ -9,7 +9,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:interufmt/core/data/atletica_model.dart'; // Importa a classe Atletica
 import 'package:interufmt/core/data/services/athletics_service.dart';
-import 'package:interufmt/features/users/news/news_page.dart';
 class HomePage extends StatefulWidget {
   static const String routename = 'home';
   const HomePage({super.key});
@@ -33,6 +32,9 @@ class _HomePageState extends State<HomePage> {
     if (index == 1) {
       // Navigate to athletics page
       context.go('/athletics');
+    } else if (index == 4) {
+      // Navigate to venues page
+      context.go('/venues');
     } else {
       setState(() {
         _selectedIndex = index;
