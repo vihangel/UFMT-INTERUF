@@ -32,6 +32,9 @@ class _HomePageState extends State<HomePage> {
     if (index == 1) {
       // Navigate to athletics page
       context.go('/athletics');
+    } else if (index == 3) {
+      // Navigate to modalities page
+      context.go('/modalities');
     } else if (index == 4) {
       // Navigate to venues page
       context.go('/venues');
