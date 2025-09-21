@@ -14,6 +14,7 @@ import 'package:interufmt/features/users/login/update_password_page.dart';
 import 'package:interufmt/features/users/athletics/athletics_page.dart';
 import 'package:interufmt/features/users/venues/venues_page.dart';
 import 'package:interufmt/features/users/modalities/modalities_page.dart';
+import 'package:interufmt/features/users/calendar/calendar_page.dart';
 import 'package:provider/provider.dart';
 import 'package:interufmt/core/data/atletica_model.dart';
 
@@ -53,6 +54,11 @@ class AppRoutes {
           name: 'athletics',
           path: '/athletics',
           builder: (context, state) => const AthleticsPage(),
+        ),
+        GoRoute(
+          name: 'calendar',
+          path: '/calendar',
+          builder: (context, state) => const CalendarPage(),
         ),
         GoRoute(
           name: 'venues',

@@ -9,6 +9,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:interufmt/core/data/atletica_model.dart'; // Importa a classe Atletica
 import 'package:interufmt/core/data/services/athletics_service.dart';
+
 class HomePage extends StatefulWidget {
   static const String routename = 'home';
   const HomePage({super.key});
@@ -32,6 +33,9 @@ class _HomePageState extends State<HomePage> {
     if (index == 1) {
       // Navigate to athletics page
       context.go('/athletics');
+    } else if (index == 2) {
+      // Navigate to calendar page
+      context.go('/calendar');
     } else if (index == 3) {
       // Navigate to modalities page
       context.go('/modalities');
