@@ -9,12 +9,12 @@ class Noticias extends StatelessWidget {
   final VoidCallback? onTap;
 
   const Noticias({
-    Key? key,
+    super.key,
     required this.imageUrl,
     required this.title,
     required this.summary,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

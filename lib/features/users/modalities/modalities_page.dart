@@ -3,19 +3,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:interufmt/features/users/home/home_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../../core/data/models/modality_with_status_model.dart';
 import '../../../core/data/repositories/modalities_repository.dart';
-import 'package:interufmt/features/users/home/home_page.dart';
 
 class ModalitiesPage extends StatefulWidget {
-  const ModalitiesPage({Key? key}) : super(key: key);
+  const ModalitiesPage({super.key});
 
   @override
-  _ModalitiesPageState createState() => _ModalitiesPageState();
+  ModalitiesPageState createState() => ModalitiesPageState();
 }
 
-class _ModalitiesPageState extends State<ModalitiesPage>
+class ModalitiesPageState extends State<ModalitiesPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late ModalitiesRepository _repository;
@@ -35,9 +36,8 @@ class _ModalitiesPageState extends State<ModalitiesPage>
 
     _tabController.addListener(() {
       setState(() {
-        _currentModalities = _tabController.index == 0
-            ? _serieAModalities
-            : _serieBModalities;
+        _currentModalities =
+            _tabController.index == 0 ? _serieAModalities : _serieBModalities;
       });
     });
   }
@@ -116,8 +116,8 @@ class _ModalitiesPageState extends State<ModalitiesPage>
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _errorMessage != null
-          ? _buildErrorState()
-          : _buildModalitiesContent(),
+              ? _buildErrorState()
+              : _buildModalitiesContent(),
     );
   }
 
@@ -207,22 +207,22 @@ class _ModalitiesPageState extends State<ModalitiesPage>
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.withOpacity(0.3)),
+              border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
             ),
             child: Column(
               children: [
                 Icon(
                   Icons.sports,
                   size: 32,
-                  color: Colors.grey.withOpacity(0.5),
+                  color: Colors.grey.withValues(alpha: 0.5),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Nenhuma\nmodalidade',
                   style: TextStyle(
-                    color: Colors.grey.withOpacity(0.7),
+                    color: Colors.grey.withValues(alpha: 0.7),
                     fontSize: 12,
                   ),
                   textAlign: TextAlign.center,
@@ -244,13 +244,13 @@ class _ModalitiesPageState extends State<ModalitiesPage>
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
         ],
-        border: Border.all(color: genderColor.withOpacity(0.2), width: 1),
+        border: Border.all(color: genderColor.withValues(alpha: 0.2), width: 1),
       ),
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -264,7 +264,7 @@ class _ModalitiesPageState extends State<ModalitiesPage>
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: genderColor.withOpacity(0.1),
+                    color: genderColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: modality.icon != null

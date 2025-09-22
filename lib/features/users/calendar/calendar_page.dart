@@ -3,17 +3,18 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/features/users/home/home_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../../core/data/models/calendar_game_model.dart';
 import '../../../core/data/repositories/calendar_games_repository.dart';
 
 class CalendarPage extends StatefulWidget {
-  const CalendarPage({Key? key}) : super(key: key);
+  const CalendarPage({super.key});
 
   @override
-  _CalendarPageState createState() => _CalendarPageState();
+  CalendarPageState createState() => CalendarPageState();
 }
 
-class _CalendarPageState extends State<CalendarPage>
+class CalendarPageState extends State<CalendarPage>
     with TickerProviderStateMixin {
   late TabController _seriesTabController;
   late TabController _serieADaysController;
@@ -27,7 +28,7 @@ class _CalendarPageState extends State<CalendarPage>
     DateTime(2025, 9, 1),
   ];
 
-  Map<String, Map<String, List<CalendarGame>>> _gamesData = {
+  final Map<String, Map<String, List<CalendarGame>>> _gamesData = {
     'A': {'Dia 1': [], 'Dia 2': [], 'Dia 3': []},
     'B': {'Dia 1': [], 'Dia 2': [], 'Dia 3': []},
   };
@@ -54,11 +55,9 @@ class _CalendarPageState extends State<CalendarPage>
 
       // Load games for both series
       for (String series in ['A', 'B']) {
-        for (
-          int dayIndex = 0;
-          dayIndex < _competitionDates.length;
-          dayIndex++
-        ) {
+        for (int dayIndex = 0;
+            dayIndex < _competitionDates.length;
+            dayIndex++) {
           final dayLabel = 'Dia ${dayIndex + 1}';
           final games = await _repository.getGamesBySeriesAndDate(
             series: series,
@@ -116,14 +115,14 @@ class _CalendarPageState extends State<CalendarPage>
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _errorMessage != null
-          ? _buildErrorState()
-          : TabBarView(
-              controller: _seriesTabController,
-              children: [
-                _buildSeriesContent('A', _serieADaysController),
-                _buildSeriesContent('B', _serieBDaysController),
-              ],
-            ),
+              ? _buildErrorState()
+              : TabBarView(
+                  controller: _seriesTabController,
+                  children: [
+                    _buildSeriesContent('A', _serieADaysController),
+                    _buildSeriesContent('B', _serieBDaysController),
+                  ],
+                ),
     );
   }
 
@@ -154,7 +153,7 @@ class _CalendarPageState extends State<CalendarPage>
       children: [
         // Days TabBar
         Container(
-          color: Colors.grey.withOpacity(0.1),
+          color: Colors.grey.withValues(alpha: 0.1),
           child: TabBar(
             controller: daysController,
             labelColor: Colors.black,
@@ -196,7 +195,7 @@ class _CalendarPageState extends State<CalendarPage>
               width: 64,
               height: 64,
               colorFilter: ColorFilter.mode(
-                Colors.grey.withOpacity(0.5),
+                Colors.grey.withValues(alpha: 0.5),
                 BlendMode.srcIn,
               ),
             ),
@@ -204,7 +203,7 @@ class _CalendarPageState extends State<CalendarPage>
             Text(
               'Nenhum jogo agendado\npara $day',
               style: TextStyle(
-                color: Colors.grey.withOpacity(0.7),
+                color: Colors.grey.withValues(alpha: 0.7),
                 fontSize: 16,
               ),
               textAlign: TextAlign.center,
@@ -249,7 +248,7 @@ class _CalendarPageState extends State<CalendarPage>
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
+                    color: Colors.blue.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -269,7 +268,7 @@ class _CalendarPageState extends State<CalendarPage>
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: _getStatusColor(game.status).withOpacity(0.1),
+                    color: _getStatusColor(game.status).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -335,7 +334,7 @@ class _CalendarPageState extends State<CalendarPage>
                 height: 40,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.grey.withOpacity(0.1),
+                  color: Colors.grey.withValues(alpha: 0.1),
                 ),
                 child: game.teamALogo != null
                     ? ClipRRect(
@@ -384,7 +383,7 @@ class _CalendarPageState extends State<CalendarPage>
                 height: 40,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.grey.withOpacity(0.1),
+                  color: Colors.grey.withValues(alpha: 0.1),
                 ),
                 child: game.teamBLogo != null
                     ? ClipRRect(
@@ -440,7 +439,7 @@ class _CalendarPageState extends State<CalendarPage>
               height: 32,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.grey.withOpacity(0.1),
+                color: Colors.grey.withValues(alpha: 0.1),
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
@@ -469,7 +468,7 @@ class _CalendarPageState extends State<CalendarPage>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey.withOpacity(0.1),
+        color: Colors.grey.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: const Row(

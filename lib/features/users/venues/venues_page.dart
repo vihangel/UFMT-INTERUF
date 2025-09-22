@@ -2,20 +2,21 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:interufmt/features/users/home/home_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import '../../../core/data/models/venues_model.dart';
 import '../../../core/data/repositories/venues_repository.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:interufmt/features/users/home/home_page.dart';
 
 class VenuesPage extends StatefulWidget {
-  const VenuesPage({Key? key}) : super(key: key);
+  const VenuesPage({super.key});
 
   @override
-  _VenuesPageState createState() => _VenuesPageState();
+  VenuesPageState createState() => VenuesPageState();
 }
 
-class _VenuesPageState extends State<VenuesPage>
+class VenuesPageState extends State<VenuesPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late VenuesRepository _repository;
@@ -99,13 +100,13 @@ class _VenuesPageState extends State<VenuesPage>
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _errorMessage != null
-          ? _buildErrorState()
-          : TabBarView(
-              controller: _tabController,
-              children: [
-                _buildVenuesList(_allVenues, showMapIcon: true),
-              ],
-            ),
+              ? _buildErrorState()
+              : TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildVenuesList(_allVenues, showMapIcon: true),
+                  ],
+                ),
     );
   }
 
@@ -180,8 +181,8 @@ class _VenuesPageState extends State<VenuesPage>
                   height: 48,
                   decoration: BoxDecoration(
                     color: hasCoordinates
-                        ? Colors.green.withOpacity(0.1)
-                        : Colors.grey.withOpacity(0.1),
+                        ? Colors.green.withValues(alpha: 0.1)
+                        : Colors.grey.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(24),
                   ),
                   child: Icon(
@@ -233,7 +234,7 @@ class _VenuesPageState extends State<VenuesPage>
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
+                  color: Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(

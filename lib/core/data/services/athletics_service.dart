@@ -1,6 +1,8 @@
 // lib/core/data/services/athletics_service.dart
 
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../atletica_model.dart';
 
 class AthleticsService {
@@ -22,7 +24,9 @@ class AthleticsService {
       if (response == null) {
         return [];
       }
-      print('RPC response: $response');
+      if (kDebugMode) {
+        print('RPC response: $response');
+      }
       return _convertToAtleticaList(response as List);
     } catch (e) {
       // Fallback: if the RPC function doesn't exist, use mock data based on the provided result

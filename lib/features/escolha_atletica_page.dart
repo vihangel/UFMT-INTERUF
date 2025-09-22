@@ -7,7 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EscolhaAtleticaPage extends StatefulWidget {
   static const String routename = 'escolha_atletica';
-  const EscolhaAtleticaPage({Key? key}) : super(key: key);
+  const EscolhaAtleticaPage({super.key});
 
   @override
   _EscolhaAtleticaPageState createState() => _EscolhaAtleticaPageState();
@@ -51,8 +51,7 @@ class _EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
         }
         _currentPageIndex =
             _tabPageControllers[_tabController.index]?.page?.round() ?? 0;
-        _pageOffset =
-            _tabPageControllers[_tabController.index]?.page ??
+        _pageOffset = _tabPageControllers[_tabController.index]?.page ??
             _tabPageControllers[_tabController.index]?.initialPage.toDouble() ??
             0.0;
       });
@@ -84,9 +83,7 @@ class _EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
         _currentSeries = _serieA;
         _isLoading = false;
       });
-
-    } catch (error, stackTrace) {
-
+    } catch (error) {
       setState(() {
         _isLoading = false;
         _errorMessage = 'Erro ao carregar atléticas: $error';
@@ -116,7 +113,6 @@ class _EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
 
   @override
   Widget build(BuildContext context) {
-    
     if (_isLoading) {
       return Scaffold(
         body: Column(
@@ -214,17 +210,15 @@ class _EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
                       ),
                       const SizedBox(height: 5),
                       Text(
-                        _currentSeries[_currentPageIndex]['name'] ??
-                            'Sem nome',
+                        _currentSeries[_currentPageIndex]['name'] ?? 'Sem nome',
                         style: const TextStyle(fontSize: 16),
                         textAlign: TextAlign.center,
                       ),
                     ],
                     const Spacer(),
                     ElevatedButton(
-                      onPressed: _currentSeries.isNotEmpty
-                          ? _saveAndNavigate
-                          : null,
+                      onPressed:
+                          _currentSeries.isNotEmpty ? _saveAndNavigate : null,
                       child: const Text('Escolher'),
                     ),
                     const SizedBox(height: 10),
@@ -279,7 +273,6 @@ class _EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
 
         final logoUrl = series[index]['logo_url'] as String?;
         final assetPath = _getAtleticAssetPath(logoUrl);
-
 
         return Center(
           child: Transform.scale(

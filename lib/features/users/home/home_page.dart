@@ -1,14 +1,14 @@
 // lib/features/users/home_page.dart
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:interufmt/features/pagina_noticias.dart';
-import 'package:provider/provider.dart';
-import 'package:interufmt/core/widgets/tabela_classificacao.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/data/atletica_model.dart'; // Importa a classe Atletica
 import 'package:interufmt/core/data/services/athletics_service.dart';
+import 'package:interufmt/core/widgets/tabela_classificacao.dart';
+import 'package:interufmt/features/pagina_noticias.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
   static const String routename = 'home';
@@ -79,7 +79,7 @@ class _HomePageState extends State<HomePage> {
 }
 
 class _HomeContent extends StatelessWidget {
-  const _HomeContent({Key? key}) : super(key: key);
+  const _HomeContent();
 
   static Future<void> _launchURL(String url) async {
     final Uri uri = Uri.parse(url);
@@ -208,9 +208,8 @@ class _HomeContent extends StatelessWidget {
                     '/classificacao',
                     extra: {
                       'title': 'Série A',
-                      'data': classificacaoSerieA
-                          .map((a) => a.toMap())
-                          .toList(),
+                      'data':
+                          classificacaoSerieA.map((a) => a.toMap()).toList(),
                     },
                   );
                 },
@@ -264,9 +263,8 @@ class _HomeContent extends StatelessWidget {
                     '/classificacao',
                     extra: {
                       'title': 'Série B',
-                      'data': classificacaoSerieB
-                          .map((a) => a.toMap())
-                          .toList(),
+                      'data':
+                          classificacaoSerieB.map((a) => a.toMap()).toList(),
                     },
                   );
                 },

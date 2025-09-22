@@ -7,11 +7,10 @@ import '../../features/users/login/auth/auth_viewmodel.dart';
 import '../../features/users/news/viewmodel/news_viewmodel.dart';
 import '../data/repositories/auth_repository.dart';
 import '../data/repositories/news_repository.dart';
+import '../data/services/athletics_service.dart';
 import '../data/services/auth_service.dart';
-import '../data/services/local_storage_service.dart';
 import '../data/services/news_service.dart';
 import '../data/services/profile_service.dart';
-import '../data/services/athletics_service.dart';
 
 class AppModule {
   /// Initializes .env/Supabase and returns the list of app providers.

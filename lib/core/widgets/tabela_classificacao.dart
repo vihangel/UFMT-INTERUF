@@ -1,7 +1,6 @@
 // lib/core/widgets/tabela_classificacao.dart
 
 import 'package:flutter/material.dart';
-import 'package:interufmt/core/data/models/athletics_model.dart';
 import 'package:interufmt/core/data/atletica_model.dart';
 
 class TabelaClassificacao extends StatelessWidget {

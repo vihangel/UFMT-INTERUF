@@ -7,11 +7,11 @@ class IconeSocialmidia extends StatelessWidget {
   final double size;
 
   const IconeSocialmidia({
-    Key? key,
+    super.key,
     required this.iconData,
     required this.url,
     this.size = 40.0,
-  }) : super(key: key);
+  });
 
   static Future<void> _launchURL(String url) async {
     final Uri uri = Uri.parse(url);

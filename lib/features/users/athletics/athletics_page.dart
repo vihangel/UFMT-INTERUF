@@ -4,17 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/features/users/home/home_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../../core/data/athletics_item_model.dart';
 import '../../../core/data/repositories/athletics_repository.dart';
 
 class AthleticsPage extends StatefulWidget {
-  const AthleticsPage({Key? key}) : super(key: key);
+  const AthleticsPage({super.key});
 
   @override
-  _AthleticsPageState createState() => _AthleticsPageState();
+  AthleticsPageState createState() => AthleticsPageState();
 }
 
-class _AthleticsPageState extends State<AthleticsPage>
+class AthleticsPageState extends State<AthleticsPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late AthleticsRepository _repository;
@@ -83,9 +84,8 @@ class _AthleticsPageState extends State<AthleticsPage>
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => context.goNamed(HomePage.routename)
-        ),
+            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            onPressed: () => context.goNamed(HomePage.routename)),
         bottom: TabBar(
           controller: _tabController,
           labelColor: Colors.black,
@@ -100,14 +100,14 @@ class _AthleticsPageState extends State<AthleticsPage>
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _errorMessage != null
-          ? _buildErrorState()
-          : TabBarView(
-              controller: _tabController,
-              children: [
-                _buildAthleticsList(_serieA),
-                _buildAthleticsList(_serieB),
-              ],
-            ),
+              ? _buildErrorState()
+              : TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildAthleticsList(_serieA),
+                    _buildAthleticsList(_serieB),
+                  ],
+                ),
     );
   }
 
@@ -170,7 +170,7 @@ class _AthleticsPageState extends State<AthleticsPage>
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
+              color: Colors.grey.withValues(alpha: 0.2),
               spreadRadius: 2,
               blurRadius: 8,
               offset: const Offset(0, 2),
@@ -187,7 +187,7 @@ class _AthleticsPageState extends State<AthleticsPage>
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(40),
                 border: Border.all(
-                  color: Colors.grey.withOpacity(0.3),
+                  color: Colors.grey.withValues(alpha: 0.3),
                   width: 1,
                 ),
               ),
