@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/config/url_strategy_mobile.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +20,9 @@ final navigatorKey = GlobalKey<NavigatorState>();
 Future<void> main() async {
   configureUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Load environment variables first
+  await dotenv.load(fileName: ".env");
   final providers = await AppModule.init();
   final localStorageService = LocalStorageService();
   final chosenAthletic = await localStorageService.getChosenAthleticName();

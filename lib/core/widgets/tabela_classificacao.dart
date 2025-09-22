@@ -2,10 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:interufmt/core/data/models/athletics_model.dart';
+import 'package:interufmt/core/data/atletica_model.dart';
 
 class TabelaClassificacao extends StatelessWidget {
   final String title;
-  final List<Map<String, dynamic>> data;
+  final List<Atletica> data;
 
   const TabelaClassificacao({
     super.key,
@@ -61,27 +62,27 @@ class TabelaClassificacao extends StatelessWidget {
                     children: [
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Text(atletica['posicao'].toString()),
+                        child: Text(atletica.posicao.toString()),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Text((atletica['atletica'] as Athletics).name),
+                        child: Text(atletica.nome),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Text(atletica['ouro'].toString()),
+                        child: Text(atletica.ouro.toString()),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Text(atletica['prata'].toString()),
+                        child: Text(atletica.prata.toString()),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Text(atletica['bronze'].toString()),
+                        child: Text(atletica.bronze.toString()),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Text(atletica['pontos'].toString()),
+                        child: Text(atletica.pontos.toString()),
                       ),
                     ],
                   );

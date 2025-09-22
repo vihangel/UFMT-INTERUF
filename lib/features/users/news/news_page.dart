@@ -8,7 +8,7 @@ import 'package:interufmt/features/users/news/widget/news_widget.dart';
 import 'package:provider/provider.dart';
 
 class NewsPage extends StatefulWidget {
-  static const String routename = 'noticias';
+  //static const String routename = 'noticias';
   const NewsPage({super.key});
 
   @override
@@ -51,7 +51,7 @@ class _NewsPageState extends State<NewsPage> {
                 return NewsWidget(
                   imageUrl: news.imageUrl ?? '',
                   title: news.title,
-                  description: news.summary ?? 'Sem resumo disponível',
+                  summary: news.summary ?? 'Sem resumo disponível',
                 );
               },
             ),
