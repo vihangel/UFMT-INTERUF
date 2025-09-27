@@ -1,10 +1,13 @@
 // lib/features/users/home_page.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/data/atletica_model.dart'; // Importa a classe Atletica
 import 'package:interufmt/core/data/services/athletics_service.dart';
+import 'package:interufmt/core/theme/app_colors.dart';
+import 'package:interufmt/core/theme/app_icons.dart';
 import 'package:interufmt/core/widgets/tabela_classificacao.dart';
 import 'package:interufmt/features/users/home/widgets/sections_social_media_widget.dart';
 import 'package:interufmt/features/users/news/news_page.dart';
@@ -55,22 +58,97 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(title: const Text('Início')),
       body: _widgetOptions.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
-          BottomNavigationBarItem(icon: Icon(Icons.shield), label: 'Atléticas'),
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
+            icon: SvgPicture.asset(
+              AppIcons.icHome,
+              colorFilter: const ColorFilter.mode(
+                AppColors.unselectedColorIcon,
+                BlendMode.srcIn,
+              ),
+            ),
+            activeIcon: SvgPicture.asset(
+              AppIcons.icHome,
+              colorFilter: const ColorFilter.mode(
+                AppColors.primaryText,
+                BlendMode.srcIn,
+              ),
+            ),
+            label: 'Início',
+          ),
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset(
+              AppIcons.icChess,
+              colorFilter: const ColorFilter.mode(
+                AppColors.unselectedColorIcon,
+                BlendMode.srcIn,
+              ),
+            ),
+            activeIcon: SvgPicture.asset(
+              AppIcons.icChess,
+              colorFilter: const ColorFilter.mode(
+                AppColors.primaryText,
+                BlendMode.srcIn,
+              ),
+            ),
+            label: 'Atléticas',
+          ),
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset(
+              AppIcons.icCalendar,
+              colorFilter: const ColorFilter.mode(
+                AppColors.unselectedColorIcon,
+                BlendMode.srcIn,
+              ),
+            ),
+            activeIcon: SvgPicture.asset(
+              AppIcons.icCalendar,
+              colorFilter: const ColorFilter.mode(
+                AppColors.primaryText,
+                BlendMode.srcIn,
+              ),
+            ),
             label: 'Calendário',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.emoji_events),
+            icon: SvgPicture.asset(
+              AppIcons.icTrophy,
+              colorFilter: const ColorFilter.mode(
+                AppColors.unselectedColorIcon,
+                BlendMode.srcIn,
+              ),
+            ),
+            activeIcon: SvgPicture.asset(
+              AppIcons.icTrophy,
+              colorFilter: const ColorFilter.mode(
+                AppColors.primaryText,
+                BlendMode.srcIn,
+              ),
+            ),
             label: 'Modalidade',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.place), label: 'Local'),
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset(
+              AppIcons.icLocation,
+              colorFilter: const ColorFilter.mode(
+                AppColors.unselectedColorIcon,
+                BlendMode.srcIn,
+              ),
+            ),
+            activeIcon: SvgPicture.asset(
+              AppIcons.icLocation,
+              colorFilter: const ColorFilter.mode(
+                AppColors.primaryText,
+                BlendMode.srcIn,
+              ),
+            ),
+            label: 'Local',
+          ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue[800],
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: AppColors.primaryText,
+
+        unselectedItemColor: AppColors.unselectedColorIcon,
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
       ),
