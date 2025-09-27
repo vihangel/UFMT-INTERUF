@@ -33,6 +33,7 @@ class AppModule {
       Provider<AuthService>(create: (_) => AuthService(client)),
       Provider<ProfileService>(create: (_) => ProfileService(client)),
       Provider<AthleticsService>(create: (_) => AthleticsService(client)),
+      Provider<NewsService>(create: (_) => NewsService(client)),
 
       // Repository depends on the service
       Provider<AuthRepository>(

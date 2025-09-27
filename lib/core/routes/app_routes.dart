@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:interufmt/core/data/atletica_model.dart';
 import 'package:interufmt/features/admin/auth/admin_login_page.dart';
 import 'package:interufmt/features/admin/home/admin_home_page.dart';
 import 'package:interufmt/features/escolha_atletica_page.dart';
-import 'package:interufmt/features/pagina_noticias.dart';
 import 'package:interufmt/features/rating_page.dart';
+import 'package:interufmt/features/users/athletics/athletics_page.dart';
+import 'package:interufmt/features/users/calendar/calendar_page.dart';
 import 'package:interufmt/features/users/home/home_page.dart';
 import 'package:interufmt/features/users/login/auth/auth_viewmodel.dart';
 import 'package:interufmt/features/users/login/forgot_password_page.dart';
 import 'package:interufmt/features/users/login/login_page.dart';
 import 'package:interufmt/features/users/login/signup_page.dart';
 import 'package:interufmt/features/users/login/update_password_page.dart';
-import 'package:interufmt/features/users/athletics/athletics_page.dart';
-import 'package:interufmt/features/users/venues/venues_page.dart';
 import 'package:interufmt/features/users/modalities/modalities_page.dart';
-import 'package:interufmt/features/users/calendar/calendar_page.dart';
+import 'package:interufmt/features/users/news/news_page.dart';
+import 'package:interufmt/features/users/venues/venues_page.dart';
 import 'package:provider/provider.dart';
-import 'package:interufmt/core/data/atletica_model.dart';
 
 class AppRoutes {
   static GoRouter getRouter(
@@ -46,9 +46,9 @@ class AppRoutes {
           builder: (context, state) => const HomePage(),
         ),
         GoRoute(
-          name: PaginaNoticias.routename,
+          name: NewsPage.routename,
           path: '/noticias',
-          builder: (context, state) => const PaginaNoticias(),
+          builder: (context, state) => const NewsPage(),
         ),
         GoRoute(
           name: 'athletics',
