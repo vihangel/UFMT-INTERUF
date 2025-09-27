@@ -103,9 +103,6 @@ class ModalitiesPageState extends State<ModalitiesPage>
         // ),
         bottom: TabBar(
           controller: _tabController,
-          labelColor: Colors.black,
-          unselectedLabelColor: Colors.grey,
-          indicatorColor: Colors.blue,
           tabs: const [
             Tab(text: 'Série A'),
             Tab(text: 'Série B'),

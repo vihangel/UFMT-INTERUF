@@ -88,9 +88,7 @@ class AthleticsPageState extends State<AthleticsPage>
         // ),
         bottom: TabBar(
           controller: _tabController,
-          labelColor: Colors.black,
-          unselectedLabelColor: Colors.grey,
-          indicatorColor: Colors.red,
+
           tabs: const [
             Tab(text: 'Série A'),
             Tab(text: 'Série B'),

@@ -45,6 +45,7 @@ class CalendarPageState extends State<CalendarPage>
   }
 
   Future<void> _loadAllGames() async {
+    if (!mounted) return;
     try {
       setState(() {
         _isLoading = true;
@@ -67,14 +68,18 @@ class CalendarPageState extends State<CalendarPage>
         }
       }
 
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     } catch (error) {
-      setState(() {
-        _isLoading = false;
-        _errorMessage = 'Erro ao carregar jogos: $error';
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = 'Erro ao carregar jogos: $error';
+        });
+      }
     }
   }
 
@@ -103,9 +108,7 @@ class CalendarPageState extends State<CalendarPage>
         // ),
         bottom: TabBar(
           controller: _seriesTabController,
-          labelColor: Colors.black,
-          unselectedLabelColor: Colors.grey,
-          indicatorColor: Colors.blue,
+
           tabs: const [
             Tab(text: 'Série A'),
             Tab(text: 'Série B'),

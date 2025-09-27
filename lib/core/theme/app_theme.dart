@@ -81,6 +81,17 @@ class AppTheme {
         indent: 20,
         endIndent: 20,
       ),
+      tabBarTheme: TabBarThemeData(
+        labelColor: AppColors.primaryText,
+        unselectedLabelColor: AppColors.secondaryText,
+        indicatorColor: AppColors.background,
+        dividerColor: AppColors.inputBorder,
+        dividerHeight: 2,
+
+        indicator: UnderlineTabIndicator(
+          borderSide: BorderSide(color: AppColors.darkBlue, width: 2),
+        ),
+      ),
     );
   }
 }
