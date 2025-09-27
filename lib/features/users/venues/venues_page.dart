@@ -1,8 +1,6 @@
 // lib/features/users/venues/venues_page.dart
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:interufmt/features/users/home/home_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -92,21 +90,19 @@ class VenuesPageState extends State<VenuesPage>
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => context.goNamed(HomePage.routename),
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back, color: Colors.black),
+        //   onPressed: () => context.goNamed(HomePage.routename),
+        // ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _errorMessage != null
-              ? _buildErrorState()
-              : TabBarView(
-                  controller: _tabController,
-                  children: [
-                    _buildVenuesList(_allVenues, showMapIcon: true),
-                  ],
-                ),
+          ? _buildErrorState()
+          : TabBarView(
+              controller: _tabController,
+              children: [_buildVenuesList(_allVenues, showMapIcon: true)],
+            ),
     );
   }
 

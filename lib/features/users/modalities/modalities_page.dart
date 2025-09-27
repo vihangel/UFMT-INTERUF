@@ -2,8 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:go_router/go_router.dart';
-import 'package:interufmt/features/users/home/home_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/data/models/modality_with_status_model.dart';
@@ -36,8 +34,9 @@ class ModalitiesPageState extends State<ModalitiesPage>
 
     _tabController.addListener(() {
       setState(() {
-        _currentModalities =
-            _tabController.index == 0 ? _serieAModalities : _serieBModalities;
+        _currentModalities = _tabController.index == 0
+            ? _serieAModalities
+            : _serieBModalities;
       });
     });
   }
@@ -98,10 +97,10 @@ class ModalitiesPageState extends State<ModalitiesPage>
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => context.goNamed(HomePage.routename),
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back, color: Colors.black),
+        //   onPressed: () => context.goNamed(HomePage.routename),
+        // ),
         bottom: TabBar(
           controller: _tabController,
           labelColor: Colors.black,
@@ -116,8 +115,8 @@ class ModalitiesPageState extends State<ModalitiesPage>
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _errorMessage != null
-              ? _buildErrorState()
-              : _buildModalitiesContent(),
+          ? _buildErrorState()
+          : _buildModalitiesContent(),
     );
   }
 

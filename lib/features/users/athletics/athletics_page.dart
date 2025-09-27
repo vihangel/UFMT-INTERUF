@@ -1,8 +1,6 @@
 // lib/features/users/athletics/athletics_page.dart
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:interufmt/features/users/home/home_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/data/athletics_item_model.dart';
@@ -83,9 +81,11 @@ class AthleticsPageState extends State<AthleticsPage>
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () => context.goNamed(HomePage.routename)),
+
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back, color: Colors.black),
+        //   onPressed: () => context.goNamed(HomePage.routename),
+        // ),
         bottom: TabBar(
           controller: _tabController,
           labelColor: Colors.black,
@@ -100,14 +100,14 @@ class AthleticsPageState extends State<AthleticsPage>
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _errorMessage != null
-              ? _buildErrorState()
-              : TabBarView(
-                  controller: _tabController,
-                  children: [
-                    _buildAthleticsList(_serieA),
-                    _buildAthleticsList(_serieB),
-                  ],
-                ),
+          ? _buildErrorState()
+          : TabBarView(
+              controller: _tabController,
+              children: [
+                _buildAthleticsList(_serieA),
+                _buildAthleticsList(_serieB),
+              ],
+            ),
     );
   }
 

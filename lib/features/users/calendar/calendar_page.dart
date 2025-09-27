@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:go_router/go_router.dart';
-import 'package:interufmt/features/users/home/home_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/data/models/calendar_game_model.dart';
@@ -55,9 +53,11 @@ class CalendarPageState extends State<CalendarPage>
 
       // Load games for both series
       for (String series in ['A', 'B']) {
-        for (int dayIndex = 0;
-            dayIndex < _competitionDates.length;
-            dayIndex++) {
+        for (
+          int dayIndex = 0;
+          dayIndex < _competitionDates.length;
+          dayIndex++
+        ) {
           final dayLabel = 'Dia ${dayIndex + 1}';
           final games = await _repository.getGamesBySeriesAndDate(
             series: series,
@@ -97,10 +97,10 @@ class CalendarPageState extends State<CalendarPage>
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => context.goNamed(HomePage.routename),
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back, color: Colors.black),
+        //   onPressed: () => context.goNamed(HomePage.routename),
+        // ),
         bottom: TabBar(
           controller: _seriesTabController,
           labelColor: Colors.black,
@@ -115,14 +115,14 @@ class CalendarPageState extends State<CalendarPage>
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _errorMessage != null
-              ? _buildErrorState()
-              : TabBarView(
-                  controller: _seriesTabController,
-                  children: [
-                    _buildSeriesContent('A', _serieADaysController),
-                    _buildSeriesContent('B', _serieBDaysController),
-                  ],
-                ),
+          ? _buildErrorState()
+          : TabBarView(
+              controller: _seriesTabController,
+              children: [
+                _buildSeriesContent('A', _serieADaysController),
+                _buildSeriesContent('B', _serieBDaysController),
+              ],
+            ),
     );
   }
 

@@ -9,8 +9,12 @@ import 'package:interufmt/core/data/services/athletics_service.dart';
 import 'package:interufmt/core/theme/app_colors.dart';
 import 'package:interufmt/core/theme/app_icons.dart';
 import 'package:interufmt/core/widgets/tabela_classificacao.dart';
+import 'package:interufmt/features/users/athletics/athletics_page.dart';
+import 'package:interufmt/features/users/calendar/calendar_page.dart';
 import 'package:interufmt/features/users/home/widgets/sections_social_media_widget.dart';
+import 'package:interufmt/features/users/modalities/modalities_page.dart';
 import 'package:interufmt/features/users/news/news_page.dart';
+import 'package:interufmt/features/users/venues/venues_page.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -24,39 +28,35 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
-  static const List<Widget> _widgetOptions = <Widget>[
-    _HomeContent(),
-    Center(child: Text('Página de Atléticas')),
-    Center(child: Text('Página do Calendário')),
-    Center(child: Text('Página de Modalidades')),
-    Center(child: Text('Página de Local')),
-  ];
+  Widget _page = const _HomeContent();
 
   void _onItemTapped(int index) {
-    if (index == 1) {
-      // Navigate to athletics page
-      context.go('/athletics');
-    } else if (index == 2) {
-      // Navigate to calendar page
-      context.go('/calendar');
-    } else if (index == 3) {
-      // Navigate to modalities page
-      context.go('/modalities');
-    } else if (index == 4) {
-      // Navigate to venues page
-      context.go('/venues');
-    } else {
-      setState(() {
-        _selectedIndex = index;
-      });
-    }
+    setState(() {
+      _selectedIndex = index;
+      switch (index) {
+        case 0:
+          _page = const _HomeContent();
+          break;
+        case 1:
+          _page = const AthleticsPage();
+          break;
+        case 2:
+          _page = const CalendarPage();
+          break;
+        case 3:
+          _page = const ModalitiesPage();
+          break;
+        case 4:
+          _page = const VenuesPage();
+          break;
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Início')),
-      body: _widgetOptions.elementAt(_selectedIndex),
+      body: _page,
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -163,161 +163,164 @@ class _HomeContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final athleticsService = context.read<AthleticsService>();
 
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SizedBox(height: 36),
-          SectionsSocialMediaWidget(),
-          const SizedBox(height: 32),
-          Card(
-            margin: const EdgeInsets.symmetric(horizontal: 16),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  const FaIcon(FontAwesomeIcons.newspaper, size: 24),
-                  const SizedBox(width: 16),
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Notícias',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+    return Scaffold(
+      appBar: AppBar(title: Text('Início')),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: 36),
+            SectionsSocialMediaWidget(),
+            const SizedBox(height: 32),
+            Card(
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    const FaIcon(FontAwesomeIcons.newspaper, size: 24),
+                    const SizedBox(width: 16),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Notícias',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        Text(
-                          'Acompanhe as novidades mais recentes...',
-                          style: TextStyle(fontSize: 14),
-                        ),
-                      ],
+                          Text(
+                            'Acompanhe as novidades mais recentes...',
+                            style: TextStyle(fontSize: 14),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      context.goNamed(NewsPage.routename);
-                    },
-                    child: const Row(
-                      children: [Text('Ver'), Icon(Icons.arrow_forward)],
+                    TextButton(
+                      onPressed: () {
+                        context.goNamed(NewsPage.routename);
+                      },
+                      child: const Row(
+                        children: [Text('Ver'), Icon(Icons.arrow_forward)],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 32),
+            const SizedBox(height: 32),
 
-          // Série A with FutureBuilder
-          FutureBuilder<List<Atletica>>(
-            future: athleticsService.getAthleticsStandings('A'),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Card(
-                  child: Padding(
-                    padding: EdgeInsets.all(32),
-                    child: Center(child: CircularProgressIndicator()),
-                  ),
-                );
-              }
-
-              if (snapshot.hasError) {
-                return Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        const Icon(Icons.error, color: Colors.red),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Erro ao carregar Série A: ${snapshot.error}',
-                          style: const TextStyle(color: Colors.red),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+            // Série A with FutureBuilder
+            FutureBuilder<List<Atletica>>(
+              future: athleticsService.getAthleticsStandings('A'),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Card(
+                    child: Padding(
+                      padding: EdgeInsets.all(32),
+                      child: Center(child: CircularProgressIndicator()),
                     ),
-                  ),
-                );
-              }
-
-              final classificacaoSerieA = snapshot.data ?? [];
-
-              return GestureDetector(
-                onTap: () {
-                  context.go(
-                    '/classificacao',
-                    extra: {
-                      'title': 'Série A',
-                      'data': classificacaoSerieA
-                          .map((a) => a.toMap())
-                          .toList(),
-                    },
                   );
-                },
-                child: TabelaClassificacao(
-                  title: 'Série A',
-                  data: classificacaoSerieA.take(4).toList(),
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: 32),
-          // Série B with FutureBuilder
-          FutureBuilder<List<Atletica>>(
-            future: athleticsService.getAthleticsStandings('B'),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Card(
-                  child: Padding(
-                    padding: EdgeInsets.all(32),
-                    child: Center(child: CircularProgressIndicator()),
-                  ),
-                );
-              }
+                }
 
-              if (snapshot.hasError) {
-                return Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        const Icon(Icons.error, color: Colors.red),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Erro ao carregar Série B: ${snapshot.error}',
-                          style: const TextStyle(color: Colors.red),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                if (snapshot.hasError) {
+                  return Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          const Icon(Icons.error, color: Colors.red),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Erro ao carregar Série A: ${snapshot.error}',
+                            style: const TextStyle(color: Colors.red),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
                     ),
+                  );
+                }
+
+                final classificacaoSerieA = snapshot.data ?? [];
+
+                return GestureDetector(
+                  onTap: () {
+                    context.go(
+                      '/classificacao',
+                      extra: {
+                        'title': 'Série A',
+                        'data': classificacaoSerieA
+                            .map((a) => a.toMap())
+                            .toList(),
+                      },
+                    );
+                  },
+                  child: TabelaClassificacao(
+                    title: 'Série A',
+                    data: classificacaoSerieA.take(4).toList(),
                   ),
                 );
-              }
-
-              final classificacaoSerieB = snapshot.data ?? [];
-
-              return GestureDetector(
-                onTap: () {
-                  context.go(
-                    '/classificacao',
-                    extra: {
-                      'title': 'Série B',
-                      'data': classificacaoSerieB
-                          .map((a) => a.toMap())
-                          .toList(),
-                    },
+              },
+            ),
+            const SizedBox(height: 32),
+            // Série B with FutureBuilder
+            FutureBuilder<List<Atletica>>(
+              future: athleticsService.getAthleticsStandings('B'),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Card(
+                    child: Padding(
+                      padding: EdgeInsets.all(32),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
                   );
-                },
-                child: TabelaClassificacao(
-                  title: 'Série B',
-                  data: classificacaoSerieB.take(4).toList(),
-                ),
-              );
-            },
-          ),
-        ],
+                }
+
+                if (snapshot.hasError) {
+                  return Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          const Icon(Icons.error, color: Colors.red),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Erro ao carregar Série B: ${snapshot.error}',
+                            style: const TextStyle(color: Colors.red),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+
+                final classificacaoSerieB = snapshot.data ?? [];
+
+                return GestureDetector(
+                  onTap: () {
+                    context.go(
+                      '/classificacao',
+                      extra: {
+                        'title': 'Série B',
+                        'data': classificacaoSerieB
+                            .map((a) => a.toMap())
+                            .toList(),
+                      },
+                    );
+                  },
+                  child: TabelaClassificacao(
+                    title: 'Série B',
+                    data: classificacaoSerieB.take(4).toList(),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
