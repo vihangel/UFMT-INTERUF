@@ -41,20 +41,20 @@ class _NewsPageState extends State<NewsPage> {
       body: viewModel.isLoading
           ? const Center(child: CircularProgressIndicator())
           : viewModel.errorMessage != null
-              ? Center(child: Text(viewModel.errorMessage!))
-              : viewModel.news.isEmpty
-                  ? const Center(child: Text('Nenhuma notícia disponível.'))
-                  : ListView.builder(
-                      itemCount: viewModel.news.length,
-                      itemBuilder: (context, index) {
-                        final news = viewModel.news[index];
-                        return NewsWidget(
-                          imageUrl: news.imageUrl ?? '',
-                          title: news.title,
-                          summary: news.summary ?? 'Sem resumo disponível',
-                        );
-                      },
-                    ),
+          ? Center(child: Text(viewModel.errorMessage!))
+          : viewModel.news.isEmpty
+          ? const Center(child: Text('Nenhuma notícia disponível.'))
+          : ListView.builder(
+              itemCount: viewModel.news.length,
+              itemBuilder: (context, index) {
+                final news = viewModel.news[index];
+                return NewsWidget(
+                  imageUrl: news.imageUrl ?? '',
+                  title: news.title,
+                  summary: news.summary ?? 'Sem resumo disponível',
+                );
+              },
+            ),
     );
   }
 }

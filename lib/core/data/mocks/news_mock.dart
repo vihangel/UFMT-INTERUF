@@ -7,7 +7,7 @@ final List<News> newsMock = [
     summary: 'Este é um resumo da primeira notícia.',
     body:
         'Este é o corpo completo da primeira notícia. Aqui você encontrará mais detalhes sobre o que aconteceu.',
-    imageUrl: 'https://picsum.photos/seed/1/600/400',
+
     publishedAt: DateTime.now().subtract(const Duration(days: 1)),
     sourceUrl: 'https://example.com/news/1',
     createdAt: DateTime.now().subtract(const Duration(days: 1)),
