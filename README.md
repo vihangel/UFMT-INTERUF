@@ -30,4 +30,9 @@ SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
     https://pub.dev/packages/flutter_native_splash
 
 - **Gerenciar fontes personalizadas**
+
   - Verificar o uso do pacote Google Fonts. Caso a fonte desejada não esteja disponível, adicionar os arquivos de fonte diretamente nos assets do projeto e configurar no `pubspec.yaml`.
+
+- **Melhorar handles de repositorios**
+
+  - Adicionar tratativas de erros.

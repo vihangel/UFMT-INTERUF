@@ -158,14 +158,6 @@ class _HomeContent extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          const Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Text(
-              'Classificação Geral',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-          ),
-
           // Série A with FutureBuilder
           FutureBuilder<List<Atletica>>(
             future: athleticsService.getAthleticsStandings('A'),
