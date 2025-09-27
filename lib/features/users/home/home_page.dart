@@ -6,9 +6,9 @@ import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/data/atletica_model.dart'; // Importa a classe Atletica
 import 'package:interufmt/core/data/services/athletics_service.dart';
 import 'package:interufmt/core/widgets/tabela_classificacao.dart';
+import 'package:interufmt/features/users/home/widgets/sections_social_media_widget.dart';
 import 'package:interufmt/features/users/news/news_page.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
   static const String routename = 'home';
@@ -81,13 +81,6 @@ class _HomePageState extends State<HomePage> {
 class _HomeContent extends StatelessWidget {
   const _HomeContent();
 
-  static Future<void> _launchURL(String url) async {
-    final Uri uri = Uri.parse(url);
-    if (!await launchUrl(uri)) {
-      throw Exception('Não foi possível abrir o link $url');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final athleticsService = context.read<AthleticsService>();
@@ -96,28 +89,9 @@ class _HomeContent extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                GestureDetector(
-                  onTap: () =>
-                      _launchURL('https://www.instagram.com/interufmt'),
-                  child: const FaIcon(FontAwesomeIcons.instagram, size: 40),
-                ),
-                GestureDetector(
-                  onTap: () => _launchURL('https://twitter.com/interufmt'),
-                  child: const FaIcon(FontAwesomeIcons.x, size: 40),
-                ),
-                GestureDetector(
-                  onTap: () => _launchURL('https://www.youtube.com/interufmt'),
-                  child: const FaIcon(FontAwesomeIcons.youtube, size: 40),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 36),
+          SectionsSocialMediaWidget(),
+          const SizedBox(height: 32),
           Card(
             margin: const EdgeInsets.symmetric(horizontal: 16),
             child: Padding(
@@ -156,7 +130,7 @@ class _HomeContent extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 32),
 
           // Série A with FutureBuilder
           FutureBuilder<List<Atletica>>(
@@ -164,7 +138,6 @@ class _HomeContent extends StatelessWidget {
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Card(
-                  margin: EdgeInsets.all(16),
                   child: Padding(
                     padding: EdgeInsets.all(32),
                     child: Center(child: CircularProgressIndicator()),
@@ -174,7 +147,6 @@ class _HomeContent extends StatelessWidget {
 
               if (snapshot.hasError) {
                 return Card(
-                  margin: const EdgeInsets.all(16),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -213,14 +185,13 @@ class _HomeContent extends StatelessWidget {
               );
             },
           ),
-
+          const SizedBox(height: 32),
           // Série B with FutureBuilder
           FutureBuilder<List<Atletica>>(
             future: athleticsService.getAthleticsStandings('B'),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Card(
-                  margin: EdgeInsets.all(16),
                   child: Padding(
                     padding: EdgeInsets.all(32),
                     child: Center(child: CircularProgressIndicator()),
@@ -230,7 +201,6 @@ class _HomeContent extends StatelessWidget {
 
               if (snapshot.hasError) {
                 return Card(
-                  margin: const EdgeInsets.all(16),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
