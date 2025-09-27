@@ -122,6 +122,7 @@ class CalendarPageState extends State<CalendarPage>
           : _errorMessage != null
           ? _buildErrorState()
           : TabBarView(
+              physics: const NeverScrollableScrollPhysics(),
               controller: _seriesTabController,
               children: [
                 _buildSeriesContent('A', _serieADaysController),
