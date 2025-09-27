@@ -18,13 +18,16 @@ class SectionsSocialMediaWidget extends StatelessWidget {
       ),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
             'Siga a liga das Atléticas da UFMT',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.start,
           ),
           SizedBox(height: 12),
           Row(
+            spacing: 16,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               _SocialMediaButton(
@@ -66,7 +69,7 @@ class _SocialMediaButton extends StatelessWidget {
     return InkWell(
       onTap: () => _launchURL(url),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16),
+        padding: EdgeInsets.symmetric(vertical: 10),
         child: Column(
           children: [
             SvgPicture.asset(iconPath, width: 60, height: 60),
