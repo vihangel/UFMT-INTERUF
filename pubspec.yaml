@@ -29,6 +29,8 @@ dependencies:
   json_annotation: ^4.9.0
   url_launcher: ^6.3.2
   font_awesome_flutter: ^10.9.1
+  flutter_native_splash: ^2.4.6
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -49,6 +51,7 @@ flutter:
     - assets/icons/
     - assets/font/Host_Grotesk/
     - assets/font/
+    - assets/app/
 
   fonts:
     # - family: HostGrotesk
@@ -56,7 +59,7 @@ flutter:
     #     - asset: assets/font/Host_Grotesk/HostGrotesk-VariableFont_wght.ttf
     #     - asset: assets/font/Host_Grotesk/HostGrotesk-Italic-VariableFont_wght.ttf
     #       style: italic
-    
+
     - family: HostGrotesk
       fonts:
         - asset: assets/font/Host_Grotesk/static/HostGrotesk-Light.ttf
@@ -81,3 +84,43 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_native_splash:
+  color: "#000000"
+  image: assets/app/splash_icon.png
+
+  android: true
+  ios: true
+  web: true
+
+  android_gravity: center
+  ios_content_mode: scaleAspectFit
+  web_image_mode: contain
+
+  android_12:
+    color: "#000000"
+    image: assets/app/splash_icon.png
+    icon_background_color: "#000000"
+
+  image_web: assets/app/splash_icon.png
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: assets/app/icon.png
+  adaptive_icon_foreground: assets/app/icon.png
+  adaptive_icon_background: "#000000"
+  ios_remove_alpha: true
+  min_sdk_android: 21
+  web:
+    generate: true
+    image_path: assets/app/icon.png
+    background_color: "#000000"
+    theme_color: "#000000"
+  windows:
+    generate: true
+    image_path: assets/app/icon.png
+    icon_size: 48
+  macos:
+    generate: true
+    image_path: assets/app/icon.png
