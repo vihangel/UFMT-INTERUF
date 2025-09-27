@@ -1,3 +1,6 @@
+import 'package:interufmt/core/theme/app_icons.dart';
+import 'package:intl/intl.dart';
+
 class CalendarGame {
   final String gameId;
   final DateTime startAt;
@@ -127,5 +130,30 @@ class CalendarGame {
         30; // Assuming competition starts on day 30 based on your query
     final dayNumber = day - baseDay + 1;
     return 'Dia $dayNumber';
+  }
+
+  String get startTimeDateFormatted {
+    return DateFormat('HH:mm - EEE, dd MMM', 'pt_BR').format(startAt);
+  }
+
+  String get gameIcon {
+    final modality = modalityPhase.toLowerCase();
+    if (modality.contains('natação')) {
+      return AppIcons.icSwimming;
+    } else if (modality.contains('futsal')) {
+      return AppIcons.icSoccer;
+    } else if (modality.contains('basquete')) {
+      return AppIcons.icBasketball;
+    } else if (modality.contains('atletismo') || modality.contains('corrida')) {
+      return AppIcons.icAthletics;
+    } else if (modality.contains('xadrez')) {
+      return AppIcons.icChess;
+    } else if (modality.contains('vôlei')) {
+      return AppIcons.icVolley;
+    } else if (modality.contains('handebol')) {
+      return AppIcons.icHandball;
+    } else {
+      return AppIcons.icTrophy;
+    }
   }
 }

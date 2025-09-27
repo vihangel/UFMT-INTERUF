@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/config/url_strategy_mobile.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
 import 'core/data/services/local_storage_service.dart';
@@ -19,6 +20,7 @@ final navigatorKey = GlobalKey<NavigatorState>();
 Future<void> main() async {
   configureUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('pt_BR', null);
 
   // Load environment variables first
   await dotenv.load(fileName: ".env");
@@ -56,6 +58,7 @@ class _MyAppState extends State<MyApp> {
       title: 'InterUFMT',
       theme: AppTheme.theme,
       routerConfig: appRoutes,
+      locale: const Locale('pt', 'BR'),
     );
   }
 }
