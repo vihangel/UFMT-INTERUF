@@ -30,4 +30,26 @@ class AppIcons {
   static const String icStatsSquare = 'assets/icons/ic_stats_square.svg';
   static const String icStats = 'assets/icons/ic_stats.svg';
   static const String icTrophy = 'assets/icons/ic_trophy.svg';
+
+  static String getGameIcon(String modality) {
+    final modalityLowerCase = modality.toLowerCase();
+    if (modalityLowerCase.contains('natação')) {
+      return AppIcons.icSwimming;
+    } else if (modalityLowerCase.contains('futsal')) {
+      return AppIcons.icSoccer;
+    } else if (modalityLowerCase.contains('basquete')) {
+      return AppIcons.icBasketball;
+    } else if (modalityLowerCase.contains('atletismo') ||
+        modalityLowerCase.contains('corrida')) {
+      return AppIcons.icAthletics;
+    } else if (modalityLowerCase.contains('xadrez')) {
+      return AppIcons.icChess;
+    } else if (modalityLowerCase.contains('vôlei')) {
+      return AppIcons.icVolley;
+    } else if (modalityLowerCase.contains('handebol')) {
+      return AppIcons.icHandball;
+    } else {
+      return AppIcons.icTrophy;
+    }
+  }
 }

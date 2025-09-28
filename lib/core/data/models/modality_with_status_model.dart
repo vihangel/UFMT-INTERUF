@@ -1,5 +1,7 @@
 // lib/core/data/models/modality_with_status_model.dart
 
+import 'package:interufmt/core/theme/app_icons.dart';
+
 class ModalityWithStatus {
   final String id;
   final String name;
@@ -112,7 +114,5 @@ class ModalityAggregated {
     );
   }
 
-  // Helper method to get the correct asset path for modality icons
-  String get assetPath =>
-      icon != null ? 'icons/ic_$icon.svg' : 'icons/ic_medal.svg';
+  String get assetPath => AppIcons.getGameIcon(name);
 }

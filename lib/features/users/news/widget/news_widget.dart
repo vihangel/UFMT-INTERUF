@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:interufmt/core/utils/extensions.dart';
 
 class NewsWidget extends StatelessWidget {
   final String? imageUrl;
@@ -25,7 +24,7 @@ class NewsWidget extends StatelessWidget {
           children: [
             if (imageUrl != null && imageUrl!.isNotEmpty)
               Image.asset(
-                'assets/images/Atlética ${imageUrl!.replaceAll('/', '').capitalize()}',
+                'assets/images/${imageUrl!.replaceAll('/', '')}',
                 fit: BoxFit.cover,
                 height: 150,
                 width: 150,

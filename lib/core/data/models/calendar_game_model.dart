@@ -136,24 +136,5 @@ class CalendarGame {
     return DateFormat('HH:mm - EEE, dd MMM', 'pt_BR').format(startAt);
   }
 
-  String get gameIcon {
-    final modality = modalityPhase.toLowerCase();
-    if (modality.contains('natação')) {
-      return AppIcons.icSwimming;
-    } else if (modality.contains('futsal')) {
-      return AppIcons.icSoccer;
-    } else if (modality.contains('basquete')) {
-      return AppIcons.icBasketball;
-    } else if (modality.contains('atletismo') || modality.contains('corrida')) {
-      return AppIcons.icAthletics;
-    } else if (modality.contains('xadrez')) {
-      return AppIcons.icChess;
-    } else if (modality.contains('vôlei')) {
-      return AppIcons.icVolley;
-    } else if (modality.contains('handebol')) {
-      return AppIcons.icHandball;
-    } else {
-      return AppIcons.icTrophy;
-    }
-  }
+  String get gameIcon => AppIcons.getGameIcon(modalityPhase);
 }

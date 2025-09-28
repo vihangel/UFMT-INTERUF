@@ -1,6 +1,7 @@
 // lib/features/users/athletics/athletics_page.dart
 
 import 'package:flutter/material.dart';
+import 'package:interufmt/core/theme/app_colors.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/data/athletics_item_model.dart';
@@ -64,7 +65,9 @@ class AthleticsPageState extends State<AthleticsPage>
     // For now, show a snackbar
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Navegando para ${athletic.nickname}'),
+        content: Text(
+          'No momento os detalhes não foram implementados. Atlética: ${athletic.nickname}',
+        ),
         duration: const Duration(seconds: 2),
       ),
     );
@@ -73,7 +76,7 @@ class AthleticsPageState extends State<AthleticsPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text(
           'Página de Atléticas',
@@ -143,57 +146,73 @@ class AthleticsPageState extends State<AthleticsPage>
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 1,
-          childAspectRatio: 0.85,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-        ),
-        itemCount: athletics.length,
-        itemBuilder: (context, index) {
-          final athletic = athletics[index];
-          return _buildAthleticCard(athletic);
-        },
-      ),
+      child: ListView(children: athletics.map(_buildAthleticCard).toList()),
     );
   }
 
   Widget _buildAthleticCard(AthleticsItem athletic) {
-    return GestureDetector(
-      onTap: () => _navigateToAthleticDetail(athletic),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withValues(alpha: 0.2),
-              spreadRadius: 2,
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: GestureDetector(
+        onTap: () => _navigateToAthleticDetail(athletic),
+        child: Stack(
           children: [
-            // Athletic Logo
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(40),
-                border: Border.all(
-                  color: Colors.grey.withValues(alpha: 0.3),
-                  width: 1,
+            SizedBox(
+              height: 140,
+              child: Card(
+                margin: const EdgeInsets.only(left: 70),
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    left: 86,
+                    right: 16,
+                    top: 16,
+                    bottom: 10,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        athletic.nickname,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryText,
+                        ),
+
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      // const SizedBox(height: 4),
+                      Expanded(
+                        child: Text(
+                          athletic.name,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.secondaryText,
+                          ),
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(40),
+            ),
+            // Athletic Logo
+            ClipRRect(
+              borderRadius: BorderRadius.circular(400),
+
+              child: Container(
+                height: 140,
+                width: 140,
+                color: AppColors.background,
                 child: Image.asset(
-                  athletic.assetPath,
+                  'assets/images/${athletic.assetPath.replaceAll('images/', '')}',
+                  height: 140,
+                  width: 140,
                   fit: BoxFit.cover,
+
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
                       decoration: BoxDecoration(
@@ -210,29 +229,6 @@ class AthleticsPageState extends State<AthleticsPage>
                 ),
               ),
             ),
-            const SizedBox(height: 12),
-            Text(
-              athletic.nickname,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              athletic.name,
-              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 8),
-            // Navigation indicator
-            Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[400]),
           ],
         ),
       ),
