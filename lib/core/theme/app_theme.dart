@@ -19,6 +19,7 @@ class AppTheme {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
         titleTextStyle: AppStyles.title.copyWith(color: Colors.black),
+        surfaceTintColor: Colors.transparent,
       ),
       buttonTheme: const ButtonThemeData(
         buttonColor: AppColors.darkBlue,
