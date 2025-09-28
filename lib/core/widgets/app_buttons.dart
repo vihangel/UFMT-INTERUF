@@ -20,6 +20,7 @@ class AppButton extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final BorderRadiusGeometry? borderRadius;
   final bool hideTrailing;
+  final TextStyle? textStyle;
 
   const AppButton({
     super.key,
@@ -35,6 +36,7 @@ class AppButton extends StatelessWidget {
     this.padding,
     this.borderRadius,
     this.hideTrailing = false,
+    this.textStyle,
   });
 
   const AppButton.outline({
@@ -51,6 +53,7 @@ class AppButton extends StatelessWidget {
     this.padding,
     this.borderRadius,
     this.hideTrailing = false,
+    this.textStyle,
   });
 
   const AppButton.text({
@@ -67,6 +70,7 @@ class AppButton extends StatelessWidget {
     this.padding,
     this.borderRadius,
     this.hideTrailing = false,
+    this.textStyle,
   });
 
   @override
@@ -96,6 +100,7 @@ class AppButton extends StatelessWidget {
         leading: leading,
         trailing: effectiveTrailing,
         variant: variant,
+        textStyle: textStyle,
       );
     }
 
@@ -104,6 +109,7 @@ class AppButton extends StatelessWidget {
       case AppButtonVariant.filled:
         style = ElevatedButton.styleFrom(
           minimumSize: Size(minWidth, height),
+
           padding: padding ?? const EdgeInsets.symmetric(horizontal: 16),
           backgroundColor: AppColors.white,
           foregroundColor: cs.primary,
@@ -182,23 +188,25 @@ class _AppButtonContent extends StatelessWidget {
   final Widget? leading;
   final Widget? trailing;
   final AppButtonVariant? variant;
+  final TextStyle? textStyle;
 
   const _AppButtonContent({
     required this.label,
     this.leading,
     this.trailing,
     this.variant,
+    this.textStyle,
   });
 
   @override
   Widget build(BuildContext context) {
     TextStyle? style;
     if (variant == AppButtonVariant.filled) {
-      style = AppStyles.buttonPrimary;
+      style = textStyle ?? AppStyles.buttonPrimary;
     } else if (variant == AppButtonVariant.text) {
-      style = AppStyles.buttonText;
+      style = textStyle ?? AppStyles.buttonText;
     } else {
-      style = AppStyles.button;
+      style = textStyle ?? AppStyles.button;
     }
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,

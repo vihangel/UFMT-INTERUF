@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:go_router/go_router.dart';
-import 'package:interufmt/features/users/home/home_page.dart';
+import 'package:interufmt/core/theme/app_colors.dart';
+import 'package:interufmt/core/theme/app_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/data/models/calendar_game_model.dart';
@@ -47,6 +47,7 @@ class CalendarPageState extends State<CalendarPage>
   }
 
   Future<void> _loadAllGames() async {
+    if (!mounted) return;
     try {
       setState(() {
         _isLoading = true;
@@ -55,9 +56,11 @@ class CalendarPageState extends State<CalendarPage>
 
       // Load games for both series
       for (String series in ['A', 'B']) {
-        for (int dayIndex = 0;
-            dayIndex < _competitionDates.length;
-            dayIndex++) {
+        for (
+          int dayIndex = 0;
+          dayIndex < _competitionDates.length;
+          dayIndex++
+        ) {
           final dayLabel = 'Dia ${dayIndex + 1}';
           final games = await _repository.getGamesBySeriesAndDate(
             series: series,
@@ -67,14 +70,18 @@ class CalendarPageState extends State<CalendarPage>
         }
       }
 
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     } catch (error) {
-      setState(() {
-        _isLoading = false;
-        _errorMessage = 'Erro ao carregar jogos: $error';
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = 'Erro ao carregar jogos: $error';
+        });
+      }
     }
   }
 
@@ -97,15 +104,13 @@ class CalendarPageState extends State<CalendarPage>
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => context.goNamed(HomePage.routename),
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back, color: Colors.black),
+        //   onPressed: () => context.goNamed(HomePage.routename),
+        // ),
         bottom: TabBar(
           controller: _seriesTabController,
-          labelColor: Colors.black,
-          unselectedLabelColor: Colors.grey,
-          indicatorColor: Colors.blue,
+
           tabs: const [
             Tab(text: 'Série A'),
             Tab(text: 'Série B'),
@@ -115,14 +120,15 @@ class CalendarPageState extends State<CalendarPage>
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _errorMessage != null
-              ? _buildErrorState()
-              : TabBarView(
-                  controller: _seriesTabController,
-                  children: [
-                    _buildSeriesContent('A', _serieADaysController),
-                    _buildSeriesContent('B', _serieBDaysController),
-                  ],
-                ),
+          ? _buildErrorState()
+          : TabBarView(
+              physics: const NeverScrollableScrollPhysics(),
+              controller: _seriesTabController,
+              children: [
+                _buildSeriesContent('A', _serieADaysController),
+                _buildSeriesContent('B', _serieBDaysController),
+              ],
+            ),
     );
   }
 
@@ -230,237 +236,152 @@ class CalendarPageState extends State<CalendarPage>
   }
 
   Widget _buildGameCard(CalendarGame game) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header: Time, Status, Venue
-            Row(
-              children: [
-                // Time
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    '${game.startAt.hour.toString().padLeft(2, '0')}:${game.startAt.minute.toString().padLeft(2, '0')}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue,
-                      fontSize: 12,
+    return Container(
+      ///Uma borda na esquerda
+      decoration: BoxDecoration(
+        border: Border(
+          left: BorderSide(color: _getStatusColor(game.status), width: 6),
+        ),
+        borderRadius: BorderRadius.circular(6),
+      ),
+
+      child: Card(
+        margin: EdgeInsets.zero,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header: Time, Status, Venue
+              Row(
+                children: [
+                  // Status
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
                     ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                // Status
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: _getStatusColor(game.status).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    game.statusDisplayText,
-                    style: TextStyle(
-                      color: _getStatusColor(game.status),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
+                    decoration: BoxDecoration(
+                      color: _getStatusColor(
+                        game.status,
+                      ).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(6),
                     ),
-                  ),
-                ),
-                const Spacer(),
-                // Venue
-                if (game.venueName != null)
-                  Row(
-                    children: [
-                      const Icon(Icons.place, size: 14, color: Colors.grey),
-                      const SizedBox(width: 4),
-                      Text(
-                        game.venueName!,
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 12,
-                        ),
+                    child: Text(
+                      game.statusDisplayText,
+                      style: TextStyle(
+                        color: _getStatusColor(game.status),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
                       ),
-                    ],
+                    ),
                   ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            // Modality Phase
-            Text(
-              game.modalityPhase,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+                ],
               ),
-            ),
-            const SizedBox(height: 12),
-            // Game Content: Two-team or Multi-team
-            if (game.isTwoTeamGame)
-              _buildTwoTeamGameContent(game)
-            else if (game.isMultiTeamGame)
-              _buildMultiTeamGameContent(game)
-            else
-              _buildUnknownGameContent(game),
-          ],
+              const SizedBox(height: 6),
+              _RowIconLabel(AppIcons.icClock, game.startTimeDateFormatted),
+              const SizedBox(height: 6),
+
+              _RowIconLabel(game.gameIcon, game.modalityPhase),
+
+              if (game.venueName != null) ...[
+                const SizedBox(height: 6),
+                _RowIconLabel(AppIcons.icLocation, game.venueName!),
+              ],
+              const SizedBox(height: 6),
+              // Game Content: Two-team or Multi-team
+              if (game.isTwoTeamGame)
+                _buildTwoTeamGameContent(game)
+              else if (game.isMultiTeamGame)
+                _buildMultiTeamGameContent(game)
+              else
+                _buildUnknownGameContent(game),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildTwoTeamGameContent(CalendarGame game) {
-    return Row(
-      children: [
-        // Team A
-        Expanded(
-          child: Column(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.grey.withValues(alpha: 0.1),
-                ),
-                child: game.teamALogo != null
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: Image.asset(
-                          'assets/images/${game.teamALogo}',
-                          width: 40,
-                          height: 40,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return const Icon(Icons.shield, color: Colors.grey);
-                          },
-                        ),
-                      )
-                    : const Icon(Icons.shield, color: Colors.grey),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '${game.displayScoreA}',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        ),
-        // VS
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            'VS',
-            style: TextStyle(
-              fontSize: 16,
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          // Team A
+          game.teamALogo != null
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Image.asset(
+                    'assets/images/${game.teamALogo}',
+                    width: 76,
+                    height: 76,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Icon(Icons.shield, color: Colors.grey);
+                    },
+                  ),
+                )
+              : const Icon(Icons.shield, color: Colors.grey),
+
+          Text(
+            '${game.displayScoreA} X ${game.displayScoreB}',
+            style: const TextStyle(
+              fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Colors.grey,
+              color: AppColors.secondaryText,
             ),
           ),
-        ),
-        // Team B
-        Expanded(
-          child: Column(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.grey.withValues(alpha: 0.1),
-                ),
-                child: game.teamBLogo != null
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: Image.asset(
-                          'assets/images/${game.teamBLogo}',
-                          width: 40,
-                          height: 40,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return const Icon(Icons.shield, color: Colors.grey);
-                          },
-                        ),
-                      )
-                    : const Icon(Icons.shield, color: Colors.grey),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '${game.displayScoreB}',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+
+          // Team B
+          game.teamBLogo != null
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Image.asset(
+                    'assets/images/${game.teamBLogo}',
+                    width: 76,
+                    height: 76,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Icon(Icons.shield, color: Colors.grey);
+                    },
+                  ),
+                )
+              : const Icon(Icons.shield, color: Colors.grey),
+        ],
+      ),
     );
   }
 
   Widget _buildMultiTeamGameContent(CalendarGame game) {
     final logos = game.multiTeamLogos;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Participantes:',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: Colors.grey,
+    return Wrap(
+      spacing: -2,
+      runSpacing: -2,
+      children: logos.map((logo) {
+        return Container(
+          width: 50,
+          height: 50,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.grey.withValues(alpha: 0.1),
           ),
-        ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: logos.map((logo) {
-            return Container(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.asset(
+              'assets/images/$logo',
               width: 32,
               height: 32,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.grey.withValues(alpha: 0.1),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.asset(
-                  'assets/images/$logo',
-                  width: 32,
-                  height: 32,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Icon(
-                      Icons.shield,
-                      color: Colors.grey,
-                      size: 16,
-                    );
-                  },
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return const Icon(Icons.shield, color: Colors.grey, size: 16);
+              },
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 
@@ -487,14 +408,42 @@ class CalendarPageState extends State<CalendarPage>
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'scheduled':
-        return Colors.blue;
+        return AppColors.error;
       case 'inprogress':
       case 'in_progress':
-        return Colors.orange;
+        return AppColors.warning;
       case 'finished':
-        return Colors.green;
+        return AppColors.success;
       default:
         return Colors.grey;
     }
+  }
+}
+
+class _RowIconLabel extends StatelessWidget {
+  final String icon;
+  final String label;
+  const _RowIconLabel(this.icon, this.label);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SvgPicture.asset(
+          icon,
+          width: 24,
+          height: 24,
+          colorFilter: const ColorFilter.mode(
+            AppColors.primaryText,
+            BlendMode.srcIn,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          label,
+          style: const TextStyle(color: AppColors.primaryText, fontSize: 14),
+        ),
+      ],
+    );
   }
 }

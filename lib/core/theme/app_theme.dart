@@ -19,6 +19,7 @@ class AppTheme {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
         titleTextStyle: AppStyles.title.copyWith(color: Colors.black),
+        surfaceTintColor: Colors.transparent,
       ),
       buttonTheme: const ButtonThemeData(
         buttonColor: AppColors.darkBlue,
@@ -80,6 +81,17 @@ class AppTheme {
         thickness: 1,
         indent: 20,
         endIndent: 20,
+      ),
+      tabBarTheme: TabBarThemeData(
+        labelColor: AppColors.primaryText,
+        unselectedLabelColor: AppColors.secondaryText,
+        indicatorColor: AppColors.background,
+        dividerColor: AppColors.inputBorder,
+        dividerHeight: 2,
+
+        indicator: UnderlineTabIndicator(
+          borderSide: BorderSide(color: AppColors.darkBlue, width: 2),
+        ),
       ),
     );
   }

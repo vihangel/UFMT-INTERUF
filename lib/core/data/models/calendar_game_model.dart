@@ -1,3 +1,6 @@
+import 'package:interufmt/core/theme/app_icons.dart';
+import 'package:intl/intl.dart';
+
 class CalendarGame {
   final String gameId;
   final DateTime startAt;
@@ -128,4 +131,10 @@ class CalendarGame {
     final dayNumber = day - baseDay + 1;
     return 'Dia $dayNumber';
   }
+
+  String get startTimeDateFormatted {
+    return DateFormat('HH:mm - EEE, dd MMM', 'pt_BR').format(startAt);
+  }
+
+  String get gameIcon => AppIcons.getGameIcon(modalityPhase);
 }

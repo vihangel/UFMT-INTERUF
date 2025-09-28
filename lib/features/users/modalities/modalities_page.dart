@@ -2,8 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:go_router/go_router.dart';
-import 'package:interufmt/features/users/home/home_page.dart';
+import 'package:interufmt/core/theme/app_colors.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/data/models/modality_with_status_model.dart';
@@ -36,8 +35,9 @@ class ModalitiesPageState extends State<ModalitiesPage>
 
     _tabController.addListener(() {
       setState(() {
-        _currentModalities =
-            _tabController.index == 0 ? _serieAModalities : _serieBModalities;
+        _currentModalities = _tabController.index == 0
+            ? _serieAModalities
+            : _serieBModalities;
       });
     });
   }
@@ -74,41 +74,26 @@ class ModalitiesPageState extends State<ModalitiesPage>
     super.dispose();
   }
 
-  Icon _getStatusIcon(String status) {
-    switch (status) {
-      case 'Não iniciada':
-        return const Icon(Icons.schedule, color: Colors.grey, size: 16);
-      case 'Em disputa':
-        return const Icon(Icons.play_circle_fill, color: Colors.grey, size: 16);
-      case 'Finalizada':
-        return const Icon(Icons.check_circle, color: Colors.grey, size: 16);
-      default:
-        return const Icon(Icons.help_outline, color: Colors.grey, size: 16);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text(
           'Modalidades',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.cardBackground,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => context.goNamed(HomePage.routename),
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back, color: Colors.black),
+        //   onPressed: () => context.goNamed(HomePage.routename),
+        // ),
         bottom: TabBar(
           controller: _tabController,
-          labelColor: Colors.black,
-          unselectedLabelColor: Colors.grey,
-          indicatorColor: Colors.blue,
           tabs: const [
             Tab(text: 'Série A'),
+
             Tab(text: 'Série B'),
           ],
         ),
@@ -116,8 +101,8 @@ class ModalitiesPageState extends State<ModalitiesPage>
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _errorMessage != null
-              ? _buildErrorState()
-              : _buildModalitiesContent(),
+          ? _buildErrorState()
+          : _buildModalitiesContent(),
     );
   }
 
@@ -150,6 +135,7 @@ class ModalitiesPageState extends State<ModalitiesPage>
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            SizedBox(height: 10),
             // Three-column layout for gender sections
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,34 +160,21 @@ class ModalitiesPageState extends State<ModalitiesPage>
     final modalities = _currentModalities[gender] ?? [];
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          children: [
-            Container(
-              width: 4,
-              height: 24,
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                gender,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: color,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
+        Text(
+          gender,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: AppColors.secondaryText,
+          ),
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 8),
-        const SizedBox(height: 12),
+
+        const SizedBox(height: 16),
+
         if (modalities.isEmpty)
           Container(
             width: double.infinity,
@@ -237,83 +210,53 @@ class ModalitiesPageState extends State<ModalitiesPage>
   }
 
   Widget _buildModalityCard(ModalityAggregated modality, Color genderColor) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
-            spreadRadius: 1,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-        border: Border.all(color: genderColor.withValues(alpha: 0.2), width: 1),
-      ),
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Center(
+              child: SvgPicture.asset(
+                modality.assetPath,
+                width: 32,
+                height: 32,
+                colorFilter: ColorFilter.mode(
+                  AppColors.primaryText,
+                  BlendMode.srcIn,
+                ),
+              ),
+            ),
+            const SizedBox(height: 5),
+
             // Modality icon and name
-            Row(
-              children: [
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: genderColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: modality.icon != null
-                      ? SvgPicture.asset(
-                          modality.assetPath,
-                          width: 16,
-                          height: 16,
-                          colorFilter: ColorFilter.mode(
-                            genderColor,
-                            BlendMode.srcIn,
-                          ),
-                        )
-                      : Icon(Icons.emoji_events, color: genderColor, size: 16),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    modality.name,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
+            Text(
+              modality.name,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppColors.primaryText,
+              ),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+
+            const SizedBox(height: 2),
+
             // Status
-            Row(
-              children: [
-                _getStatusIcon(modality.modalityStatus),
-                const SizedBox(width: 4),
-                Expanded(
-                  child: Text(
-                    modality.modalityStatus,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
+            Text(
+              modality.modalityStatus,
+              style: TextStyle(
+                fontSize: 12,
+                color: AppColors.secondaryText,
+                fontWeight: FontWeight.w500,
+              ),
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 6),
           ],
         ),
       ),

@@ -10,10 +10,10 @@ class EscolhaAtleticaPage extends StatefulWidget {
   const EscolhaAtleticaPage({super.key});
 
   @override
-  _EscolhaAtleticaPageState createState() => _EscolhaAtleticaPageState();
+  EscolhaAtleticaPageState createState() => EscolhaAtleticaPageState();
 }
 
-class _EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
+class EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _currentPageIndex = 0;
@@ -51,7 +51,8 @@ class _EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
         }
         _currentPageIndex =
             _tabPageControllers[_tabController.index]?.page?.round() ?? 0;
-        _pageOffset = _tabPageControllers[_tabController.index]?.page ??
+        _pageOffset =
+            _tabPageControllers[_tabController.index]?.page ??
             _tabPageControllers[_tabController.index]?.initialPage.toDouble() ??
             0.0;
       });
@@ -217,8 +218,9 @@ class _EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
                     ],
                     const Spacer(),
                     ElevatedButton(
-                      onPressed:
-                          _currentSeries.isNotEmpty ? _saveAndNavigate : null,
+                      onPressed: _currentSeries.isNotEmpty
+                          ? _saveAndNavigate
+                          : null,
                       child: const Text('Escolher'),
                     ),
                     const SizedBox(height: 10),
@@ -284,7 +286,6 @@ class _EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
                       assetPath,
                       fit: BoxFit.contain,
                       errorBuilder: (context, error, stackTrace) {
-                        print('❌ Error loading asset $assetPath: $error');
                         return Container(
                           width: 150,
                           height: 150,
