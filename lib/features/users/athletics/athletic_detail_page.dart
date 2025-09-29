@@ -10,6 +10,7 @@ import '../../../core/data/models/athletic_detail_model.dart';
 import '../../../core/data/models/athletic_game_model.dart';
 import '../../../core/data/models/modality_with_status_model.dart';
 import '../../../core/data/repositories/athletic_detail_repository.dart';
+import '../games/games_page.dart';
 
 class AthleticDetailPage extends StatefulWidget {
   final AthleticsItem athletic;
@@ -474,6 +475,18 @@ class AthleticDetailPageState extends State<AthleticDetailPage>
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
+        onTap: () {
+          // Navigate to games page for this modality
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => GamesPage(
+                modalityId: modality.id,
+                modalityName: '${modality.name} ${modality.gender}',
+              ),
+            ),
+          );
+        },
         leading: Container(
           width: 48,
           height: 48,
