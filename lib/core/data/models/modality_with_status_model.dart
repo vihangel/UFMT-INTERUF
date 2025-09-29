@@ -70,6 +70,9 @@ class ModalityWithStatus {
       return 'Em disputa';
     }
   }
+  static bool isUniqueGame(List<String> gameStatuses) {
+    return gameStatuses.length == 1;
+  }
 }
 
 // Model for aggregated modality data
@@ -79,6 +82,7 @@ class ModalityAggregated {
   final String gender;
   final String? icon;
   final String series;
+  final bool? isUniqueGame;
   final List<String> gameStatuses;
   final String modalityStatus;
 
@@ -88,6 +92,7 @@ class ModalityAggregated {
     required this.gender,
     this.icon,
     required this.series,
+    this.isUniqueGame,
     required this.gameStatuses,
     required this.modalityStatus,
   });
@@ -102,6 +107,7 @@ class ModalityAggregated {
     final first = modalities.first;
     final gameStatuses = modalities.map((m) => m.status).toList();
     final modalityStatus = ModalityWithStatus.getModalityStatus(gameStatuses);
+    final isUniqueGame = ModalityWithStatus.isUniqueGame(gameStatuses);
 
     return ModalityAggregated(
       id: first.id,
@@ -110,6 +116,7 @@ class ModalityAggregated {
       icon: first.icon,
       series: first.series,
       gameStatuses: gameStatuses,
+      isUniqueGame: isUniqueGame,
       modalityStatus: modalityStatus,
     );
   }
