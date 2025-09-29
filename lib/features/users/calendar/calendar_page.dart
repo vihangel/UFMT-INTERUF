@@ -21,12 +21,19 @@ class CalendarPageState extends State<CalendarPage>
   late TabController _serieBDaysController;
   late CalendarGamesRepository _repository;
 
-  // Competition dates (August 30, 31, September 1)
-  final List<DateTime> _competitionDates = [
-    DateTime(2025, 8, 30),
-    DateTime(2025, 8, 31),
-    DateTime(2025, 9, 1),
-  ];
+  // Competition dates for each series
+  final Map<String, List<DateTime>> _competitionDates = {
+    'A': [
+      DateTime(2025, 10, 31), // October 31
+      DateTime(2025, 11, 1), // November 1
+      DateTime(2025, 11, 2), // November 2
+    ],
+    'B': [
+      DateTime(2025, 11, 14), // November 14
+      DateTime(2025, 11, 15), // November 15
+      DateTime(2025, 11, 16), // November 16
+    ],
+  };
 
   final Map<String, Map<String, List<CalendarGame>>> _gamesData = {
     'A': {'Dia 1': [], 'Dia 2': [], 'Dia 3': []},
@@ -54,17 +61,14 @@ class CalendarPageState extends State<CalendarPage>
         _errorMessage = null;
       });
 
-      // Load games for both series
+      // Load games for both series with their specific dates
       for (String series in ['A', 'B']) {
-        for (
-          int dayIndex = 0;
-          dayIndex < _competitionDates.length;
-          dayIndex++
-        ) {
+        final seriesDates = _competitionDates[series]!;
+        for (int dayIndex = 0; dayIndex < seriesDates.length; dayIndex++) {
           final dayLabel = 'Dia ${dayIndex + 1}';
           final games = await _repository.getGamesBySeriesAndDate(
             series: series,
-            date: _competitionDates[dayIndex],
+            date: seriesDates[dayIndex],
           );
           _gamesData[series]![dayLabel] = games;
         }
@@ -154,6 +158,19 @@ class CalendarPageState extends State<CalendarPage>
     );
   }
 
+  String _formatDateForTab(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}';
+  }
+
+  List<Tab> _getTabsForSeries(String series) {
+    final dates = _competitionDates[series]!;
+    return [
+      Tab(text: 'Dia 1\n${_formatDateForTab(dates[0])}'),
+      Tab(text: 'Dia 2\n${_formatDateForTab(dates[1])}'),
+      Tab(text: 'Dia 3\n${_formatDateForTab(dates[2])}'),
+    ];
+  }
+
   Widget _buildSeriesContent(String series, TabController daysController) {
     return Column(
       children: [
@@ -166,11 +183,7 @@ class CalendarPageState extends State<CalendarPage>
             unselectedLabelColor: Colors.grey,
             indicatorColor: Colors.blue,
             indicatorSize: TabBarIndicatorSize.tab,
-            tabs: [
-              Tab(text: 'Dia 1\n30/08'),
-              Tab(text: 'Dia 2\n31/08'),
-              Tab(text: 'Dia 3\n01/09'),
-            ],
+            tabs: _getTabsForSeries(series),
           ),
         ),
         // Days TabBarView
