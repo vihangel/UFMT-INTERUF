@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/data/athletics_item_model.dart';
 import '../../../core/data/repositories/athletics_repository.dart';
+import 'athletic_detail_page.dart';
 
 class AthleticsPage extends StatefulWidget {
   const AthleticsPage({super.key});
@@ -61,14 +62,9 @@ class AthleticsPageState extends State<AthleticsPage>
   }
 
   void _navigateToAthleticDetail(AthleticsItem athletic) {
-    // TODO: Navigate to athletic detail page when it's created
-    // For now, show a snackbar
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'No momento os detalhes não foram implementados. Atlética: ${athletic.nickname}',
-        ),
-        duration: const Duration(seconds: 2),
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => AthleticDetailPage(athletic: athletic),
       ),
     );
   }
