@@ -8,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/data/models/modality_with_status_model.dart';
 import '../../../core/data/repositories/modalities_repository.dart';
 import '../games/games_page.dart';
+import '../games/game_detail_page.dart';
 
 class ModalitiesPage extends StatefulWidget {
   const ModalitiesPage({super.key});
@@ -213,8 +214,21 @@ class ModalitiesPageState extends State<ModalitiesPage>
   Widget _buildModalityCard(ModalityAggregated modality, Color genderColor) {
     return GestureDetector(
       onTap: () {
-        // Navigate to games page if modality has multiple games (tournament bracket)
-        if (modality.isUniqueGame == false) {
+        // Navigate based on whether it's a unique game or tournament
+        if (modality.isUniqueGame == true) {
+          // Navigate to game detail page for unique games
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => GameDetailPage(
+                modalityId: modality.id,
+                modalityName: '${modality.name} ${modality.gender}',
+                series: modality.series,
+              ),
+            ),
+          );
+        } else {
+          // Navigate to games page for tournament brackets
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -272,30 +286,6 @@ class ModalitiesPageState extends State<ModalitiesPage>
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
               ),
-
-              // Show tournament indicator if not unique game
-              if (modality.isUniqueGame == false) ...[
-                const SizedBox(height: 4),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Text(
-                    'Torneio',
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: Colors.blue,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ],
             ],
           ),
         ),
