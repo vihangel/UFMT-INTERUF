@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/data/models/game_detail_model.dart';
 import '../../../core/data/repositories/game_detail_repository.dart';
+import '../athletes/athlete_detail_page.dart';
 
 class GameDetailPage extends StatefulWidget {
   final String modalityId;
@@ -441,77 +442,99 @@ class GameDetailPageState extends State<GameDetailPage> {
   }
 
   Widget _buildStandingRow(AthleteStanding standing) {
-    return Row(
-      children: [
-        // Position
-        Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: _getPositionColor(standing.position),
-            shape: BoxShape.circle,
-          ),
-          child: Center(
-            child: Text(
-              '${standing.position}º',
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-              ),
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AthleteDetailPage(
+              athleteId: standing.athleteId,
+              gameId: _gameDetail!.gameId,
             ),
           ),
-        ),
-        const SizedBox(width: 16),
-        // Athletic logo
-        ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: Container(
-            width: 40,
-            height: 40,
-            color: AppColors.background,
-            child: Image.asset(
-              standing.athleticLogoPath.isNotEmpty
-                  ? 'assets/${standing.athleticLogoPath}'
-                  : 'assets/images/blankimg.png',
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Icon(Icons.sports, color: Colors.grey, size: 20),
-                );
-              },
+        );
+      },
+      child: Row(
+        children: [
+          // Position
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: _getPositionColor(standing.position),
+              shape: BoxShape.circle,
             ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        // Athlete name and athletic name
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                standing.athleteName,
+            child: Center(
+              child: Text(
+                '${standing.position}º',
                 style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryText,
-                ),
-              ),
-              Text(
-                standing.athleticName,
-                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                   fontSize: 12,
-                  color: AppColors.secondaryText,
                 ),
               ),
-            ],
+            ),
           ),
-        ),
-      ],
+          const SizedBox(width: 16),
+          // Athletic logo
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              width: 40,
+              height: 40,
+              color: AppColors.background,
+              child: Image.asset(
+                standing.athleticLogoPath.isNotEmpty
+                    ? 'assets/${standing.athleticLogoPath}'
+                    : 'assets/images/blankimg.png',
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Icon(
+                      Icons.sports,
+                      color: Colors.grey,
+                      size: 20,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          // Athlete name and athletic name
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  standing.athleteName,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primaryText,
+                  ),
+                ),
+                Text(
+                  standing.athleticName,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.secondaryText,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Icon(
+            Icons.arrow_forward_ios,
+            size: 16,
+            color: AppColors.secondaryText,
+          ),
+        ],
+      ),
     );
   }
 

@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/data/models/tournament_game_detail_model.dart';
 import '../../../core/data/repositories/tournament_game_detail_repository.dart';
+import '../athletes/athlete_detail_page.dart';
 
 class TournamentGameDetailPage extends StatefulWidget {
   final String gameId;
@@ -597,21 +598,13 @@ class TournamentGameDetailPageState extends State<TournamentGameDetailPage>
   Widget _buildAthleteRow(GameAthlete athlete) {
     return InkWell(
       onTap: () {
-        // TODO: Navigate to athlete detail page
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => AthleteDetailPage(athleteId: athlete.athleteId),
-        //   ),
-        // );
-
-        // For now, show a placeholder message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Detalhes de ${athlete.fullName} - Em desenvolvimento',
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AthleteDetailPage(
+              athleteId: athlete.athleteId,
+              gameId: widget.gameId,
             ),
-            duration: const Duration(seconds: 2),
           ),
         );
       },
