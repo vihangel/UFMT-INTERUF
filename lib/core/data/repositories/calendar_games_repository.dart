@@ -21,6 +21,7 @@ class CalendarGamesRepository {
         g.start_at,
         g.status,
         g.series,
+        g.modality_id,
         -- Update athletics_standings to include logo URLs
         CASE 
           WHEN g.athletics_standings IS NOT NULL THEN

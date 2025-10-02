@@ -1,45 +1,38 @@
+// lib/features/users/games/games_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:interufmt/core/theme/app_colors.dart';
 import 'package:interufmt/core/theme/app_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../core/data/models/calendar_game_model.dart';
-import '../../../core/data/repositories/calendar_games_repository.dart';
-import '../games/game_detail_page.dart';
-import '../games/tournament_game_detail_page.dart';
+import '../../../core/data/models/bracket_game_model.dart';
+import '../../../core/data/repositories/bracket_games_repository.dart';
+import 'tournament_game_detail_page.dart';
 
-class CalendarPage extends StatefulWidget {
-  const CalendarPage({super.key});
+class GamesPage extends StatefulWidget {
+  final String modalityId;
+  final String modalityName;
+
+  const GamesPage({
+    super.key,
+    required this.modalityId,
+    required this.modalityName,
+  });
 
   @override
-  CalendarPageState createState() => CalendarPageState();
+  GamesPageState createState() => GamesPageState();
 }
 
-class CalendarPageState extends State<CalendarPage>
-    with TickerProviderStateMixin {
+class GamesPageState extends State<GamesPage> with TickerProviderStateMixin {
   late TabController _seriesTabController;
-  late TabController _serieADaysController;
-  late TabController _serieBDaysController;
-  late CalendarGamesRepository _repository;
+  late TabController _serieAPhasesController;
+  late TabController _serieBPhasesController;
+  late BracketGamesRepository _repository;
 
-  // Competition dates for each series
-  final Map<String, List<DateTime>> _competitionDates = {
-    'A': [
-      DateTime(2025, 10, 31), // October 31
-      DateTime(2025, 11, 1), // November 1
-      DateTime(2025, 11, 2), // November 2
-    ],
-    'B': [
-      DateTime(2025, 11, 14), // November 14
-      DateTime(2025, 11, 15), // November 15
-      DateTime(2025, 11, 16), // November 16
-    ],
-  };
-
-  final Map<String, Map<String, List<CalendarGame>>> _gamesData = {
-    'A': {'Dia 1': [], 'Dia 2': [], 'Dia 3': []},
-    'B': {'Dia 1': [], 'Dia 2': [], 'Dia 3': []},
+  final Map<String, Map<String, List<BracketGame>>> _gamesData = {
+    'A': {'Oitavas': [], 'Quartas': [], 'Semis': [], 'Final': []},
+    'B': {'Oitavas': [], 'Quartas': [], 'Semis': [], 'Final': []},
   };
 
   bool _isLoading = true;
@@ -49,9 +42,9 @@ class CalendarPageState extends State<CalendarPage>
   void initState() {
     super.initState();
     _seriesTabController = TabController(length: 2, vsync: this);
-    _serieADaysController = TabController(length: 3, vsync: this);
-    _serieBDaysController = TabController(length: 3, vsync: this);
-    _repository = CalendarGamesRepository(Supabase.instance.client);
+    _serieAPhasesController = TabController(length: 4, vsync: this);
+    _serieBPhasesController = TabController(length: 4, vsync: this);
+    _repository = BracketGamesRepository(Supabase.instance.client);
     _loadAllGames();
   }
 
@@ -63,18 +56,13 @@ class CalendarPageState extends State<CalendarPage>
         _errorMessage = null;
       });
 
-      // Load games for both series with their specific dates
-      for (String series in ['A', 'B']) {
-        final seriesDates = _competitionDates[series]!;
-        for (int dayIndex = 0; dayIndex < seriesDates.length; dayIndex++) {
-          final dayLabel = 'Dia ${dayIndex + 1}';
-          final games = await _repository.getGamesBySeriesAndDate(
-            series: series,
-            date: seriesDates[dayIndex],
-          );
-          _gamesData[series]![dayLabel] = games;
-        }
-      }
+      // Load games for both series
+      final allGames = await _repository.getAllBracketGamesByModality(
+        modalityId: widget.modalityId,
+      );
+
+      _gamesData['A'] = allGames['A'] ?? {};
+      _gamesData['B'] = allGames['B'] ?? {};
 
       if (mounted) {
         setState(() {
@@ -94,8 +82,8 @@ class CalendarPageState extends State<CalendarPage>
   @override
   void dispose() {
     _seriesTabController.dispose();
-    _serieADaysController.dispose();
-    _serieBDaysController.dispose();
+    _serieAPhasesController.dispose();
+    _serieBPhasesController.dispose();
     super.dispose();
   }
 
@@ -104,19 +92,21 @@ class CalendarPageState extends State<CalendarPage>
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
-          'Calendário',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        title: Text(
+          widget.modalityName,
+          style: const TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        // leading: IconButton(
-        //   icon: const Icon(Icons.arrow_back, color: Colors.black),
-        //   onPressed: () => context.goNamed(HomePage.routename),
-        // ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
         bottom: TabBar(
           controller: _seriesTabController,
-
           tabs: const [
             Tab(text: 'Série A'),
             Tab(text: 'Série B'),
@@ -131,8 +121,8 @@ class CalendarPageState extends State<CalendarPage>
               physics: const NeverScrollableScrollPhysics(),
               controller: _seriesTabController,
               children: [
-                _buildSeriesContent('A', _serieADaysController),
-                _buildSeriesContent('B', _serieBDaysController),
+                _buildSeriesContent('A', _serieAPhasesController),
+                _buildSeriesContent('B', _serieBPhasesController),
               ],
             ),
     );
@@ -160,42 +150,36 @@ class CalendarPageState extends State<CalendarPage>
     );
   }
 
-  String _formatDateForTab(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}';
-  }
-
-  List<Tab> _getTabsForSeries(String series) {
-    final dates = _competitionDates[series]!;
-    return [
-      Tab(text: 'Dia 1\n${_formatDateForTab(dates[0])}'),
-      Tab(text: 'Dia 2\n${_formatDateForTab(dates[1])}'),
-      Tab(text: 'Dia 3\n${_formatDateForTab(dates[2])}'),
-    ];
-  }
-
-  Widget _buildSeriesContent(String series, TabController daysController) {
+  Widget _buildSeriesContent(String series, TabController phasesController) {
     return Column(
       children: [
-        // Days TabBar
+        // Phases TabBar
         Container(
           color: Colors.grey.withValues(alpha: 0.1),
           child: TabBar(
-            controller: daysController,
+            controller: phasesController,
             labelColor: Colors.black,
             unselectedLabelColor: Colors.grey,
             indicatorColor: Colors.blue,
             indicatorSize: TabBarIndicatorSize.tab,
-            tabs: _getTabsForSeries(series),
+            isScrollable: true,
+            tabs: const [
+              Tab(text: 'Oitavas'),
+              Tab(text: 'Quartas'),
+              Tab(text: 'Semis'),
+              Tab(text: 'Final'),
+            ],
           ),
         ),
-        // Days TabBarView
+        // Phases TabBarView
         Expanded(
           child: TabBarView(
-            controller: daysController,
+            controller: phasesController,
             children: [
-              _buildDayContent(series, 'Dia 1'),
-              _buildDayContent(series, 'Dia 2'),
-              _buildDayContent(series, 'Dia 3'),
+              _buildPhaseContent(series, 'Oitavas'),
+              _buildPhaseContent(series, 'Quartas'),
+              _buildPhaseContent(series, 'Semis'),
+              _buildPhaseContent(series, 'Final'),
             ],
           ),
         ),
@@ -203,8 +187,8 @@ class CalendarPageState extends State<CalendarPage>
     );
   }
 
-  Widget _buildDayContent(String series, String day) {
-    final games = _gamesData[series]![day] ?? [];
+  Widget _buildPhaseContent(String series, String phase) {
+    final games = _gamesData[series]![phase] ?? [];
 
     if (games.isEmpty) {
       return Center(
@@ -212,7 +196,7 @@ class CalendarPageState extends State<CalendarPage>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SvgPicture.asset(
-              'assets/icons/ic_calendar.svg',
+              'assets/icons/ic_trophy.svg',
               width: 64,
               height: 64,
               colorFilter: ColorFilter.mode(
@@ -222,7 +206,7 @@ class CalendarPageState extends State<CalendarPage>
             ),
             const SizedBox(height: 16),
             Text(
-              'Nenhum jogo agendado\npara $day',
+              'Nenhum jogo encontrado\npara $phase',
               style: TextStyle(
                 color: Colors.grey.withValues(alpha: 0.7),
                 fontSize: 16,
@@ -250,43 +234,25 @@ class CalendarPageState extends State<CalendarPage>
     );
   }
 
-  Widget _buildGameCard(CalendarGame game) {
+  Widget _buildGameCard(BracketGame game) {
     return Container(
-      ///Uma borda na esquerda
       decoration: BoxDecoration(
         border: Border(
           left: BorderSide(color: _getStatusColor(game.status), width: 6),
         ),
         borderRadius: BorderRadius.circular(6),
       ),
-
       child: Card(
         margin: EdgeInsets.zero,
         child: InkWell(
           onTap: () {
-            // Navigate based on game type
-            if (game.isTwoTeamGame) {
-              // Navigate to tournament game detail page for two-team games
+            // Navigate to tournament game detail page for bracket games
+            if (game.hasTeams) {
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
                       TournamentGameDetailPage(gameId: game.gameId),
-                ),
-              );
-            } else if (game.isMultiTeamGame) {
-              // Navigate to game detail page for multi-team games (standings)
-              // We need to extract modality info from modalityPhase
-              // Format: "Modality Gender - Phase" or just "Modality Gender"
-              final modalityName = game.modalityPhase.split(' - ').first;
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => GameDetailPage(
-                    modalityId: game.modalityId,
-                    modalityName: modalityName,
-                    series: game.series,
-                  ),
                 ),
               );
             }
@@ -297,10 +263,28 @@ class CalendarPageState extends State<CalendarPage>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header: Time, Status, Venue
+                // Header: Phase, Status
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Status
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _getPhaseColor(game.phase),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        game.phase,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
@@ -310,37 +294,36 @@ class CalendarPageState extends State<CalendarPage>
                         color: _getStatusColor(
                           game.status,
                         ).withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
                         game.statusDisplayText,
                         style: TextStyle(
                           color: _getStatusColor(game.status),
                           fontSize: 12,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 6),
-                _RowIconLabel(AppIcons.icClock, game.startTimeDateFormatted),
-                const SizedBox(height: 6),
+                const SizedBox(height: 12),
 
-                _RowIconLabel(game.gameIcon, game.modalityPhase),
+                // Time and venue info
+                _RowIconLabel(AppIcons.icClock, game.startTimeDateFormatted),
 
                 if (game.venueName != null) ...[
                   const SizedBox(height: 6),
                   _RowIconLabel(AppIcons.icLocation, game.venueName!),
                 ],
-                const SizedBox(height: 6),
-                // Game Content: Two-team or Multi-team
-                if (game.isTwoTeamGame)
-                  _buildTwoTeamGameContent(game)
-                else if (game.isMultiTeamGame)
-                  _buildMultiTeamGameContent(game)
+
+                const SizedBox(height: 16),
+
+                // Teams and score
+                if (game.hasTeams)
+                  _buildTeamsAndScore(game)
                 else
-                  _buildUnknownGameContent(game),
+                  _buildNoTeamsContent(),
               ],
             ),
           ),
@@ -349,89 +332,107 @@ class CalendarPageState extends State<CalendarPage>
     );
   }
 
-  Widget _buildTwoTeamGameContent(CalendarGame game) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          // Team A
-          game.teamALogo != null
-              ? ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
+  Widget _buildTeamsAndScore(BracketGame game) {
+    return Row(
+      children: [
+        // Team A
+        Expanded(
+          child: Column(
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.grey.withValues(alpha: 0.1),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(30),
                   child: Image.asset(
-                    'assets/images/${game.teamALogo}',
-                    width: 76,
-                    height: 76,
+                    game.teamALogoPath,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return const Icon(Icons.shield, color: Colors.grey);
                     },
                   ),
-                )
-              : const Icon(Icons.shield, color: Colors.grey),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                game.teamAName ?? 'A definir',
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
 
-          Text(
-            '${game.displayScoreA} X ${game.displayScoreB}',
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppColors.secondaryText,
+        // Score
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              '${game.scoreA} X ${game.scoreB}',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppColors.secondaryText,
+              ),
             ),
           ),
+        ),
 
-          // Team B
-          game.teamBLogo != null
-              ? ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
+        // Team B
+        Expanded(
+          child: Column(
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.grey.withValues(alpha: 0.1),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(30),
                   child: Image.asset(
-                    'assets/images/${game.teamBLogo}',
-                    width: 76,
-                    height: 76,
+                    game.teamBLogoPath,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return const Icon(Icons.shield, color: Colors.grey);
                     },
                   ),
-                )
-              : const Icon(Icons.shield, color: Colors.grey),
-        ],
-      ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                game.teamBName ?? 'A definir',
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildMultiTeamGameContent(CalendarGame game) {
-    final logos = game.multiTeamLogos;
-
-    return Wrap(
-      spacing: -2,
-      runSpacing: -2,
-      children: logos.map((logo) {
-        return Container(
-          width: 50,
-          height: 50,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.grey.withValues(alpha: 0.1),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: Image.asset(
-              'assets/images/$logo',
-              width: 32,
-              height: 32,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return const Icon(Icons.shield, color: Colors.grey, size: 16);
-              },
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildUnknownGameContent(CalendarGame game) {
+  Widget _buildNoTeamsContent() {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -442,10 +443,7 @@ class CalendarPageState extends State<CalendarPage>
         children: [
           Icon(Icons.help_outline, color: Colors.grey),
           SizedBox(width: 8),
-          Text(
-            'Informações dos participantes não disponíveis',
-            style: TextStyle(color: Colors.grey),
-          ),
+          Text('Times a serem definidos', style: TextStyle(color: Colors.grey)),
         ],
       ),
     );
@@ -464,6 +462,22 @@ class CalendarPageState extends State<CalendarPage>
         return Colors.grey;
     }
   }
+
+  Color _getPhaseColor(String phase) {
+    switch (phase.toLowerCase()) {
+      case 'final':
+        return Colors.amber;
+      case 'semifinal':
+      case 'semis':
+        return Colors.orange;
+      case 'quartas':
+        return Colors.blue;
+      case 'oitavas':
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
+  }
 }
 
 class _RowIconLabel extends StatelessWidget {
@@ -477,17 +491,19 @@ class _RowIconLabel extends StatelessWidget {
       children: [
         SvgPicture.asset(
           icon,
-          width: 24,
-          height: 24,
+          width: 20,
+          height: 20,
           colorFilter: const ColorFilter.mode(
             AppColors.primaryText,
             BlendMode.srcIn,
           ),
         ),
         const SizedBox(width: 8),
-        Text(
-          label,
-          style: const TextStyle(color: AppColors.primaryText, fontSize: 14),
+        Expanded(
+          child: Text(
+            label,
+            style: const TextStyle(color: AppColors.primaryText, fontSize: 14),
+          ),
         ),
       ],
     );

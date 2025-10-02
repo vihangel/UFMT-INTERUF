@@ -6,12 +6,14 @@ part 'game_stats_model.g.dart';
 class GameStats {
   final String gameId;
   final String statCode;
-  final int value;
+  final int valuea;
+  final int valueb;
 
   GameStats({
     required this.gameId,
     required this.statCode,
-    required this.value,
+    required this.valuea,
+    required this.valueb,
   });
 
   factory GameStats.fromJson(Map<String, dynamic> json) =>
