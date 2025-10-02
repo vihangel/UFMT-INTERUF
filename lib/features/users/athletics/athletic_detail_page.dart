@@ -12,6 +12,7 @@ import '../../../core/data/models/athletic_game_model.dart';
 import '../../../core/data/models/modality_with_status_model.dart';
 import '../../../core/data/repositories/athletic_detail_repository.dart';
 import '../games/games_page.dart';
+import '../games/game_detail_page.dart';
 
 class AthleticDetailPage extends StatefulWidget {
   final AthleticsItem athletic;
@@ -29,7 +30,7 @@ class AthleticDetailPageState extends State<AthleticDetailPage>
   late AthleticDetailRepository _repository;
 
   AthleticDetail? _athleticDetail;
-  List<ModalityWithStatus> _modalities = [];
+  List<ModalityAggregated> _modalities = [];
   final Map<String, List<AthleticGame>> _gamesByDate = {};
   List<String> _availableDates = [];
 
@@ -525,21 +526,36 @@ class AthleticDetailPageState extends State<AthleticDetailPage>
     );
   }
 
-  Widget _buildModalityCard(ModalityWithStatus modality) {
+  Widget _buildModalityCard(ModalityAggregated modality) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
         onTap: () {
-          // Navigate to games page for this modality
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => GamesPage(
-                modalityId: modality.id,
-                modalityName: '${modality.name} ${modality.gender}',
+          // Navigate based on whether it's a unique game or tournament
+          if (modality.isUniqueGame == true) {
+            // Navigate to game detail page for unique games
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => GameDetailPage(
+                  modalityId: modality.id,
+                  modalityName: '${modality.name} ${modality.gender}',
+                  series: modality.series,
+                ),
               ),
-            ),
-          );
+            );
+          } else {
+            // Navigate to games page for tournament brackets
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => GamesPage(
+                  modalityId: modality.id,
+                  modalityName: '${modality.name} ${modality.gender}',
+                ),
+              ),
+            );
+          }
         },
         leading: Container(
           width: 48,
@@ -573,11 +589,11 @@ class AthleticDetailPageState extends State<AthleticDetailPage>
         trailing: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
           decoration: BoxDecoration(
-            color: _getModalityStatusColor(modality.status),
+            color: _getModalityStatusColor(modality.modalityStatus),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
-            modality.status,
+            modality.modalityStatus,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 12,

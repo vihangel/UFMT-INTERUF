@@ -142,11 +142,12 @@ class AthleticDetailRepository {
   }
 
   /// Get modalities that the athletic participates in
-  Future<List<ModalityWithStatus>> getAthleticModalities(
+  Future<List<ModalityAggregated>> getAthleticModalities(
     String athleticId,
   ) async {
     try {
       // Use raw SQL query to get modalities including athletics_standings
+      // is_unique_game = true when a_athletic_id is null AND athletics_standings is not null
       final query =
           '''
         SELECT DISTINCT
@@ -154,7 +155,9 @@ class AthleticDetailRepository {
           m.name AS modality_name,
           m.gender AS modality_gender,
           m.icon AS modality_icon,
-          array_agg(DISTINCT g.status) AS statuses
+          g.series AS series,
+          array_agg(DISTINCT g.status) AS statuses,
+          bool_or(g.a_athletic_id IS NULL AND g.athletics_standings IS NOT NULL) AS is_unique_game
         FROM games g
         JOIN modalities m ON g.modality_id = m.id
         WHERE (
@@ -165,7 +168,7 @@ class AthleticDetailRepository {
             AND g.athletics_standings->'id_atletics' ? '$athleticId'::text
           )
         )
-        GROUP BY m.id, m.name, m.gender, m.icon
+        GROUP BY m.id, m.name, m.gender, m.icon, g.series
         ORDER BY m.name ASC
       ''';
 
@@ -178,7 +181,7 @@ class AthleticDetailRepository {
 
       final List<dynamic> modalitiesList = response as List<dynamic>;
 
-      return modalitiesList.map<ModalityWithStatus>((modalityData) {
+      return modalitiesList.map<ModalityAggregated>((modalityData) {
         final Map<String, dynamic> modalityMap = Map<String, dynamic>.from(
           modalityData,
         );
@@ -188,13 +191,18 @@ class AthleticDetailRepository {
             .map((status) => status.toString())
             .toList();
 
-        return ModalityWithStatus(
+        // Get is_unique_game from the query result
+        final isUniqueGame = modalityMap['is_unique_game'] as bool? ?? false;
+
+        return ModalityAggregated(
           id: modalityMap['modality_id'] as String,
           name: modalityMap['modality_name'] as String,
           gender: modalityMap['modality_gender'] as String,
           icon: modalityMap['modality_icon'] as String?,
-          series: '', // Will be filled from athletic detail
-          status: ModalityWithStatus.getModalityStatus(statuses),
+          series: modalityMap['series'] as String? ?? '',
+          isUniqueGame: isUniqueGame,
+          gameStatuses: statuses,
+          modalityStatus: ModalityWithStatus.getModalityStatus(statuses),
         );
       }).toList();
     } catch (e) {
