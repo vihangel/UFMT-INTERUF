@@ -13,6 +13,7 @@ import '../../../core/data/models/modality_with_status_model.dart';
 import '../../../core/data/repositories/athletic_detail_repository.dart';
 import '../games/games_page.dart';
 import '../games/game_detail_page.dart';
+import '../games/tournament_game_detail_page.dart';
 
 class AthleticDetailPage extends StatefulWidget {
   final AthleticsItem athletic;
@@ -300,66 +301,111 @@ class AthleticDetailPageState extends State<AthleticDetailPage>
   Widget _buildGameCard(AthleticGame game) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Game info
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    game.modalityPhase,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryText,
+      child: InkWell(
+        onTap: () {
+          // Navigate based on game type
+          if (game.isTwoTeamGame) {
+            // Navigate to tournament game detail page for two-team games
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    TournamentGameDetailPage(gameId: game.gameId),
+              ),
+            );
+          } else if (game.isMultiTeamGame) {
+            // Navigate to game detail page for multi-team games (standings)
+            // Extract modality info from modalityPhase
+            // Format: "Modality Gender - Phase" or just "Modality Gender"
+            final modalityName = game.modalityPhase.split(' - ').first;
+
+            // We need to get the modality ID and series from the game
+            // Since we don't have these in AthleticGame, we'll need to find them
+            final modality = _modalities.firstWhere(
+              (m) => game.modalityPhase.contains(m.name),
+              orElse: () => _modalities.first,
+            );
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => GameDetailPage(
+                  modalityId: modality.id,
+                  modalityName: modalityName,
+                  series: modality.series,
+                ),
+              ),
+            );
+          }
+        },
+        borderRadius: BorderRadius.circular(6),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Game info
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      game.modalityPhase,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryText,
+                      ),
                     ),
                   ),
-                ),
+                  Text(
+                    _formatGameTime(game.startAt),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: AppColors.secondaryText,
+                    ),
+                  ),
+                ],
+              ),
+              if (game.venueName != null) ...[
+                const SizedBox(height: 4),
                 Text(
-                  _formatGameTime(game.startAt),
+                  'Local: ${game.venueName!}',
                   style: TextStyle(
                     fontSize: 14,
                     color: AppColors.secondaryText,
                   ),
                 ),
               ],
-            ),
-            if (game.venueName != null) ...[
-              const SizedBox(height: 4),
-              Text(
-                'Local: ${game.venueName!}',
-                style: TextStyle(fontSize: 14, color: AppColors.secondaryText),
-              ),
-            ],
-            const SizedBox(height: 12),
-            // Teams and scores - conditional rendering based on game type
-            if (game.isTwoTeamGame)
-              _buildTwoTeamGameContent(game)
-            else if (game.isMultiTeamGame)
-              _buildMultiTeamGameContent(game)
-            else
-              _buildUnknownGameContent(game),
-            const SizedBox(height: 8),
-            // Status
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                color: _getStatusColor(game.status),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                _getStatusText(game.status),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
+              const SizedBox(height: 12),
+              // Teams and scores - conditional rendering based on game type
+              if (game.isTwoTeamGame)
+                _buildTwoTeamGameContent(game)
+              else if (game.isMultiTeamGame)
+                _buildMultiTeamGameContent(game)
+              else
+                _buildUnknownGameContent(game),
+              const SizedBox(height: 8),
+              // Status
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: _getStatusColor(game.status),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  _getStatusText(game.status),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
