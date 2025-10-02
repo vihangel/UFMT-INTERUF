@@ -8,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/data/models/bracket_game_model.dart';
 import '../../../core/data/repositories/bracket_games_repository.dart';
+import 'tournament_game_detail_page.dart';
 
 class GamesPage extends StatefulWidget {
   final String modalityId;
@@ -243,73 +244,88 @@ class GamesPageState extends State<GamesPage> with TickerProviderStateMixin {
       ),
       child: Card(
         margin: EdgeInsets.zero,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header: Phase, Status
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _getPhaseColor(game.phase),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      game.phase,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
+        child: InkWell(
+          onTap: () {
+            // Navigate to tournament game detail page for bracket games
+            if (game.hasTeams) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      TournamentGameDetailPage(gameId: game.gameId),
+                ),
+              );
+            }
+          },
+          borderRadius: BorderRadius.circular(6),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header: Phase, Status
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _getPhaseColor(game.phase),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        game.phase,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _getStatusColor(
-                        game.status,
-                      ).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      game.statusDisplayText,
-                      style: TextStyle(
-                        color: _getStatusColor(game.status),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _getStatusColor(
+                          game.status,
+                        ).withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        game.statusDisplayText,
+                        style: TextStyle(
+                          color: _getStatusColor(game.status),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
-                  ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+
+                // Time and venue info
+                _RowIconLabel(AppIcons.icClock, game.startTimeDateFormatted),
+
+                if (game.venueName != null) ...[
+                  const SizedBox(height: 6),
+                  _RowIconLabel(AppIcons.icLocation, game.venueName!),
                 ],
-              ),
-              const SizedBox(height: 12),
 
-              // Time and venue info
-              _RowIconLabel(AppIcons.icClock, game.startTimeDateFormatted),
+                const SizedBox(height: 16),
 
-              if (game.venueName != null) ...[
-                const SizedBox(height: 6),
-                _RowIconLabel(AppIcons.icLocation, game.venueName!),
+                // Teams and score
+                if (game.hasTeams)
+                  _buildTeamsAndScore(game)
+                else
+                  _buildNoTeamsContent(),
               ],
-
-              const SizedBox(height: 16),
-
-              // Teams and score
-              if (game.hasTeams)
-                _buildTeamsAndScore(game)
-              else
-                _buildNoTeamsContent(),
-            ],
+            ),
           ),
         ),
       ),
