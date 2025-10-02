@@ -333,40 +333,13 @@ class AthleticDetailPageState extends State<AthleticDetailPage>
               ),
             ],
             const SizedBox(height: 12),
-            // Teams and scores
-            Row(
-              children: [
-                // Team A
-                Expanded(
-                  child: _buildTeamInfo(
-                    teamId: game.teamAId,
-                    teamLogo: game.teamALogo,
-                    score: game.scoreA,
-                    isTeamA: true,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                // VS
-                Text(
-                  'VS',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.secondaryText,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                // Team B
-                Expanded(
-                  child: _buildTeamInfo(
-                    teamId: game.teamBId,
-                    teamLogo: game.teamBLogo,
-                    score: game.scoreB,
-                    isTeamA: false,
-                  ),
-                ),
-              ],
-            ),
+            // Teams and scores - conditional rendering based on game type
+            if (game.isTwoTeamGame)
+              _buildTwoTeamGameContent(game)
+            else if (game.isMultiTeamGame)
+              _buildMultiTeamGameContent(game)
+            else
+              _buildUnknownGameContent(game),
             const SizedBox(height: 8),
             // Status
             Container(
@@ -386,6 +359,86 @@ class AthleticDetailPageState extends State<AthleticDetailPage>
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildTwoTeamGameContent(AthleticGame game) {
+    return Row(
+      children: [
+        // Team A
+        Expanded(
+          child: _buildTeamInfo(
+            teamId: game.teamAId,
+            teamLogo: game.teamALogo,
+            score: game.scoreA,
+            isTeamA: true,
+          ),
+        ),
+        const SizedBox(width: 16),
+        // VS
+        Text(
+          'VS',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: AppColors.secondaryText,
+          ),
+        ),
+        const SizedBox(width: 16),
+        // Team B
+        Expanded(
+          child: _buildTeamInfo(
+            teamId: game.teamBId,
+            teamLogo: game.teamBLogo,
+            score: game.scoreB,
+            isTeamA: false,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMultiTeamGameContent(AthleticGame game) {
+    final logos = game.multiTeamLogos;
+
+    return Wrap(
+      spacing: -2,
+      runSpacing: -2,
+      children: logos.map((logo) {
+        return Container(
+          width: 48,
+          height: 48,
+          margin: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 2),
+            image: DecorationImage(
+              image: AssetImage('assets/images/$logo'),
+              fit: BoxFit.cover,
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildUnknownGameContent(AthleticGame game) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: const Row(
+        children: [
+          Icon(Icons.info_outline, color: Colors.grey),
+          SizedBox(width: 8),
+          Text(
+            'Informações do jogo indisponíveis',
+            style: TextStyle(color: Colors.grey),
+          ),
+        ],
       ),
     );
   }

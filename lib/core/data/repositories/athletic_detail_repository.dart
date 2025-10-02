@@ -47,47 +47,94 @@ class AthleticDetailRepository {
       // print('RPC function not available, using fallback query: $e');
     }
 
-    // Fallback: use direct table query with joins
+    // Fallback: use direct table query with raw SQL for better control
     try {
-      final response = await _client
-          .from('games')
-          .select('''
-            id,
-            start_at,
-            status,
-            score_a,
-            score_b,
-            modalities!inner(name, gender),
-            venues(name),
-            a_athletics:athletics!a_athletic_id(id, logo_url),
-            b_athletics:athletics!b_athletic_id(id, logo_url)
-          ''')
-          .or('a_athletic_id.eq.$athleticId,b_athletic_id.eq.$athleticId')
-          .gte('start_at', '${date}T00:00:00+00:00')
-          .lt('start_at', '${date}T23:59:59+00:00')
-          .order('start_at');
+      final query =
+          '''
+        SELECT
+          g.id AS game_id,
+          g.start_at,
+          g.status,
+          -- Update athletics_standings to include logo URLs
+          CASE 
+            WHEN g.athletics_standings IS NOT NULL THEN
+              jsonb_build_object(
+                'athletics_data', (
+                  SELECT jsonb_agg(
+                    jsonb_build_object(
+                      'logo_url', a.logo_url
+                    )
+                  )
+                  FROM athletics a
+                  WHERE a.id = ANY(
+                    ARRAY(
+                      SELECT jsonb_array_elements_text(g.athletics_standings->'id_atletics')
+                    )::uuid[]
+                  )
+                )
+              )
+            ELSE NULL
+          END AS athletics_standings,
+          CONCAT(
+            m.name, ' ', m.gender,
+            CASE
+              WHEN bracket_info.position = 1 THEN ' - Final'
+              WHEN bracket_info.position BETWEEN 2 AND 3 THEN ' - Semifinal'
+              WHEN bracket_info.position BETWEEN 4 AND 7 THEN ' - Quartas'
+              WHEN bracket_info.position BETWEEN 8 AND 15 THEN ' - Oitavas'
+              ELSE ''
+            END
+          ) AS modality_phase,
+          v.name AS venue_name,
+          ta.id AS team_a_id,
+          ta.logo_url AS team_a_logo,
+          tb.id AS team_b_id,
+          tb.logo_url AS team_b_logo,
+          g.score_a,
+          g.score_b
+        FROM games g
+        JOIN modalities m ON g.modality_id = m.id
+        LEFT JOIN venues v ON g.venue_id = v.id
+        LEFT JOIN athletics ta ON g.a_athletic_id = ta.id
+        LEFT JOIN athletics tb ON g.b_athletic_id = tb.id
+        LEFT JOIN (
+          SELECT
+            t.game_id, t.position
+          FROM
+            brackets, unnest(brackets.heap_brackeat) WITH ordinality AS t(game_id, position)
+        ) AS bracket_info ON g.id = bracket_info.game_id::uuid
+        WHERE (
+          g.a_athletic_id = '$athleticId'::uuid
+          OR g.b_athletic_id = '$athleticId'::uuid
+          OR (
+            g.athletics_standings IS NOT NULL 
+            AND g.athletics_standings->'id_atletics' ? '$athleticId'::text
+          )
+        )
+        AND g.start_at::date = '$date'::date
+        ORDER BY g.start_at ASC
+      ''';
 
-      return response.map<AthleticGame>((game) {
-        final modality = game['modalities'] as Map<String, dynamic>?;
-        final venue = game['venues'] as Map<String, dynamic>?;
-        final teamA = game['a_athletics'] as Map<String, dynamic>?;
-        final teamB = game['b_athletics'] as Map<String, dynamic>?;
+      final response = await _client.rpc(
+        'execute_raw_sql',
+        params: {'query': query},
+      );
 
-        return AthleticGame(
-          gameId: game['id'] as String,
-          startAt: DateTime.parse(game['start_at'] as String),
-          status: game['status'] as String,
-          modalityPhase: modality != null
-              ? '${modality['name']} ${modality['gender']}'
-              : 'Modalidade',
-          venueName: venue?['name'] as String?,
-          teamAId: teamA?['id'] as String?,
-          teamALogo: teamA?['logo_url'] as String?,
-          teamBId: teamB?['id'] as String?,
-          teamBLogo: teamB?['logo_url'] as String?,
-          scoreA: game['score_a'] as int?,
-          scoreB: game['score_b'] as int?,
+      if (response == null) return [];
+
+      final List<dynamic> gamesList = response as List<dynamic>;
+
+      return gamesList.map<AthleticGame>((gameData) {
+        final Map<String, dynamic> gameMap = Map<String, dynamic>.from(
+          gameData,
         );
+
+        // Convert start_at to DateTime if it's a string
+        if (gameMap['start_at'] is String) {
+          gameMap['start_at'] = DateTime.parse(gameMap['start_at'] as String);
+        }
+
+        return AthleticGame.fromJson(gameMap);
       }).toList();
     } catch (e) {
       throw Exception('Erro ao carregar jogos da atlética: $e');

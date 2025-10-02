@@ -9,6 +9,7 @@ RETURNS TABLE(
   game_id UUID,
   start_at TIMESTAMPTZ,
   status TEXT,
+  athletics_standings JSONB,
   modality_phase TEXT,
   venue_name TEXT,
   team_a_id UUID,
@@ -24,13 +25,33 @@ AS $$
     games.id AS game_id,
     games.start_at,
     games.status,
+    -- Update athletics_standings to include logo URLs
+    CASE 
+      WHEN games.athletics_standings IS NOT NULL THEN
+        jsonb_build_object(
+          'athletics_data', (
+            SELECT jsonb_agg(
+              jsonb_build_object(
+                'logo_url', a.logo_url
+              )
+            )
+            FROM athletics a
+            WHERE a.id = ANY(
+              ARRAY(
+                SELECT jsonb_array_elements_text(games.athletics_standings->'id_atletics')
+              )::uuid[]
+            )
+          )
+        )
+      ELSE NULL
+    END AS athletics_standings,
     CONCAT(
-      modalities.name, ' ', modalities.gender, ' - ',
+      modalities.name, ' ', modalities.gender,
       CASE
-        WHEN bracket_info.position = 1 THEN 'Final'
-        WHEN bracket_info.position BETWEEN 2 AND 3 THEN 'Semifinal'
-        WHEN bracket_info.position BETWEEN 4 AND 7 THEN 'Quartas'
-        WHEN bracket_info.position BETWEEN 8 AND 15 THEN 'Oitavas'
+        WHEN bracket_info.position = 1 THEN ' - Final'
+        WHEN bracket_info.position BETWEEN 2 AND 3 THEN ' - Semifinal'
+        WHEN bracket_info.position BETWEEN 4 AND 7 THEN ' - Quartas'
+        WHEN bracket_info.position BETWEEN 8 AND 15 THEN ' - Oitavas'
         ELSE ''
       END
     ) AS modality_phase,
@@ -58,7 +79,14 @@ AS $$
       brackets, unnest(brackets.heap_brackeat) WITH ordinality AS t(game_id, position)
   ) AS bracket_info ON games.id = bracket_info.game_id::uuid
   WHERE
-    (games.a_athletic_id = athletic_id_param OR games.b_athletic_id = athletic_id_param) 
+    (
+      games.a_athletic_id = athletic_id_param 
+      OR games.b_athletic_id = athletic_id_param
+      OR (
+        games.athletics_standings IS NOT NULL 
+        AND games.athletics_standings->'id_atletics' ? athletic_id_param::text
+      )
+    )
     AND games.start_at::DATE = date_param
   ORDER BY
     games.start_at ASC;
