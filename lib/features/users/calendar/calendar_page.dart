@@ -6,6 +6,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/data/models/calendar_game_model.dart';
 import '../../../core/data/repositories/calendar_games_repository.dart';
+import '../games/game_detail_page.dart';
+import '../games/tournament_game_detail_page.dart';
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({super.key});
@@ -260,56 +262,87 @@ class CalendarPageState extends State<CalendarPage>
 
       child: Card(
         margin: EdgeInsets.zero,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header: Time, Status, Venue
-              Row(
-                children: [
-                  // Status
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _getStatusColor(
-                        game.status,
-                      ).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      game.statusDisplayText,
-                      style: TextStyle(
-                        color: _getStatusColor(game.status),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
+        child: InkWell(
+          onTap: () {
+            // Navigate based on game type
+            if (game.isTwoTeamGame) {
+              // Navigate to tournament game detail page for two-team games
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      TournamentGameDetailPage(gameId: game.gameId),
+                ),
+              );
+            } else if (game.isMultiTeamGame) {
+              // Navigate to game detail page for multi-team games (standings)
+              // We need to extract modality info from modalityPhase
+              // Format: "Modality Gender - Phase" or just "Modality Gender"
+              final modalityName = game.modalityPhase.split(' - ').first;
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => GameDetailPage(
+                    modalityId: game.modalityId,
+                    modalityName: modalityName,
+                    series: game.series,
+                  ),
+                ),
+              );
+            }
+          },
+          borderRadius: BorderRadius.circular(6),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header: Time, Status, Venue
+                Row(
+                  children: [
+                    // Status
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _getStatusColor(
+                          game.status,
+                        ).withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        game.statusDisplayText,
+                        style: TextStyle(
+                          color: _getStatusColor(game.status),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              _RowIconLabel(AppIcons.icClock, game.startTimeDateFormatted),
-              const SizedBox(height: 6),
-
-              _RowIconLabel(game.gameIcon, game.modalityPhase),
-
-              if (game.venueName != null) ...[
+                  ],
+                ),
                 const SizedBox(height: 6),
-                _RowIconLabel(AppIcons.icLocation, game.venueName!),
+                _RowIconLabel(AppIcons.icClock, game.startTimeDateFormatted),
+                const SizedBox(height: 6),
+
+                _RowIconLabel(game.gameIcon, game.modalityPhase),
+
+                if (game.venueName != null) ...[
+                  const SizedBox(height: 6),
+                  _RowIconLabel(AppIcons.icLocation, game.venueName!),
+                ],
+                const SizedBox(height: 6),
+                // Game Content: Two-team or Multi-team
+                if (game.isTwoTeamGame)
+                  _buildTwoTeamGameContent(game)
+                else if (game.isMultiTeamGame)
+                  _buildMultiTeamGameContent(game)
+                else
+                  _buildUnknownGameContent(game),
               ],
-              const SizedBox(height: 6),
-              // Game Content: Two-team or Multi-team
-              if (game.isTwoTeamGame)
-                _buildTwoTeamGameContent(game)
-              else if (game.isMultiTeamGame)
-                _buildMultiTeamGameContent(game)
-              else
-                _buildUnknownGameContent(game),
-            ],
+            ),
           ),
         ),
       ),

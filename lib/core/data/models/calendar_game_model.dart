@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 class CalendarGame {
   final String gameId;
+  final String modalityId;
   final DateTime startAt;
   final String status;
   final String series;
@@ -18,6 +19,7 @@ class CalendarGame {
 
   CalendarGame({
     required this.gameId,
+    required this.modalityId,
     required this.startAt,
     required this.status,
     required this.series,
@@ -51,6 +53,7 @@ class CalendarGame {
 
     return CalendarGame(
       gameId: json['game_id'] as String,
+      modalityId: json['modality_id'] as String,
       startAt: json['start_at'] is String
           ? DateTime.parse(json['start_at'])
           : json['start_at'] as DateTime,
@@ -71,6 +74,7 @@ class CalendarGame {
   Map<String, dynamic> toJson() {
     return {
       'game_id': gameId,
+      'modality_id': modalityId,
       'start_at': startAt.toIso8601String(),
       'status': status,
       'series': series,
