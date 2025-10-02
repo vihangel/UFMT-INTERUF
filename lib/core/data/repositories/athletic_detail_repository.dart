@@ -146,43 +146,53 @@ class AthleticDetailRepository {
     String athleticId,
   ) async {
     try {
-      // Get all modalities where this athletic has games
-      final response = await _client
-          .from('games')
-          .select('''
-            modalities!inner(id, name, gender, icon),
-            status
-          ''')
-          .or('a_athletic_id.eq.$athleticId,b_athletic_id.eq.$athleticId');
+      // Use raw SQL query to get modalities including athletics_standings
+      final query =
+          '''
+        SELECT DISTINCT
+          m.id AS modality_id,
+          m.name AS modality_name,
+          m.gender AS modality_gender,
+          m.icon AS modality_icon,
+          array_agg(DISTINCT g.status) AS statuses
+        FROM games g
+        JOIN modalities m ON g.modality_id = m.id
+        WHERE (
+          g.a_athletic_id = '$athleticId'::uuid
+          OR g.b_athletic_id = '$athleticId'::uuid
+          OR (
+            g.athletics_standings IS NOT NULL 
+            AND g.athletics_standings->'id_atletics' ? '$athleticId'::text
+          )
+        )
+        GROUP BY m.id, m.name, m.gender, m.icon
+        ORDER BY m.name ASC
+      ''';
 
-      // Group by modality and determine status
-      final modalityMap = <String, Map<String, dynamic>>{};
+      final response = await _client.rpc(
+        'execute_raw_sql',
+        params: {'query': query},
+      );
 
-      for (final game in response) {
-        final modality = game['modalities'] as Map<String, dynamic>;
-        final modalityId = modality['id'] as String;
+      if (response == null) return [];
 
-        if (!modalityMap.containsKey(modalityId)) {
-          modalityMap[modalityId] = {
-            'modality': modality,
-            'statuses': <String>[],
-          };
-        }
+      final List<dynamic> modalitiesList = response as List<dynamic>;
 
-        (modalityMap[modalityId]!['statuses'] as List<String>).add(
-          game['status'] as String,
+      return modalitiesList.map<ModalityWithStatus>((modalityData) {
+        final Map<String, dynamic> modalityMap = Map<String, dynamic>.from(
+          modalityData,
         );
-      }
 
-      return modalityMap.values.map((entry) {
-        final modality = entry['modality'] as Map<String, dynamic>;
-        final statuses = entry['statuses'] as List<String>;
+        // Extract statuses array
+        final List<String> statuses = (modalityMap['statuses'] as List<dynamic>)
+            .map((status) => status.toString())
+            .toList();
 
         return ModalityWithStatus(
-          id: modality['id'] as String,
-          name: modality['name'] as String,
-          gender: modality['gender'] as String,
-          icon: modality['icon'] as String?,
+          id: modalityMap['modality_id'] as String,
+          name: modalityMap['modality_name'] as String,
+          gender: modalityMap['modality_gender'] as String,
+          icon: modalityMap['modality_icon'] as String?,
           series: '', // Will be filled from athletic detail
           status: ModalityWithStatus.getModalityStatus(statuses),
         );

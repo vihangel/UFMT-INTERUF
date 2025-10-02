@@ -1,6 +1,7 @@
 // lib/features/users/athletics/athletic_detail_page.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:interufmt/core/theme/app_colors.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
@@ -547,10 +548,18 @@ class AthleticDetailPageState extends State<AthleticDetailPage>
             color: AppColors.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(24),
           ),
-          child: Icon(
-            _getModalityIcon(modality.name),
-            color: AppColors.primary,
-            size: 24,
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: modality.icon != null
+                ? SvgPicture.asset(
+                    'assets/icons/ic_${modality.icon}.svg',
+                    colorFilter: const ColorFilter.mode(
+                      AppColors.primary,
+                      BlendMode.srcIn,
+                    ),
+                    fit: BoxFit.contain,
+                  )
+                : const Icon(Icons.sports, color: AppColors.primary, size: 24),
           ),
         ),
         title: Text(
@@ -609,43 +618,16 @@ class AthleticDetailPageState extends State<AthleticDetailPage>
   Color _getModalityStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'concluída':
+      case 'finalizada':
         return Colors.green;
       case 'em andamento':
+      case 'em disputa':
         return Colors.orange;
       case 'programada':
+      case 'não iniciada':
         return Colors.blue;
       default:
         return Colors.grey;
-    }
-  }
-
-  IconData _getModalityIcon(String modalityName) {
-    switch (modalityName.toLowerCase()) {
-      case 'futsal':
-        return Icons.sports_soccer;
-      case 'basquete':
-      case 'basketball':
-        return Icons.sports_basketball;
-      case 'vôlei':
-      case 'volleyball':
-        return Icons.sports_volleyball;
-      case 'handebol':
-      case 'handball':
-        return Icons.sports_handball;
-      case 'atletismo':
-      case 'athletics':
-        return Icons.directions_run;
-      case 'natação':
-      case 'swimming':
-        return Icons.pool;
-      case 'tênis de mesa':
-      case 'table tennis':
-        return Icons.sports_tennis;
-      case 'xadrez':
-      case 'chess':
-        return Icons.sports_esports;
-      default:
-        return Icons.sports;
     }
   }
 }
