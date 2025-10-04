@@ -9,7 +9,7 @@ import 'package:interufmt/features/users/games/tournament_game_detail_page.dart'
 
 class CardGame extends StatelessWidget {
   final String status;
-  final String statusDisplayText;
+  final String? statusDisplayText;
   final String startTimeDateFormatted;
   final String gameIcon;
   final String modalityPhase;
@@ -27,10 +27,11 @@ class CardGame extends StatelessWidget {
   final int? displayScoreB;
   final List<String>? multiTeamLogos;
   final VoidCallback? onTap;
+  final String? extraTextScore;
   const CardGame({
     super.key,
     required this.status,
-    required this.statusDisplayText,
+    this.statusDisplayText,
     required this.startTimeDateFormatted,
     required this.gameIcon,
     required this.modalityPhase,
@@ -48,6 +49,7 @@ class CardGame extends StatelessWidget {
     this.displayScoreB,
     this.multiTeamLogos,
     this.onTap,
+    this.extraTextScore,
   });
 
   @override
@@ -95,28 +97,31 @@ class CardGame extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _getStatusColor(status).withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          statusDisplayText,
-                          style: TextStyle(
-                            color: _getStatusColor(status),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
+                  if (statusDisplayText != null)
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _getStatusColor(
+                              status,
+                            ).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            statusDisplayText!,
+                            style: TextStyle(
+                              color: _getStatusColor(status),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
                   const SizedBox(height: 6),
                   _RowIconLabel(
                     AppIcons.icClock,
@@ -141,6 +146,7 @@ class CardGame extends StatelessWidget {
                       scoreB: scoreB,
                       displayScoreA: displayScoreA,
                       displayScoreB: displayScoreB,
+                      extraTextScore: extraTextScore,
                     )
                   else if (isMultiTeamGame)
                     RowMultiTeamsLogosWidget(logos: multiTeamLogos!)

@@ -300,7 +300,7 @@ class AthleticDetailPageState extends State<AthleticDetailPage>
         child: CardGame(
           status: games[index].status,
           startTimeDateFormatted: games[index].startTimeDateFormatted,
-          statusDisplayText: games[index].statusDisplayText,
+          // statusDisplayText: games[index].statusDisplayText,
           gameIcon: games[index].gameIcon,
           modalityPhase: games[index].modalityPhase,
           venueName: games[index].venueName,
@@ -316,6 +316,7 @@ class AthleticDetailPageState extends State<AthleticDetailPage>
           scoreB: games[index].scoreB,
           displayScoreA: games[index].scoreA,
           displayScoreB: games[index].scoreB,
+          extraTextScore: games[index].statusDisplayText,
           onTap: () {
             if (games[index].isTwoTeamGame) {
               Navigator.push(
