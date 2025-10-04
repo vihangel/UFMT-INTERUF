@@ -61,12 +61,8 @@ class AthleteDetailPageState extends State<AthleteDetailPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text(
-          'Estatísticas do atleta',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
+        title: const Text('Estatísticas do atleta'),
+
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
@@ -106,66 +102,56 @@ class AthleteDetailPageState extends State<AthleteDetailPage> {
 
   Widget _buildContent() {
     if (_athleteDetail == null) return const SizedBox.shrink();
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(),
-          const SizedBox(height: 24),
-          _buildPersonalSection(),
-          const SizedBox(height: 24),
-          _buildStatisticsSection(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Text(
-            _athleteDetail!.modalityWithGender,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primaryText,
+    final detail = _athleteDetail!;
+    return Column(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.cardBackground,
+            border: const Border(
+              top: BorderSide(color: AppColors.inputBorder, width: 1),
+              bottom: BorderSide(color: AppColors.inputBorder, width: 1),
             ),
-            textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              'Série ${_athleteDetail!.series}',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primary,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                detail.modalityWithGender,
+                style: const TextStyle(
+                  color: AppColors.secondaryText,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
+              Text(
+                'Série ${detail.series}',
+                style: const TextStyle(
+                  color: AppColors.primaryText,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 24),
+                _buildPersonalSection(),
+                const SizedBox(height: 24),
+                _buildStatisticsSection(),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
