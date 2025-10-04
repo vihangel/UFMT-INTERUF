@@ -115,22 +115,24 @@ class AthleteDetailPageState extends State<AthleteDetailPage> {
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Text(
-                detail.modalityWithGender,
-                style: const TextStyle(
-                  color: AppColors.secondaryText,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
+              Expanded(
+                child: Text(
+                  detail.modalityWithGender,
+                  style: const TextStyle(
+                    color: AppColors.secondaryText,
+                    fontSize: 20,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
               ),
+              SizedBox(width: 16),
               Text(
                 'Série ${detail.series}',
                 style: const TextStyle(
                   color: AppColors.primaryText,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 20,
                 ),
               ),
             ],
@@ -156,32 +158,13 @@ class AthleteDetailPageState extends State<AthleteDetailPage> {
   }
 
   Widget _buildPersonalSection() {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+    return Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: double.infinity,
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
-              ),
-            ),
+
             child: const Text(
               'Pessoal',
               style: TextStyle(
@@ -192,15 +175,15 @@ class AthleteDetailPageState extends State<AthleteDetailPage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
             child: Column(
               children: [
                 _buildInfoRow('Nome', _athleteDetail!.fullName),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 _buildInfoRow('Camisa', '${_athleteDetail!.shirtNumber}'),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 _buildInfoRow('Idade', '${_athleteDetail!.age} anos'),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 _buildInfoRow('Curso', _athleteDetail!.course),
               ],
             ),
@@ -211,115 +194,89 @@ class AthleteDetailPageState extends State<AthleteDetailPage> {
   }
 
   Widget _buildInfoRow(String label, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        SizedBox(
-          width: 80,
-          child: Text(
-            '$label:',
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: AppColors.secondaryText,
-            ),
+        Text(
+          '$label:',
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: AppColors.primaryText,
           ),
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            value,
-            style: const TextStyle(fontSize: 16, color: AppColors.primaryText),
-          ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: const TextStyle(fontSize: 16, color: AppColors.primaryText),
         ),
       ],
     );
   }
 
   Widget _buildStatisticsSection() {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
-              ),
-            ),
-            child: const Text(
-              'Na partida',
+    return Card(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Na Partida',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: AppColors.primary,
               ),
             ),
-          ),
-          if (_athleteDetail!.statistics.isEmpty)
-            Padding(
-              padding: const EdgeInsets.all(32),
-              child: Center(
+            if (_athleteDetail!.statistics.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 18),
                 child: Column(
                   children: [
                     Icon(
                       Icons.bar_chart,
                       size: 48,
-                      color: Colors.grey.withValues(alpha: 0.5),
+                      color: AppColors.secondaryText.withValues(alpha: 0.5),
                     ),
                     const SizedBox(height: 16),
                     Text(
                       'Sem estatísticas registradas',
                       style: TextStyle(
-                        color: Colors.grey.withValues(alpha: 0.7),
+                        color: AppColors.secondaryText.withValues(alpha: 0.7),
                         fontSize: 16,
                       ),
                     ),
                   ],
                 ),
-              ),
-            )
-          else
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: _athleteDetail!.statistics.asMap().entries.map((
-                  entry,
-                ) {
-                  final index = entry.key;
-                  final stat = entry.value;
-                  final isLast = index == _athleteDetail!.statistics.length - 1;
+              )
+            else
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: _athleteDetail!.statistics.asMap().entries.map((
+                    entry,
+                  ) {
+                    final index = entry.key;
+                    final stat = entry.value;
+                    final isLast =
+                        index == _athleteDetail!.statistics.length - 1;
 
-                  return Column(
-                    children: [
-                      _buildStatisticRow(stat),
-                      if (!isLast)
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 12),
-                          child: Divider(height: 1),
-                        ),
-                    ],
-                  );
-                }).toList(),
+                    return Column(
+                      children: [
+                        _buildStatisticRow(stat),
+                        if (!isLast)
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 12),
+                            child: Divider(height: 1),
+                          ),
+                      ],
+                    );
+                  }).toList(),
+                ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
