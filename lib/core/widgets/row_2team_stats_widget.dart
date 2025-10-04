@@ -6,8 +6,9 @@ class Row2teamStatsWidget extends StatelessWidget {
   final String? teamBLogo;
   final int? scoreA;
   final int? scoreB;
-  final int displayScoreA;
-  final int displayScoreB;
+  final int? displayScoreA;
+  final int? displayScoreB;
+  final String? extraTextScore;
 
   const Row2teamStatsWidget({
     super.key,
@@ -15,8 +16,9 @@ class Row2teamStatsWidget extends StatelessWidget {
     this.teamBLogo,
     this.scoreA,
     this.scoreB,
-    required this.displayScoreA,
-    required this.displayScoreB,
+    this.displayScoreA,
+    this.displayScoreB,
+    this.extraTextScore,
   });
 
   @override
@@ -42,13 +44,25 @@ class Row2teamStatsWidget extends StatelessWidget {
                 )
               : const Icon(Icons.shield, color: Colors.grey),
 
-          Text(
-            '$displayScoreA X $displayScoreB',
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppColors.secondaryText,
-            ),
+          Column(
+            children: [
+              Text(
+                '$displayScoreA X $displayScoreB',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.secondaryText,
+                ),
+              ),
+              if (extraTextScore != null)
+                Text(
+                  extraTextScore!,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.secondaryText,
+                  ),
+                ),
+            ],
           ),
 
           // Team B

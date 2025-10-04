@@ -329,7 +329,7 @@ class CalendarPageState extends State<CalendarPage>
                   _RowIconLabel(AppIcons.icLocation, game.venueName!),
                 ],
                 const SizedBox(height: 6),
-                // Game Content: Two-team or Multi-team
+
                 if (game.isTwoTeamGame)
                   Row2teamStatsWidget(
                     teamALogo: game.teamALogo,

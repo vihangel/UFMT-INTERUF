@@ -3,16 +3,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:interufmt/core/theme/app_colors.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:interufmt/core/widgets/row_2team_stats_widget.dart';
+import 'package:interufmt/core/widgets/row_multi_teams_logos_widget.dart';
 import 'package:intl/intl.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/data/athletics_item_model.dart';
 import '../../../core/data/models/athletic_detail_model.dart';
 import '../../../core/data/models/athletic_game_model.dart';
 import '../../../core/data/models/modality_with_status_model.dart';
 import '../../../core/data/repositories/athletic_detail_repository.dart';
-import '../games/games_page.dart';
 import '../games/game_detail_page.dart';
+import '../games/games_page.dart';
 import '../games/tournament_game_detail_page.dart';
 
 class AthleticDetailPage extends StatefulWidget {
@@ -379,9 +381,16 @@ class AthleticDetailPageState extends State<AthleticDetailPage>
               const SizedBox(height: 12),
               // Teams and scores - conditional rendering based on game type
               if (game.isTwoTeamGame)
-                _buildTwoTeamGameContent(game)
+                Row2teamStatsWidget(
+                  teamALogo: game.teamALogo,
+                  teamBLogo: game.teamBLogo,
+                  scoreA: game.scoreA,
+                  scoreB: game.scoreB,
+                  displayScoreA: game.scoreA,
+                  displayScoreB: game.scoreB,
+                )
               else if (game.isMultiTeamGame)
-                _buildMultiTeamGameContent(game)
+                RowMultiTeamsLogosWidget(logos: game.multiTeamLogos)
               else
                 _buildUnknownGameContent(game),
               const SizedBox(height: 8),
@@ -408,66 +417,6 @@ class AthleticDetailPageState extends State<AthleticDetailPage>
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildTwoTeamGameContent(AthleticGame game) {
-    return Row(
-      children: [
-        // Team A
-        Expanded(
-          child: _buildTeamInfo(
-            teamId: game.teamAId,
-            teamLogo: game.teamALogo,
-            score: game.scoreA,
-            isTeamA: true,
-          ),
-        ),
-        const SizedBox(width: 16),
-        // VS
-        Text(
-          'VS',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: AppColors.secondaryText,
-          ),
-        ),
-        const SizedBox(width: 16),
-        // Team B
-        Expanded(
-          child: _buildTeamInfo(
-            teamId: game.teamBId,
-            teamLogo: game.teamBLogo,
-            score: game.scoreB,
-            isTeamA: false,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMultiTeamGameContent(AthleticGame game) {
-    final logos = game.multiTeamLogos;
-
-    return Wrap(
-      spacing: -2,
-      runSpacing: -2,
-      children: logos.map((logo) {
-        return Container(
-          width: 48,
-          height: 48,
-          margin: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2),
-            image: DecorationImage(
-              image: AssetImage('assets/images/$logo'),
-              fit: BoxFit.cover,
-            ),
-          ),
-        );
-      }).toList(),
     );
   }
 
