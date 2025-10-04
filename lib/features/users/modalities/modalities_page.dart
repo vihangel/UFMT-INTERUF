@@ -7,6 +7,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/data/models/modality_with_status_model.dart';
 import '../../../core/data/repositories/modalities_repository.dart';
+import '../games/games_page.dart';
+import '../games/game_detail_page.dart';
 
 class ModalitiesPage extends StatefulWidget {
   const ModalitiesPage({super.key});
@@ -210,54 +212,82 @@ class ModalitiesPageState extends State<ModalitiesPage>
   }
 
   Widget _buildModalityCard(ModalityAggregated modality, Color genderColor) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Center(
-              child: SvgPicture.asset(
-                modality.assetPath,
-                width: 32,
-                height: 32,
-                colorFilter: ColorFilter.mode(
-                  AppColors.primaryText,
-                  BlendMode.srcIn,
+    return GestureDetector(
+      onTap: () {
+        // Navigate based on whether it's a unique game or tournament
+        if (modality.isUniqueGame == true) {
+          // Navigate to game detail page for unique games
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => GameDetailPage(
+                modalityId: modality.id,
+                modalityName: '${modality.name} ${modality.gender}',
+                series: modality.series,
+              ),
+            ),
+          );
+        } else {
+          // Navigate to games page for tournament brackets
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => GamesPage(
+                modalityId: modality.id,
+                modalityName: '${modality.name} ${modality.gender}',
+              ),
+            ),
+          );
+        }
+      },
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 12),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: SvgPicture.asset(
+                  modality.assetPath,
+                  width: 32,
+                  height: 32,
+                  colorFilter: ColorFilter.mode(
+                    AppColors.primaryText,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 5),
+              const SizedBox(height: 5),
 
-            // Modality icon and name
-            Text(
-              modality.name,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: AppColors.primaryText,
+              // Modality icon and name
+              Text(
+                modality.name,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.primaryText,
+                ),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
               ),
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-            ),
 
-            const SizedBox(height: 2),
+              const SizedBox(height: 2),
 
-            // Status
-            Text(
-              modality.modalityStatus,
-              style: TextStyle(
-                fontSize: 12,
-                color: AppColors.secondaryText,
-                fontWeight: FontWeight.w500,
+              // Status
+              Text(
+                modality.modalityStatus,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.secondaryText,
+                  fontWeight: FontWeight.w500,
+                ),
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
               ),
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

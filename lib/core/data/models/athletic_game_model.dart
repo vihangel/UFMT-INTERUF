@@ -1,13 +1,9 @@
-import 'package:interufmt/core/theme/app_icons.dart';
-import 'package:intl/intl.dart';
+// lib/core/data/models/athletic_game_model.dart
 
-class CalendarGame {
+class AthleticGame {
   final String gameId;
-  final String modalityId;
   final DateTime startAt;
   final String status;
-  final String series;
-  final Map<String, dynamic>? athleticsStandings;
   final String modalityPhase;
   final String? venueName;
   final String? teamAId;
@@ -16,14 +12,12 @@ class CalendarGame {
   final String? teamBLogo;
   final int? scoreA;
   final int? scoreB;
+  final Map<String, dynamic>? athleticsStandings;
 
-  CalendarGame({
+  const AthleticGame({
     required this.gameId,
-    required this.modalityId,
     required this.startAt,
     required this.status,
-    required this.series,
-    this.athleticsStandings,
     required this.modalityPhase,
     this.venueName,
     this.teamAId,
@@ -32,9 +26,10 @@ class CalendarGame {
     this.teamBLogo,
     this.scoreA,
     this.scoreB,
+    this.athleticsStandings,
   });
 
-  factory CalendarGame.fromJson(Map<String, dynamic> json) {
+  factory AthleticGame.fromJson(Map<String, dynamic> json) {
     // Handle athletics_standings which can be Map, List, or null
     Map<String, dynamic>? athleticsStandings;
     final rawStandings = json['athletics_standings'];
@@ -51,15 +46,10 @@ class CalendarGame {
       };
     }
 
-    return CalendarGame(
+    return AthleticGame(
       gameId: json['game_id'] as String,
-      modalityId: json['modality_id'] as String,
-      startAt: json['start_at'] is String
-          ? DateTime.parse(json['start_at'])
-          : json['start_at'] as DateTime,
+      startAt: DateTime.parse(json['start_at'] as String),
       status: json['status'] as String,
-      series: json['series'] as String,
-      athleticsStandings: athleticsStandings,
       modalityPhase: json['modality_phase'] as String,
       venueName: json['venue_name'] as String?,
       teamAId: json['team_a_id'] as String?,
@@ -68,17 +58,15 @@ class CalendarGame {
       teamBLogo: json['team_b_logo'] as String?,
       scoreA: json['score_a'] as int?,
       scoreB: json['score_b'] as int?,
+      athleticsStandings: athleticsStandings,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'game_id': gameId,
-      'modality_id': modalityId,
       'start_at': startAt.toIso8601String(),
       'status': status,
-      'series': series,
-      'athletics_standings': athleticsStandings,
       'modality_phase': modalityPhase,
       'venue_name': venueName,
       'team_a_id': teamAId,
@@ -87,6 +75,7 @@ class CalendarGame {
       'team_b_logo': teamBLogo,
       'score_a': scoreA,
       'score_b': scoreB,
+      'athletics_standings': athleticsStandings,
     };
   }
 
@@ -110,35 +99,9 @@ class CalendarGame {
         .toList();
   }
 
-  int get displayScoreA => scoreA ?? 0;
-  int get displayScoreB => scoreB ?? 0;
+  // Helper method to get team A asset path
+  String? get teamAAssetPath => teamALogo != null ? 'images/$teamALogo' : null;
 
-  String get statusDisplayText {
-    switch (status.toLowerCase()) {
-      case 'scheduled':
-        return 'Agendado';
-      case 'inprogress':
-      case 'in_progress':
-        return 'Em andamento';
-      case 'finished':
-        return 'Finalizado';
-      default:
-        return status;
-    }
-  }
-
-  String get dayLabel {
-    // Extract day from date for "Dia 1", "Dia 2", "Dia 3" classification
-    final day = startAt.day;
-    final baseDay =
-        30; // Assuming competition starts on day 30 based on your query
-    final dayNumber = day - baseDay + 1;
-    return 'Dia $dayNumber';
-  }
-
-  String get startTimeDateFormatted {
-    return DateFormat('HH:mm - EEE, dd MMM', 'pt_BR').format(startAt);
-  }
-
-  String get gameIcon => AppIcons.getGameIcon(modalityPhase);
+  // Helper method to get team B asset path
+  String? get teamBAssetPath => teamBLogo != null ? 'images/$teamBLogo' : null;
 }
