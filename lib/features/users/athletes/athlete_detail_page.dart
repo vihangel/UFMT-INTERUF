@@ -62,7 +62,7 @@ class AthleteDetailPageState extends State<AthleteDetailPage> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Estatísticas do atleta'),
-
+        backgroundColor: AppColors.cardBackground,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
@@ -109,8 +109,8 @@ class AthleteDetailPageState extends State<AthleteDetailPage> {
           decoration: BoxDecoration(
             color: AppColors.cardBackground,
             border: const Border(
-              top: BorderSide(color: AppColors.inputBorder, width: 1),
-              bottom: BorderSide(color: AppColors.inputBorder, width: 1),
+              top: BorderSide(color: AppColors.inputBorder, width: 2),
+              bottom: BorderSide(color: AppColors.inputBorder, width: 2),
             ),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -147,7 +147,7 @@ class AthleteDetailPageState extends State<AthleteDetailPage> {
               children: [
                 const SizedBox(height: 24),
                 _buildPersonalSection(),
-                const SizedBox(height: 24),
+                const SizedBox(height: 8),
                 _buildStatisticsSection(),
               ],
             ),
@@ -159,13 +159,12 @@ class AthleteDetailPageState extends State<AthleteDetailPage> {
 
   Widget _buildPersonalSection() {
     return Card(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-
-            child: const Text(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
               'Pessoal',
               style: TextStyle(
                 fontSize: 18,
@@ -173,10 +172,8 @@ class AthleteDetailPageState extends State<AthleteDetailPage> {
                 color: AppColors.primary,
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-            child: Column(
+            const SizedBox(height: 12),
+            Column(
               children: [
                 _buildInfoRow('Nome', _athleteDetail!.fullName),
                 const SizedBox(height: 12),
@@ -187,8 +184,8 @@ class AthleteDetailPageState extends State<AthleteDetailPage> {
                 _buildInfoRow('Curso', _athleteDetail!.course),
               ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
