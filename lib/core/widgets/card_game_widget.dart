@@ -26,6 +26,7 @@ class CardGame extends StatelessWidget {
   final int? displayScoreA;
   final int? displayScoreB;
   final List<String>? multiTeamLogos;
+  final VoidCallback? onTap;
   const CardGame({
     super.key,
     required this.status,
@@ -46,99 +47,107 @@ class CardGame extends StatelessWidget {
     this.displayScoreA,
     this.displayScoreB,
     this.multiTeamLogos,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          left: BorderSide(color: _getStatusColor(status), width: 6),
-        ),
-        borderRadius: BorderRadius.circular(6),
-      ),
-
-      child: Card(
-        color: AppColors.white,
-        margin: EdgeInsets.zero,
-        child: InkWell(
-          onTap: () {
-            if (isTwoTeamGame) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      TournamentGameDetailPage(gameId: gameId),
-                ),
-              );
-            } else if (isMultiTeamGame) {
-              final modalityName = modalityPhase.split(' - ').first;
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => GameDetailPage(
-                    modalityId: modalityId,
-                    modalityName: modalityName,
-                    series: series,
-                  ),
-                ),
-              );
-            }
-          },
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border(
+            left: BorderSide(color: _getStatusColor(status), width: 6),
+          ),
           borderRadius: BorderRadius.circular(6),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _getStatusColor(status).withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        statusDisplayText,
-                        style: TextStyle(
-                          color: _getStatusColor(status),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
+        ),
+
+        child: Card(
+          color: AppColors.white,
+          margin: EdgeInsets.zero,
+          child: InkWell(
+            onTap: () {
+              if (isTwoTeamGame) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        TournamentGameDetailPage(gameId: gameId),
+                  ),
+                );
+              } else if (isMultiTeamGame) {
+                final modalityName = modalityPhase.split(' - ').first;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => GameDetailPage(
+                      modalityId: modalityId,
+                      modalityName: modalityName,
+                      series: series,
+                    ),
+                  ),
+                );
+              }
+            },
+            borderRadius: BorderRadius.circular(6),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _getStatusColor(status).withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          statusDisplayText,
+                          style: TextStyle(
+                            color: _getStatusColor(status),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                _RowIconLabel(AppIcons.icClock, startTimeDateFormatted),
-                const SizedBox(height: 6),
-
-                _RowIconLabel(gameIcon, modalityPhase),
-
-                if (venueName != null) ...[
+                    ],
+                  ),
                   const SizedBox(height: 6),
-                  _RowIconLabel(AppIcons.icLocation, venueName!),
-                ],
-                const SizedBox(height: 6),
+                  _RowIconLabel(
+                    AppIcons.icClock,
+                    startTimeDateFormatted,
+                    isBold: true,
+                  ),
+                  const SizedBox(height: 6),
 
-                if (isTwoTeamGame)
-                  Row2teamStatsWidget(
-                    teamALogo: teamALogo,
-                    teamBLogo: teamBLogo,
-                    scoreA: scoreA,
-                    scoreB: scoreB,
-                    displayScoreA: displayScoreA,
-                    displayScoreB: displayScoreB,
-                  )
-                else if (isMultiTeamGame)
-                  RowMultiTeamsLogosWidget(logos: multiTeamLogos!)
-                else
-                  _buildUnknownGameContent(),
-              ],
+                  _RowIconLabel(gameIcon, modalityPhase),
+
+                  if (venueName != null) ...[
+                    const SizedBox(height: 6),
+                    _RowIconLabel(AppIcons.icLocation, venueName!),
+                  ],
+                  const SizedBox(height: 6),
+
+                  if (isTwoTeamGame)
+                    Row2teamStatsWidget(
+                      teamALogo: teamALogo,
+                      teamBLogo: teamBLogo,
+                      scoreA: scoreA,
+                      scoreB: scoreB,
+                      displayScoreA: displayScoreA,
+                      displayScoreB: displayScoreB,
+                    )
+                  else if (isMultiTeamGame)
+                    RowMultiTeamsLogosWidget(logos: multiTeamLogos!)
+                  else
+                    _buildUnknownGameContent(),
+                ],
+              ),
             ),
           ),
         ),
@@ -184,7 +193,8 @@ class CardGame extends StatelessWidget {
 class _RowIconLabel extends StatelessWidget {
   final String icon;
   final String label;
-  const _RowIconLabel(this.icon, this.label);
+  final bool isBold;
+  const _RowIconLabel(this.icon, this.label, {this.isBold = false});
 
   @override
   Widget build(BuildContext context) {
@@ -202,7 +212,11 @@ class _RowIconLabel extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           label,
-          style: const TextStyle(color: AppColors.primaryText, fontSize: 14),
+          style: TextStyle(
+            color: AppColors.primaryText,
+            fontSize: 14,
+            fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+          ),
         ),
       ],
     );
