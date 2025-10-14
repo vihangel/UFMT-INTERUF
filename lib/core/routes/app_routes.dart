@@ -17,6 +17,7 @@ import 'package:interufmt/features/users/modalities/modalities_page.dart';
 import 'package:interufmt/features/users/news/news_page.dart';
 import 'package:interufmt/features/users/venues/venues_page.dart';
 import 'package:provider/provider.dart';
+import 'package:interufmt/features/users/torcidometro_page.dart';
 
 class AppRoutes {
   static GoRouter getRouter(
@@ -49,6 +50,11 @@ class AppRoutes {
           name: NewsPage.routename,
           path: '/noticias',
           builder: (context, state) => const NewsPage(),
+        ),
+        GoRoute(
+          name: TorcidometroPage.routename, // Usa a nova constante
+          path: '/torcidometro',
+          builder: (context, state) => const TorcidometroPage(),
         ),
         GoRoute(
           name: 'athletics',

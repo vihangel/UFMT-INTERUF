@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../models/game_detail_model.dart';
 
 class GameDetailRepository {
@@ -133,8 +134,9 @@ class GameDetailRepository {
             .where((item) => item != null)
             .map((item) {
               if (item is String) return item;
-              if (item is Map && item.containsKey('id'))
+              if (item is Map && item.containsKey('id')) {
                 return item['id'] as String;
+              }
               return null;
             })
             .where((id) => id != null)

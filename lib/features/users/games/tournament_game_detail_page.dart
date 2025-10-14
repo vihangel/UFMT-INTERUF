@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:interufmt/core/theme/app_colors.dart';
 import 'package:interufmt/core/theme/app_icons.dart';
+import 'package:interufmt/core/widgets/row_2team_stats_widget.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/data/models/tournament_game_detail_model.dart';
@@ -183,112 +184,14 @@ class TournamentGameDetailPageState extends State<TournamentGameDetailPage>
           const SizedBox(height: 20),
 
           // Teams and Score
-          Row(
-            children: [
-              // Team A
-              Expanded(
-                child: Column(
-                  children: [
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.grey.withValues(alpha: 0.1),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(40),
-                        child: Image.asset(
-                          _gameDetail!.teamALogoPath,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return const Icon(
-                              Icons.shield,
-                              color: Colors.grey,
-                              size: 40,
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      _gameDetail!.teamAName,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primaryText,
-                      ),
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-
-              // Score
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  '${_gameDetail!.scoreA} X ${_gameDetail!.scoreB}',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryText,
-                  ),
-                ),
-              ),
-
-              // Team B
-              Expanded(
-                child: Column(
-                  children: [
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.grey.withValues(alpha: 0.1),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(40),
-                        child: Image.asset(
-                          _gameDetail!.teamBLogoPath,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return const Icon(
-                              Icons.shield,
-                              color: Colors.grey,
-                              size: 40,
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      _gameDetail!.teamBName,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primaryText,
-                      ),
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-            ],
+          Row2teamStatsWidget(
+            teamALogo: _gameDetail!.teamALogo,
+            teamBLogo: _gameDetail!.teamBLogo,
+            scoreA: _gameDetail!.scoreA,
+            scoreB: _gameDetail!.scoreB,
+            displayScoreA: _gameDetail!.scoreA,
+            displayScoreB: _gameDetail!.scoreB,
+            extraTextScore: _gameDetail!.statusDisplayText,
           ),
         ],
       ),

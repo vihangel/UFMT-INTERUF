@@ -34,6 +34,29 @@ class EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
     return 'assets/images/$logoUrl';
   }
 
+  /*
+ Future<void> _incrementTorcidometro(String athleticId) async {
+  // A classe Postgrest é a correta para usar o incremento
+  final postgrest = Supabase.instance.client.from('torcidometro');
+  
+  try {
+    // Tenta incrementar o campo 'pontos_torcida' em 1 para a atlética
+    await postgrest
+        .update({'pontos_torcida': postgrest.increment(1)}) 
+        .eq('athletic_id', athleticId)
+        .single();
+        
+  } catch (e) {
+    // Se a linha não existir (primeiro voto), a gente a cria (INSERT)
+    if (e.toString().contains('no rows found')) {
+       await Supabase.instance.client
+           .from('torcidometro')
+           .insert({'athletic_id': athleticId, 'pontos_torcida': 1});
+    }
+    print('Erro ao atualizar torcidometro: $e');
+  }
+}
+*/
   @override
   void initState() {
     super.initState();
