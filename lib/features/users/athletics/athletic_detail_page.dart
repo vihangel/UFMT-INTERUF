@@ -16,6 +16,8 @@ import '../games/game_detail_page.dart';
 import '../games/games_page.dart';
 import '../games/tournament_game_detail_page.dart';
 
+import 'package:interufmt/features/users/torcidometro_page.dart';
+
 class AthleticDetailPage extends StatefulWidget {
   final AthleticsItem athletic;
 
@@ -125,10 +127,18 @@ class AthleticDetailPageState extends State<AthleticDetailPage>
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.bar_chart,
+              color: Colors.black,
+            ), // Ícone de barras
+            onPressed: () {
+              // Navega para a rota do Torcidômetro
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
         bottom: _athleticDetail != null
             ? TabBar(
                 controller: _mainTabController,
