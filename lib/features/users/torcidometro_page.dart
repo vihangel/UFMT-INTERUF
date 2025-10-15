@@ -10,34 +10,33 @@ import 'package:interufmt/features/users/athletics/athletics_page.dart';
 const Map<String, Color> ATLETICA_COLORS = {
   'Trojan': Color(0xFF1E3A8A),
   'Pintada': Color(0xFFFF5722),
-  'Guará': Color(0xFFD32F2F),
-  'Turuna': Color(0xFFDC2626),
+  'Guara': Color(0xFFD32F2F),
   'Hydra': Color(0xFF00796B),
   'Macabra': Color(0xFF22543D),
-  'Gato Preto': Color(0xFFB71C1C),
+  'GatoPreto': Color(0xFFB71C1C),
   'Admafia': Color(0xFF1976D2),
-  'Ampère': Color(0xFFFBC02D),
+  'Ampere': Color(0xFFFBC02D),
   'Arcaica': Color(0xFFF9A825),
   'Armada': Color(0xFFD32F2F),
   'Atena': Color(0xFF673AB7),
-  'Atômica': Color(0xFFFFD600),
-  'Barões': Color(0xFFC62828),
-  'Búfalos': Color(0xFFD50000),
+  'Atomica': Color(0xFFFFD600),
+  'Baroes': Color(0xFFC62828),
+  'Bufalos': Color(0xFFD50000),
   'Caiman': Color(0xFF558B2F),
-  'Caótica': Color(0xFFE65100),
+  'Caotica': Color(0xFFE65100),
   'Compila': Color(0xFF0D47A1),
   'Deltas': Color(0xFF1A237E),
   'Detona': Color(0xFFFF8F00),
   'Devora': Color(0xFFF4511E),
-  'Enfúria': Color(0xFF00BCD4),
+  'Enfuria': Color(0xFF00BCD4),
   'Infernal': Color(0xFF880E4F),
-  'Monopólio': Color(0xFF000000),
-  'Quântica': Color(0xFFB3E5FC),
-  'Rústica': Color(0xFF0D47A1),
+  'Monopolio': Color(0xFF000000),
+  'Quantica': Color(0xFFB3E5FC),
+  'Rustica': Color(0xFF0D47A1),
   'Tempesta': Color(0xFF1565C0),
   'Tormenta': Color(0xFFD50000),
   'Turbulenta': Color(0xFF0D47A1),
-  'Sumaúma': Color(0xFF558B2F),
+  'Sumauma': Color(0xFF558B2F),
   'Rochedo': Color(0xFFFF9800),
   'Transtorna': Color(0xFFFF9800),
 };
@@ -75,19 +74,11 @@ class _TorcidometroPageState extends State<TorcidometroPage>
     ),
     const Atletica(
       posicao: 3,
-      nome: 'Guará',
+      nome: 'Guara',
       ouro: 0,
       prata: 0,
       bronze: 0,
       pontos: 140,
-    ),
-    const Atletica(
-      posicao: 4,
-      nome: 'Turuna',
-      ouro: 0,
-      prata: 0,
-      bronze: 0,
-      pontos: 112,
     ),
     const Atletica(
       posicao: 5,
@@ -107,7 +98,7 @@ class _TorcidometroPageState extends State<TorcidometroPage>
     ),
     const Atletica(
       posicao: 7,
-      nome: 'Gato Preto',
+      nome: 'GatoPreto',
       ouro: 0,
       prata: 0,
       bronze: 0,
@@ -134,7 +125,7 @@ class _TorcidometroPageState extends State<TorcidometroPage>
     ),
     const Atletica(
       posicao: 2,
-      nome: 'Gato Preto',
+      nome: 'GatoPreto',
       ouro: 0,
       prata: 0,
       bronze: 0,
@@ -150,7 +141,7 @@ class _TorcidometroPageState extends State<TorcidometroPage>
     ),
     const Atletica(
       posicao: 4,
-      nome: 'Caótica',
+      nome: 'Caotica',
       ouro: 0,
       prata: 0,
       bronze: 0,
@@ -163,7 +154,7 @@ class _TorcidometroPageState extends State<TorcidometroPage>
 
   // Função auxiliar para gerar o caminho do asset
   String _getAtleticAssetPath(String nome) {
-    return 'assets/images/Atlética $nome.png';
+    return 'assets/images/$nome.png';
   }
 
   // Função auxiliar para obter a cor da atlética

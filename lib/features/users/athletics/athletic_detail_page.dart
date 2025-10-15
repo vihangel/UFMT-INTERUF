@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/theme/app_colors.dart';
 import 'package:interufmt/core/widgets/card_game_widget.dart';
 import 'package:intl/intl.dart';
@@ -134,7 +135,7 @@ class AthleticDetailPageState extends State<AthleticDetailPage>
               color: Colors.black,
             ), // Ícone de barras
             onPressed: () {
-              // Navega para a rota do Torcidômetro
+              context.goNamed(TorcidometroPage.routename);
             },
           ),
           const SizedBox(width: 8),
