@@ -31,21 +31,21 @@ class SectionsSocialMediaWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               _SocialMediaButton(
-                url: 'https://www.instagram.com/interufmt',
+                url: 'https://www.instagram.com/laufmt',
                 label: 'Instagram',
                 iconPath: AppIcons.icInstagram,
               ),
-              _SocialMediaButton(
-                url: 'https://twitter.com/interufmt',
-                label: 'X (Twitter)',
-                iconPath: AppIcons.icTwitter,
-              ),
+              // _SocialMediaButton(
+              //   url: 'https://twitter.com/interufmt',
+              //   label: 'X (Twitter)',
+              //   iconPath: AppIcons.icTwitter,
+              // ),
 
-              _SocialMediaButton(
-                url: 'https://www.youtube.com/interufmt',
-                label: 'YouTube',
-                iconPath: AppIcons.icYoutube,
-              ),
+              // _SocialMediaButton(
+              //   url: 'https://www.youtube.com/interufmt',
+              //   label: 'YouTube',
+              //   iconPath: AppIcons.icYoutube,
+              // ),
             ],
           ),
         ],
