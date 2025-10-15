@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../core/services/voting_service.dart';
 
 class EscolhaAtleticaPage extends StatefulWidget {
   static const String routename = 'escolha_atletica';
@@ -16,6 +17,7 @@ class EscolhaAtleticaPage extends StatefulWidget {
 class EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late VotingService _votingService;
   int _currentPageIndex = 0;
   List<Map<String, dynamic>> _currentSeries = [];
   String _currentSeriesName = 'Série A';
@@ -25,6 +27,7 @@ class EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
   List<Map<String, dynamic>> _serieB = [];
   bool _isLoading = true;
   String? _errorMessage;
+  bool _isVoting = false;
 
   final Map<int, PageController> _tabPageControllers = {};
 
@@ -61,6 +64,7 @@ class EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _votingService = VotingService(Supabase.instance.client);
     _loadAthletics();
 
     _tabController.addListener(() {
@@ -125,14 +129,61 @@ class EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
   void _saveAndNavigate() async {
     if (_currentSeries.isEmpty) return;
 
-    final prefs = await SharedPreferences.getInstance();
-    final chosenAtletica = _currentSeries[_currentPageIndex];
+    setState(() {
+      _isVoting = true;
+    });
 
-    await prefs.setString('chosen_athletic_name', chosenAtletica['nickname']!);
-    await prefs.setString('chosen_athletic_id', chosenAtletica['id']!);
-    await prefs.setString('chosen_athletic_series', _currentSeriesName);
+    try {
+      final chosenAtletica = _currentSeries[_currentPageIndex];
+      final athleticId = chosenAtletica['id'] as String;
 
-    context.go('/home');
+      // Register vote in database
+      await _votingService.vote(athleticId);
+
+      // Save to local preferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(
+        'chosen_athletic_name',
+        chosenAtletica['nickname']!,
+      );
+      await prefs.setString('chosen_athletic_id', athleticId);
+      await prefs.setString('chosen_athletic_series', _currentSeriesName);
+
+      // Show success message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Voto registrado para ${chosenAtletica['nickname']}!',
+            ),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+
+      // Navigate to home
+      if (mounted) {
+        context.go('/home');
+      }
+    } catch (error) {
+      // Show error message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao registrar voto: $error'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isVoting = false;
+        });
+      }
+    }
   }
 
   @override
@@ -241,10 +292,21 @@ class EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
                     ],
                     const Spacer(),
                     ElevatedButton(
-                      onPressed: _currentSeries.isNotEmpty
+                      onPressed: _currentSeries.isNotEmpty && !_isVoting
                           ? _saveAndNavigate
                           : null,
-                      child: const Text('Escolher'),
+                      child: _isVoting
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
+                              ),
+                            )
+                          : const Text('Escolher'),
                     ),
                     const SizedBox(height: 10),
                     const Text(
