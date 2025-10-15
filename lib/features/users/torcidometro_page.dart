@@ -3,8 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/data/atletica_model.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:interufmt/features/users/athletics/athletics_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../core/data/repositories/torcidometro_repository.dart';
 
 // Mapeamento de cores final para todas as atléticas (usado para as barras)
 const Map<String, Color> ATLETICA_COLORS = {
@@ -39,6 +40,7 @@ const Map<String, Color> ATLETICA_COLORS = {
   'Sumauma': Color(0xFF558B2F),
   'Rochedo': Color(0xFFFF9800),
   'Transtorna': Color(0xFFFF9800),
+  'Metralha': Color(0xFF424242),
 };
 
 class TorcidometroPage extends StatefulWidget {
@@ -53,108 +55,22 @@ class TorcidometroPage extends StatefulWidget {
 class _TorcidometroPageState extends State<TorcidometroPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late TorcidometroRepository _repository;
 
-  // Dados simulados com o Model Atletica
-  final List<Atletica> _serieA = [
-    const Atletica(
-      posicao: 1,
-      nome: 'Trojan',
-      ouro: 0,
-      prata: 0,
-      bronze: 0,
-      pontos: 241,
-    ),
-    const Atletica(
-      posicao: 2,
-      nome: 'Pintada',
-      ouro: 0,
-      prata: 0,
-      bronze: 0,
-      pontos: 192,
-    ),
-    const Atletica(
-      posicao: 3,
-      nome: 'Guara',
-      ouro: 0,
-      prata: 0,
-      bronze: 0,
-      pontos: 140,
-    ),
-    const Atletica(
-      posicao: 5,
-      nome: 'Hydra',
-      ouro: 0,
-      prata: 0,
-      bronze: 0,
-      pontos: 87,
-    ),
-    const Atletica(
-      posicao: 6,
-      nome: 'Macabra',
-      ouro: 0,
-      prata: 0,
-      bronze: 0,
-      pontos: 68,
-    ),
-    const Atletica(
-      posicao: 7,
-      nome: 'GatoPreto',
-      ouro: 0,
-      prata: 0,
-      bronze: 0,
-      pontos: 62,
-    ),
-    const Atletica(
-      posicao: 8,
-      nome: 'Admafia',
-      ouro: 0,
-      prata: 0,
-      bronze: 0,
-      pontos: 41,
-    ),
-  ];
+  List<Atletica> _serieA = [];
+  List<Atletica> _serieB = [];
 
-  final List<Atletica> _serieB = [
-    const Atletica(
-      posicao: 1,
-      nome: 'Macabra',
-      ouro: 0,
-      prata: 0,
-      bronze: 0,
-      pontos: 310,
-    ),
-    const Atletica(
-      posicao: 2,
-      nome: 'GatoPreto',
-      ouro: 0,
-      prata: 0,
-      bronze: 0,
-      pontos: 280,
-    ),
-    const Atletica(
-      posicao: 3,
-      nome: 'Admafia',
-      ouro: 0,
-      prata: 0,
-      bronze: 0,
-      pontos: 150,
-    ),
-    const Atletica(
-      posicao: 4,
-      nome: 'Caotica',
-      ouro: 0,
-      prata: 0,
-      bronze: 0,
-      pontos: 90,
-    ),
-  ];
+  bool _isLoadingA = true;
+  bool _isLoadingB = true;
+  String? _errorMessageA;
+  String? _errorMessageB;
 
-  late double _maxPointsA;
-  late double _maxPointsB;
+  double _maxPointsA = 1.0;
+  double _maxPointsB = 1.0;
 
   // Função auxiliar para gerar o caminho do asset
-  String _getAtleticAssetPath(String nome) {
-    return 'assets/images/$nome.png';
+  String _getAtleticAssetPath(String logo) {
+    return 'assets/images/$logo';
   }
 
   // Função auxiliar para obter a cor da atlética
@@ -166,12 +82,63 @@ class _TorcidometroPageState extends State<TorcidometroPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _repository = TorcidometroRepository(Supabase.instance.client);
+    _loadRankings();
+  }
 
-    // Ordena e calcula a pontuação máxima
-    _serieA.sort((a, b) => b.pontos.compareTo(a.pontos));
-    _serieB.sort((a, b) => b.pontos.compareTo(a.pontos));
-    _maxPointsA = _serieA.isNotEmpty ? _serieA.first.pontos.toDouble() : 1.0;
-    _maxPointsB = _serieB.isNotEmpty ? _serieB.first.pontos.toDouble() : 1.0;
+  Future<void> _loadRankings() async {
+    // Load Serie A
+    _loadSerieA();
+    // Load Serie B
+    _loadSerieB();
+  }
+
+  Future<void> _loadSerieA() async {
+    try {
+      setState(() {
+        _isLoadingA = true;
+        _errorMessageA = null;
+      });
+
+      final rankings = await _repository.getRankingBySeries('A');
+
+      setState(() {
+        _serieA = rankings;
+        _maxPointsA = _serieA.isNotEmpty
+            ? _serieA.first.pontos.toDouble()
+            : 1.0;
+        _isLoadingA = false;
+      });
+    } catch (error) {
+      setState(() {
+        _isLoadingA = false;
+        _errorMessageA = 'Erro ao carregar ranking da Série A: $error';
+      });
+    }
+  }
+
+  Future<void> _loadSerieB() async {
+    try {
+      setState(() {
+        _isLoadingB = true;
+        _errorMessageB = null;
+      });
+
+      final rankings = await _repository.getRankingBySeries('B');
+
+      setState(() {
+        _serieB = rankings;
+        _maxPointsB = _serieB.isNotEmpty
+            ? _serieB.first.pontos.toDouble()
+            : 1.0;
+        _isLoadingB = false;
+      });
+    } catch (error) {
+      setState(() {
+        _isLoadingB = false;
+        _errorMessageB = 'Erro ao carregar ranking da Série B: $error';
+      });
+    }
   }
 
   @override
@@ -202,18 +169,61 @@ class _TorcidometroPageState extends State<TorcidometroPage>
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildRankingTab(_serieA, _maxPointsA, 'Série A'),
-          _buildRankingTab(_serieB, _maxPointsB, 'Série B'),
+          _buildRankingTabWithLoading(
+            _serieA,
+            _maxPointsA,
+            'Série A',
+            _isLoadingA,
+            _errorMessageA,
+            _loadSerieA,
+          ),
+          _buildRankingTabWithLoading(
+            _serieB,
+            _maxPointsB,
+            'Série B',
+            _isLoadingB,
+            _errorMessageB,
+            _loadSerieB,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildRankingTab(
+  Widget _buildRankingTabWithLoading(
     List<Atletica> ranking,
     double maxPoints,
     String seriesTitle,
+    bool isLoading,
+    String? errorMessage,
+    VoidCallback onRetry,
   ) {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (errorMessage != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error_outline, size: 64, color: Colors.red),
+            const SizedBox(height: 16),
+            Text(
+              errorMessage,
+              style: const TextStyle(color: Colors.red),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: onRetry,
+              child: const Text('Tentar novamente'),
+            ),
+          ],
+        ),
+      );
+    }
+
     if (ranking.isEmpty) {
       return const Center(
         child: Text('Nenhuma atlética encontrada nesta série.'),
@@ -260,7 +270,7 @@ class _TorcidometroPageState extends State<TorcidometroPage>
             ClipRRect(
               borderRadius: BorderRadius.circular(50),
               child: Image.asset(
-                _getAtleticAssetPath(atletica.nome),
+                _getAtleticAssetPath(atletica.logo ?? ''),
                 height: 100,
                 width: 100,
                 fit: BoxFit.cover,
@@ -305,7 +315,7 @@ class _TorcidometroPageState extends State<TorcidometroPage>
                 ),
                 child: ClipOval(
                   child: Image.asset(
-                    _getAtleticAssetPath(atletica.nome),
+                    _getAtleticAssetPath(atletica.logo ?? ''),
                     height: 40,
                     width: 40,
                     fit: BoxFit.cover,
