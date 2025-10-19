@@ -46,6 +46,49 @@ class AuthService {
         metadata?['picture'] as String?;
   }
 
+  /// Get user role from roles table
+  /// Returns 'user', 'moderator', or 'admin'
+  /// Returns null if not authenticated or role not found
+  Future<String?> getUserRole() async {
+    final user = currentUser;
+    if (user == null) return null;
+
+    try {
+      final response = await _c
+          .from('roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+      if (response == null) {
+        return 'user'; // Default role if not found in roles table
+      }
+
+      return response['role'] as String?;
+    } catch (e) {
+      debugPrint('Error fetching user role: $e');
+      return 'user'; // Default to user on error
+    }
+  }
+
+  /// Check if user is admin
+  Future<bool> isAdmin() async {
+    final role = await getUserRole();
+    return role == 'admin';
+  }
+
+  /// Check if user is moderator
+  Future<bool> isModerator() async {
+    final role = await getUserRole();
+    return role == 'moderator';
+  }
+
+  /// Check if user is admin or moderator
+  Future<bool> isAdminOrModerator() async {
+    final role = await getUserRole();
+    return role == 'admin' || role == 'moderator';
+  }
+
   /// Validate if email domain is allowed
   bool isEmailDomainAllowed(String email) {
     if (allowedDomains.isEmpty) {
@@ -91,10 +134,16 @@ class AuthService {
     }
 
     try {
+      // For web, use the current window location origin
+      // For mobile, use the deep link scheme
+      final redirectUrl = kIsWeb
+          ? '${Uri.base.origin}/auth/callback'
+          : 'interufmt://login-callback';
+
       return await _c.auth.signUp(
         email: email,
         password: password,
-        emailRedirectTo: kIsWeb ? null : 'interufmt://login-callback',
+        emailRedirectTo: redirectUrl,
         data: {
           if (fullName != null) 'full_name': fullName,
           if (avatarUrl != null) 'avatar_url': avatarUrl,
@@ -152,10 +201,13 @@ class AuthService {
     }
 
     try {
-      await _c.auth.signInWithOtp(
-        email: email,
-        emailRedirectTo: kIsWeb ? null : 'interufmt://login-callback',
-      );
+      // For web, use the current window location origin
+      // For mobile, use the deep link scheme
+      final redirectUrl = kIsWeb
+          ? '${Uri.base.origin}/auth/callback'
+          : 'interufmt://login-callback';
+
+      await _c.auth.signInWithOtp(email: email, emailRedirectTo: redirectUrl);
     } on AuthException {
       rethrow;
     }
@@ -179,9 +231,15 @@ class AuthService {
 
   // Recuperação por link (recomendado p/ mobile)
   Future<void> sendPasswordResetEmail(String email, {String? redirectTo}) {
+    // For web, use the current window location origin
+    // For mobile, use the deep link scheme
+    final defaultRedirectUrl = kIsWeb
+        ? '${Uri.base.origin}/auth/callback'
+        : 'interufmt://reset';
+
     return _c.auth.resetPasswordForEmail(
       email,
-      redirectTo: redirectTo ?? (kIsWeb ? null : 'interufmt://reset'),
+      redirectTo: redirectTo ?? defaultRedirectUrl,
     );
   }
 

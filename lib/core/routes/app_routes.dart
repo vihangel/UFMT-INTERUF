@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/data/atletica_model.dart';
+import 'package:interufmt/features/admin/admin_panel_page.dart';
 import 'package:interufmt/features/admin/auth/admin_login_page.dart';
 import 'package:interufmt/features/admin/home/admin_home_page.dart';
 import 'package:interufmt/features/escolha_atletica_page.dart';
@@ -40,6 +41,32 @@ class AppRoutes {
           name: LoginPage.routename,
           path: '/login',
           builder: (context, state) => const LoginPage(),
+        ),
+        // Auth callback handler for web (magic links, email verification)
+        GoRoute(
+          path: '/auth/callback',
+          builder: (context, state) {
+            // Show loading screen while Supabase processes the auth callback
+            return const Scaffold(
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text('Autenticando...'),
+                  ],
+                ),
+              ),
+            );
+          },
+          redirect: (context, state) async {
+            // Give Supabase a moment to process the callback
+            await Future.delayed(const Duration(milliseconds: 800));
+
+            // After authentication is processed, redirect to home
+            return '/home';
+          },
         ),
         GoRoute(
           name: HomePage.routename,
@@ -103,6 +130,12 @@ class AppRoutes {
           name: UpdatePasswordPage.routename,
           path: '/update-password',
           builder: (context, state) => const UpdatePasswordPage(),
+        ),
+        // Admin Panel (for moderators and admins)
+        GoRoute(
+          name: AdminPanelPage.routename,
+          path: '/admin-panel',
+          builder: (context, state) => const AdminPanelPage(),
         ),
         // Rotas admin
         GoRoute(
