@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/theme/app_colors.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:interufmt/features/users/torcidometro_page.dart';
+import 'package:interufmt/features/torcidometro_page.dart';
 import '../../../core/data/athletics_item_model.dart';
 import '../../../core/data/repositories/athletics_repository.dart';
 import 'athletic_detail_page.dart';
-import '../torcidometro_page.dart';
+import '../../torcidometro_page.dart';
 
 class AthleticsPage extends StatefulWidget {
   static const String routename = 'athletics';

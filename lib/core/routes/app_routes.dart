@@ -17,7 +17,7 @@ import 'package:interufmt/features/users/modalities/modalities_page.dart';
 import 'package:interufmt/features/users/news/news_page.dart';
 import 'package:interufmt/features/users/venues/venues_page.dart';
 import 'package:provider/provider.dart';
-import 'package:interufmt/features/users/torcidometro_page.dart';
+import 'package:interufmt/features/torcidometro_page.dart';
 
 class AppRoutes {
   static GoRouter getRouter(

@@ -19,7 +19,7 @@ class NewsService {
       return newsMock;
     }
 
-    final response = await client.from(AppSupabaseTables.news).select();
+    final response = await client.from(AppSupabaseTables.news).select().lt('published_at', DateTime.now());
     final newsList = response as List;
     return newsList.map((item) => News.fromJson(item)).toList();
   }

@@ -17,7 +17,7 @@ import '../games/game_detail_page.dart';
 import '../games/games_page.dart';
 import '../games/tournament_game_detail_page.dart';
 
-import 'package:interufmt/features/users/torcidometro_page.dart';
+import 'package:interufmt/features/torcidometro_page.dart';
 
 class AthleticDetailPage extends StatefulWidget {
   final AthleticsItem athletic;

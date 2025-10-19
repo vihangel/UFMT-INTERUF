@@ -3,9 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/data/atletica_model.dart';
-import 'package:interufmt/features/users/athletics/athletics_page.dart';
+import 'package:interufmt/features/users/home/home_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../core/data/repositories/torcidometro_repository.dart';
+import '../core/data/repositories/torcidometro_repository.dart';
 
 // Mapeamento de cores final para todas as atléticas (usado para as barras)
 const Map<String, Color> ATLETICA_COLORS = {
@@ -155,7 +155,7 @@ class _TorcidometroPageState extends State<TorcidometroPage>
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            context.goNamed(AthleticsPage.routename);
+            context.goNamed(HomePage.routename);
           },
         ),
         bottom: TabBar(
