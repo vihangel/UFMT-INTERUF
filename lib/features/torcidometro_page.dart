@@ -6,6 +6,9 @@ import 'package:interufmt/core/data/atletica_model.dart';
 import 'package:interufmt/features/users/home/home_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../core/data/repositories/torcidometro_repository.dart';
+import '../core/services/voting_service.dart';
+import '../core/data/services/auth_service.dart';
+import 'escolha_atletica_page.dart';
 
 // Mapeamento de cores final para todas as atléticas (usado para as barras)
 const Map<String, Color> ATLETICA_COLORS = {
@@ -56,6 +59,8 @@ class _TorcidometroPageState extends State<TorcidometroPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late TorcidometroRepository _repository;
+  late VotingService _votingService;
+  late AuthService _authService;
 
   List<Atletica> _serieA = [];
   List<Atletica> _serieB = [];
@@ -67,6 +72,11 @@ class _TorcidometroPageState extends State<TorcidometroPage>
 
   double _maxPointsA = 1.0;
   double _maxPointsB = 1.0;
+
+  // User vote info
+  String? _userVotedAthleticId;
+  Map<String, dynamic>? _userVotedAthletic;
+  bool _isLoadingUserVote = true;
 
   // Função auxiliar para gerar o caminho do asset
   String _getAtleticAssetPath(String logo) {
@@ -83,7 +93,10 @@ class _TorcidometroPageState extends State<TorcidometroPage>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _repository = TorcidometroRepository(Supabase.instance.client);
+    _votingService = VotingService(Supabase.instance.client);
+    _authService = AuthService(Supabase.instance.client);
     _loadRankings();
+    _loadUserVote();
   }
 
   Future<void> _loadRankings() async {
@@ -91,6 +104,38 @@ class _TorcidometroPageState extends State<TorcidometroPage>
     _loadSerieA();
     // Load Serie B
     _loadSerieB();
+  }
+
+  Future<void> _loadUserVote() async {
+    setState(() {
+      _isLoadingUserVote = true;
+    });
+
+    try {
+      if (_authService.isAuthenticated) {
+        final votedAthleticId = await _votingService.getAuthenticatedUserVote();
+
+        if (votedAthleticId != null) {
+          // Fetch athletic details
+          final response = await Supabase.instance.client
+              .from('athletics')
+              .select('id, nickname, name, logo_url, series')
+              .eq('id', votedAthleticId)
+              .single();
+
+          setState(() {
+            _userVotedAthleticId = votedAthleticId;
+            _userVotedAthletic = response;
+          });
+        }
+      }
+    } catch (error) {
+      print('Error loading user vote: $error');
+    } finally {
+      setState(() {
+        _isLoadingUserVote = false;
+      });
+    }
   }
 
   Future<void> _loadSerieA() async {
@@ -158,35 +203,297 @@ class _TorcidometroPageState extends State<TorcidometroPage>
             context.goNamed(HomePage.routename);
           },
         ),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Série A'),
-            Tab(text: 'Série B'),
-          ],
-        ),
       ),
-      body: TabBarView(
-        controller: _tabController,
+      body: Column(
         children: [
-          _buildRankingTabWithLoading(
-            _serieA,
-            _maxPointsA,
-            'Série A',
-            _isLoadingA,
-            _errorMessageA,
-            _loadSerieA,
+          // User Vote Card (above tabs)
+          _buildUserVoteCard(),
+
+          // Tabs
+          TabBar(
+            controller: _tabController,
+            tabs: const [
+              Tab(text: 'Série A'),
+              Tab(text: 'Série B'),
+            ],
           ),
-          _buildRankingTabWithLoading(
-            _serieB,
-            _maxPointsB,
-            'Série B',
-            _isLoadingB,
-            _errorMessageB,
-            _loadSerieB,
+
+          // Tab Content
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildRankingTabWithLoading(
+                  _serieA,
+                  _maxPointsA,
+                  'Série A',
+                  _isLoadingA,
+                  _errorMessageA,
+                  _loadSerieA,
+                ),
+                _buildRankingTabWithLoading(
+                  _serieB,
+                  _maxPointsB,
+                  'Série B',
+                  _isLoadingB,
+                  _errorMessageB,
+                  _loadSerieB,
+                ),
+              ],
+            ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildUserVoteCard() {
+    if (_isLoadingUserVote) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        child: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    // User is not authenticated
+    if (!_authService.isAuthenticated) {
+      return Container(
+        margin: const EdgeInsets.all(16),
+        child: Card(
+          elevation: 2,
+          child: InkWell(
+            onTap: () {
+              // Navigate to escolha atletica page to login and vote
+              context.pushNamed(EscolhaAtleticaPage.routename);
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.how_to_vote,
+                    size: 40,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Faça login para votar',
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Escolha sua atlética e ajude no torcidômetro!',
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(Icons.arrow_forward_ios, color: Colors.grey[400]),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // User is authenticated but hasn't voted
+    if (_userVotedAthletic == null) {
+      return Container(
+        margin: const EdgeInsets.all(16),
+        child: Card(
+          elevation: 2,
+          child: InkWell(
+            onTap: () {
+              // Navigate to escolha atletica page to vote
+              context.pushNamed(EscolhaAtleticaPage.routename);
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.how_to_vote_outlined,
+                    size: 40,
+                    color: Colors.orange,
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Você ainda não votou',
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Escolha sua atlética favorita!',
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(Icons.arrow_forward_ios, color: Colors.grey[400]),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // User has voted - show their vote
+    final athletic = _userVotedAthletic!;
+    final athleticName = athletic['nickname'] as String;
+    final logoUrl = athletic['logo_url'] as String?;
+    final series = athletic['series'] as String;
+    final atleticaColor = _getAtleticaColor(athleticName);
+
+    return Container(
+      margin: const EdgeInsets.all(16),
+      child: Card(
+        elevation: 3,
+        color: Colors.grey[100],
+        child: InkWell(
+          onTap: () async {
+            // Show dialog to confirm vote change
+            final shouldChange = await _showChangeVoteDialog(athleticName);
+            if (shouldChange == true && mounted) {
+              context.pushNamed(EscolhaAtleticaPage.routename);
+            }
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                // Athletic Logo
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: logoUrl != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.asset(
+                            _getAtleticAssetPath(logoUrl),
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Icon(
+                                Icons.sports,
+                                size: 30,
+                                color: atleticaColor,
+                              );
+                            },
+                          ),
+                        )
+                      : Icon(Icons.sports, size: 30, color: atleticaColor),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.check_circle,
+                            color: Colors.green,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Seu voto',
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: Colors.green[700],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        athleticName,
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: atleticaColor,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Série $series',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Column(
+                  children: [
+                    Icon(Icons.swap_horiz, color: Colors.grey[600], size: 24),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Trocar',
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<bool?> _showChangeVoteDialog(String currentAthleticName) {
+    return showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Trocar voto?'),
+          content: Text(
+            'Você está votando atualmente em $currentAthleticName.\n\n'
+            'Deseja trocar seu voto?',
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancelar'),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+            ),
+            ElevatedButton(
+              child: const Text('Trocar voto'),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
