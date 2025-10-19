@@ -73,30 +73,18 @@ class LoginViewModel extends ChangeNotifier {
 
   Future<void> onGoogleSignIn() async {
     loading = true;
-    error = null;
+    error = "Google Sign-In foi removido. Use autenticação por email.";
     notifyListeners();
-    try {
-      await _auth.signInWithGoogle();
-    } on AuthException catch (e) {
-      error = e.message;
-    } finally {
-      loading = false;
-      notifyListeners();
-    }
+    loading = false;
+    notifyListeners();
   }
 
   Future<void> onAppleSignIn() async {
     loading = true;
-    error = null;
+    error = "Apple Sign-In foi removido. Use autenticação por email.";
     notifyListeners();
-    try {
-      await _auth.signInWithApple();
-    } on AuthException catch (e) {
-      error = e.message;
-    } finally {
-      loading = false;
-      notifyListeners();
-    }
+    loading = false;
+    notifyListeners();
   }
 
   void onGoToRegister() {

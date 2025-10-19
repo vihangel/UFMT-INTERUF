@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../core/services/voting_service.dart';
+import '../core/data/services/auth_service.dart';
 
 class EscolhaAtleticaPage extends StatefulWidget {
   static const String routename = 'escolha_atletica';
@@ -18,6 +19,7 @@ class EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late VotingService _votingService;
+  late AuthService _authService;
   int _currentPageIndex = 0;
   List<Map<String, dynamic>> _currentSeries = [];
   String _currentSeriesName = 'Série A';
@@ -28,6 +30,7 @@ class EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
   bool _isLoading = true;
   String? _errorMessage;
   bool _isVoting = false;
+  bool _isAuthenticating = false;
 
   final Map<int, PageController> _tabPageControllers = {};
 
@@ -65,6 +68,7 @@ class EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _votingService = VotingService(Supabase.instance.client);
+    _authService = AuthService(Supabase.instance.client);
     _loadAthletics();
 
     _tabController.addListener(() {
@@ -129,33 +133,222 @@ class EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
   void _saveAndNavigate() async {
     if (_currentSeries.isEmpty) return;
 
+    final chosenAtletica = _currentSeries[_currentPageIndex];
+    final athleticId = chosenAtletica['id'] as String;
+
+    // Check if user is authenticated
+    if (!_authService.isAuthenticated) {
+      // Show login dialog
+      await _showLoginDialog(athleticId, chosenAtletica['nickname']!);
+      return;
+    }
+
+    // User is authenticated, proceed with voting
+    await _registerVoteAndNavigate(athleticId, chosenAtletica['nickname']!);
+  }
+
+  Future<void> _showLoginDialog(String athleticId, String nickname) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Login necessário'),
+          content: const Text(
+            'Para votar, você precisa fazer login com seu email.\n\n'
+            'Você também pode continuar sem votar para explorar o aplicativo.',
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Continuar sem votar'),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                // Save preference without voting
+                await _savePreferenceWithoutVoting(athleticId, nickname);
+              },
+            ),
+            ElevatedButton(
+              child: const Text('Fazer Login'),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _handleEmailLogin(athleticId, nickname);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _handleEmailLogin(String athleticId, String nickname) async {
+    // Show email input dialog
+    final email = await _showEmailInputDialog();
+
+    if (email == null || email.isEmpty) {
+      return; // User cancelled
+    }
+
+    setState(() {
+      _isAuthenticating = true;
+    });
+
+    try {
+      // Send magic link
+      await _authService.signInWithMagicLink(email);
+
+      if (mounted) {
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Um link de autenticação foi enviado para $email.\n'
+              'Verifique sua caixa de entrada e clique no link para fazer login.',
+            ),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 5),
+          ),
+        );
+
+        // Save pending vote data to complete after authentication
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('pending_vote_athletic_id', athleticId);
+        await prefs.setString('pending_vote_nickname', nickname);
+
+        // Navigate to a waiting screen or stay on current page
+        // The auth state listener will handle the rest
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao enviar email: $error'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isAuthenticating = false;
+        });
+      }
+    }
+  }
+
+  Future<String?> _showEmailInputDialog() async {
+    final emailController = TextEditingController();
+
+    return showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Entrar com Email'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Digite seu email. Enviaremos um link mágico para autenticação.',
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                  hintText: 'seu@email.com',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              if (AuthService.allowedDomains.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  'Apenas emails dos domínios: ${AuthService.allowedDomains.map((d) => '@$d').join(', ')}',
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ],
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancelar'),
+              onPressed: () {
+                Navigator.of(context).pop(null);
+              },
+            ),
+            ElevatedButton(
+              child: const Text('Enviar'),
+              onPressed: () {
+                Navigator.of(context).pop(emailController.text.trim());
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _savePreferenceWithoutVoting(
+    String athleticId,
+    String nickname,
+  ) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('chosen_athletic_name', nickname);
+      await prefs.setString('chosen_athletic_id', athleticId);
+      await prefs.setString('chosen_athletic_series', _currentSeriesName);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Preferência salva! Faça login depois para votar.'),
+            backgroundColor: Colors.orange,
+            duration: Duration(seconds: 2),
+          ),
+        );
+
+        context.go('/home');
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao salvar preferência: $error'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _registerVoteAndNavigate(
+    String athleticId,
+    String nickname,
+  ) async {
     setState(() {
       _isVoting = true;
     });
 
     try {
-      final chosenAtletica = _currentSeries[_currentPageIndex];
-      final athleticId = chosenAtletica['id'] as String;
-
       // Register vote in database
       await _votingService.vote(athleticId);
 
       // Save to local preferences
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(
-        'chosen_athletic_name',
-        chosenAtletica['nickname']!,
-      );
+      await prefs.setString('chosen_athletic_name', nickname);
       await prefs.setString('chosen_athletic_id', athleticId);
       await prefs.setString('chosen_athletic_series', _currentSeriesName);
+
+      // Clear pending vote if exists
+      await prefs.remove('pending_vote_athletic_id');
+      await prefs.remove('pending_vote_nickname');
 
       // Show success message
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              'Voto registrado para ${chosenAtletica['nickname']}!',
-            ),
+            content: Text('Voto registrado para $nickname!'),
             backgroundColor: Colors.green,
             duration: const Duration(seconds: 2),
           ),
