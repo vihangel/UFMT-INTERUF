@@ -45,14 +45,11 @@ class AthleticsRepository {
   }
 
   /// CRUD methods for admin panel
-  
+
   /// Get all athletics (raw data for CRUD)
   Future<List<Map<String, dynamic>>> getAllAthleticsForCrud() async {
     try {
-      final response = await _client
-          .from('athletics')
-          .select()
-          .order('name');
+      final response = await _client.from('athletics').select().order('name');
 
       return List<Map<String, dynamic>>.from(response as List);
     } catch (e) {
@@ -100,17 +97,20 @@ class AthleticsRepository {
     String? youtube,
   }) async {
     try {
-      await _client.from('athletics').update({
-        'name': name,
-        'nickname': nickname,
-        'series': series,
-        'logo_url': logoUrl,
-        'description': description,
-        'instagram': instagram,
-        'twitter': twitter,
-        'youtube': youtube,
-        'updated_at': DateTime.now().toIso8601String(),
-      }).eq('id', id);
+      await _client
+          .from('athletics')
+          .update({
+            'name': name,
+            'nickname': nickname,
+            'series': series,
+            'logo_url': logoUrl,
+            'description': description,
+            'instagram': instagram,
+            'twitter': twitter,
+            'youtube': youtube,
+            'updated_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', id);
     } catch (e) {
       throw Exception('Erro ao atualizar atlética: $e');
     }

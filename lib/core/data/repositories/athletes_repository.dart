@@ -30,7 +30,9 @@ class AthletesRepository {
   }
 
   /// Get athletes by athletic
-  Future<List<Map<String, dynamic>>> getAthletesByAthletic(String athleticId) async {
+  Future<List<Map<String, dynamic>>> getAthletesByAthletic(
+    String athleticId,
+  ) async {
     try {
       final response = await _client
           .from('athletes')
@@ -75,14 +77,17 @@ class AthletesRepository {
     DateTime? birthdate,
   }) async {
     try {
-      await _client.from('athletes').update({
-        'athletic_id': athleticId,
-        'full_name': fullName,
-        'rga': rga,
-        'course': course,
-        'birthdate': birthdate?.toIso8601String(),
-        'updated_at': DateTime.now().toIso8601String(),
-      }).eq('id', id);
+      await _client
+          .from('athletes')
+          .update({
+            'athletic_id': athleticId,
+            'full_name': fullName,
+            'rga': rga,
+            'course': course,
+            'birthdate': birthdate?.toIso8601String(),
+            'updated_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', id);
     } catch (e) {
       throw Exception('Erro ao atualizar atleta: $e');
     }

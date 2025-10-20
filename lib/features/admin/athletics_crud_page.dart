@@ -55,12 +55,13 @@ class _AthleticsCrudPageState extends State<AthleticsCrudPage> {
   void _applyFilters() {
     _filteredAthletics = _athletics.where((athletic) {
       // Apply search filter
-      final matchesSearch = _searchQuery.isEmpty ||
+      final matchesSearch =
+          _searchQuery.isEmpty ||
           athletic['name'].toLowerCase().contains(_searchQuery.toLowerCase()) ||
           (athletic['nickname'] != null &&
-              athletic['nickname']
-                  .toLowerCase()
-                  .contains(_searchQuery.toLowerCase()));
+              athletic['nickname'].toLowerCase().contains(
+                _searchQuery.toLowerCase(),
+              ));
 
       // Apply series filter
       final matchesSeries =
@@ -87,9 +88,7 @@ class _AthleticsCrudPageState extends State<AthleticsCrudPage> {
   Future<void> _showCreateDialog() async {
     final result = await showDialog<bool>(
       context: context,
-      builder: (context) => _AthleticFormDialog(
-        repository: _repository,
-      ),
+      builder: (context) => _AthleticFormDialog(repository: _repository),
     );
 
     if (result == true) {
@@ -108,10 +107,8 @@ class _AthleticsCrudPageState extends State<AthleticsCrudPage> {
   Future<void> _showEditDialog(Map<String, dynamic> athletic) async {
     final result = await showDialog<bool>(
       context: context,
-      builder: (context) => _AthleticFormDialog(
-        repository: _repository,
-        athletic: athletic,
-      ),
+      builder: (context) =>
+          _AthleticFormDialog(repository: _repository, athletic: athletic),
     );
 
     if (result == true) {
@@ -248,127 +245,124 @@ class _AthleticsCrudPageState extends State<AthleticsCrudPage> {
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _filteredAthletics.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.school,
-                              size: 64,
-                              color: Colors.grey[400],
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              _searchQuery.isEmpty
-                                  ? 'Nenhuma atlética encontrada'
-                                  : 'Nenhuma atlética encontrada para "$_searchQuery"',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey[600],
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.school, size: 64, color: Colors.grey[400]),
+                        const SizedBox(height: 16),
+                        Text(
+                          _searchQuery.isEmpty
+                              ? 'Nenhuma atlética encontrada'
+                              : 'Nenhuma atlética encontrada para "$_searchQuery"',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : RefreshIndicator(
+                    onRefresh: _loadAthletics,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: _filteredAthletics.length,
+                      itemBuilder: (context, index) {
+                        final athletic = _filteredAthletics[index];
+
+                        return Card(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          child: ListTile(
+                            leading:
+                                athletic['logo_url'] != null &&
+                                    athletic['logo_url'].toString().isNotEmpty
+                                ? CircleAvatar(
+                                    backgroundColor: Colors.blue[100],
+                                    backgroundImage: AssetImage(
+                                      'assets/images/${athletic['logo_url'].replaceAll('images/', '')}',
+                                    ),
+                                  )
+                                : CircleAvatar(
+                                    backgroundColor: Colors.grey[300],
+                                    child: Icon(
+                                      Icons.school,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                            title: Text(
+                              athletic['name'],
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ],
-                        ),
-                      )
-                    : RefreshIndicator(
-                        onRefresh: _loadAthletics,
-                        child: ListView.builder(
-                          padding: const EdgeInsets.all(16),
-                          itemCount: _filteredAthletics.length,
-                          itemBuilder: (context, index) {
-                            final athletic = _filteredAthletics[index];
-
-                            return Card(
-                              margin: const EdgeInsets.only(bottom: 12),
-                              child: ListTile(
-                                leading: athletic['logo_url'] != null &&
-                                        athletic['logo_url'].toString().isNotEmpty
-                                    ? CircleAvatar(
-                                        backgroundColor: Colors.blue[100],
-                                        backgroundImage: AssetImage(
-                                          'assets/images/${athletic['logo_url'].replaceAll('images/', '')}',
-                                        ),
-                                      )
-                                    : CircleAvatar(
-                                        backgroundColor: Colors.grey[300],
-                                        child: Icon(
-                                          Icons.school,
-                                          color: Colors.grey[600],
-                                        ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (athletic['nickname'] != null)
+                                  Text(
+                                    athletic['nickname'],
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.category,
+                                      size: 14,
+                                      color: Colors.grey[600],
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'Série ${athletic['series']}',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[600],
                                       ),
-                                title: Text(
-                                  athletic['name'],
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            trailing: PopupMenuButton<String>(
+                              onSelected: (value) {
+                                if (value == 'edit') {
+                                  _showEditDialog(athletic);
+                                } else if (value == 'delete') {
+                                  _showDeleteDialog(athletic);
+                                }
+                              },
+                              itemBuilder: (context) => [
+                                const PopupMenuItem(
+                                  value: 'edit',
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.edit, color: Colors.blue),
+                                      SizedBox(width: 8),
+                                      Text('Editar'),
+                                    ],
                                   ),
                                 ),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    if (athletic['nickname'] != null)
-                                      Text(
-                                        athletic['nickname'],
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey[600],
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    Row(
-                                      children: [
-                                        Icon(
-                                          Icons.category,
-                                          size: 14,
-                                          color: Colors.grey[600],
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          'Série ${athletic['series']}',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.grey[600],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                                const PopupMenuItem(
+                                  value: 'delete',
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.delete, color: Colors.red),
+                                      SizedBox(width: 8),
+                                      Text('Excluir'),
+                                    ],
+                                  ),
                                 ),
-                                trailing: PopupMenuButton<String>(
-                                  onSelected: (value) {
-                                    if (value == 'edit') {
-                                      _showEditDialog(athletic);
-                                    } else if (value == 'delete') {
-                                      _showDeleteDialog(athletic);
-                                    }
-                                  },
-                                  itemBuilder: (context) => [
-                                    const PopupMenuItem(
-                                      value: 'edit',
-                                      child: Row(
-                                        children: [
-                                          Icon(Icons.edit, color: Colors.blue),
-                                          SizedBox(width: 8),
-                                          Text('Editar'),
-                                        ],
-                                      ),
-                                    ),
-                                    const PopupMenuItem(
-                                      value: 'delete',
-                                      child: Row(
-                                        children: [
-                                          Icon(Icons.delete, color: Colors.red),
-                                          SizedBox(width: 8),
-                                          Text('Excluir'),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
           ),
         ],
       ),
@@ -386,10 +380,7 @@ class _AthleticFormDialog extends StatefulWidget {
   final AthleticsRepository repository;
   final Map<String, dynamic>? athletic;
 
-  const _AthleticFormDialog({
-    required this.repository,
-    this.athletic,
-  });
+  const _AthleticFormDialog({required this.repository, this.athletic});
 
   @override
   State<_AthleticFormDialog> createState() => _AthleticFormDialogState();
@@ -411,18 +402,24 @@ class _AthleticFormDialogState extends State<_AthleticFormDialog> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.athletic?['name']);
-    _nicknameController =
-        TextEditingController(text: widget.athletic?['nickname']);
-    _logoUrlController =
-        TextEditingController(text: widget.athletic?['logo_url']);
-    _descriptionController =
-        TextEditingController(text: widget.athletic?['description']);
-    _instagramController =
-        TextEditingController(text: widget.athletic?['instagram']);
-    _twitterController =
-        TextEditingController(text: widget.athletic?['twitter']);
-    _youtubeController =
-        TextEditingController(text: widget.athletic?['youtube']);
+    _nicknameController = TextEditingController(
+      text: widget.athletic?['nickname'],
+    );
+    _logoUrlController = TextEditingController(
+      text: widget.athletic?['logo_url'],
+    );
+    _descriptionController = TextEditingController(
+      text: widget.athletic?['description'],
+    );
+    _instagramController = TextEditingController(
+      text: widget.athletic?['instagram'],
+    );
+    _twitterController = TextEditingController(
+      text: widget.athletic?['twitter'],
+    );
+    _youtubeController = TextEditingController(
+      text: widget.athletic?['youtube'],
+    );
     _selectedSeries = widget.athletic?['series'] ?? 'A';
   }
 
@@ -533,10 +530,7 @@ class _AthleticFormDialogState extends State<_AthleticFormDialog> {
               ),
               child: Row(
                 children: [
-                  Icon(
-                    isEdit ? Icons.edit : Icons.add,
-                    color: Colors.white,
-                  ),
+                  Icon(isEdit ? Icons.edit : Icons.add, color: Colors.white),
                   const SizedBox(width: 8),
                   Text(
                     isEdit ? 'Editar Atlética' : 'Nova Atlética',
@@ -605,14 +599,8 @@ class _AthleticFormDialogState extends State<_AthleticFormDialog> {
                           prefixIcon: Icon(Icons.category),
                         ),
                         items: const [
-                          DropdownMenuItem(
-                            value: 'A',
-                            child: Text('Série A'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'B',
-                            child: Text('Série B'),
-                          ),
+                          DropdownMenuItem(value: 'A', child: Text('Série A')),
+                          DropdownMenuItem(value: 'B', child: Text('Série B')),
                         ],
                         onChanged: (value) {
                           if (value != null) {
@@ -704,9 +692,7 @@ class _AthleticFormDialogState extends State<_AthleticFormDialog> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(color: Colors.grey[300]!),
-                ),
+                border: Border(top: BorderSide(color: Colors.grey[300]!)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
