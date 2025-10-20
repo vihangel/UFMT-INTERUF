@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/data/atletica_model.dart';
 import 'package:interufmt/features/admin/admin_panel_page.dart';
+import 'package:interufmt/features/admin/athletes_crud_page.dart';
+import 'package:interufmt/features/admin/athletics_crud_page.dart';
 import 'package:interufmt/features/admin/auth/admin_login_page.dart';
 import 'package:interufmt/features/admin/home/admin_home_page.dart';
 import 'package:interufmt/features/admin/modalities_crud_page.dart';
@@ -155,6 +157,16 @@ class AppRoutes {
           name: ModalitiesCrudPage.routename,
           path: '/admin-panel/modalities',
           builder: (context, state) => const ModalitiesCrudPage(),
+        ),
+        GoRoute(
+          name: AthleticsCrudPage.routename,
+          path: '/admin-panel/athletics',
+          builder: (context, state) => const AthleticsCrudPage(),
+        ),
+        GoRoute(
+          name: AthletesCrudPage.routename,
+          path: '/admin-panel/athletes',
+          builder: (context, state) => const AthletesCrudPage(),
         ),
         // Rotas admin
         GoRoute(

@@ -161,8 +161,7 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                   icon: FontAwesomeIcons.chessPawn,
                   color: Colors.blue,
                   onTap: () {
-                    // TODO: Navigate to athletics CRUD page
-                    _showComingSoonDialog(context, 'Atléticas');
+                    context.pushNamed('athletics-crud');
                   },
                 ),
                 _buildCrudCard(
@@ -199,8 +198,7 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                   icon: FontAwesomeIcons.personRunning,
                   color: Colors.purple,
                   onTap: () {
-                    // TODO: Navigate to athletes CRUD page
-                    _showComingSoonDialog(context, 'Atletas');
+                    context.pushNamed('athletes-crud');
                   },
                 ),
                 _buildCrudCard(

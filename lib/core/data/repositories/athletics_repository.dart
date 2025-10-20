@@ -43,4 +43,85 @@ class AthleticsRepository {
       throw Exception('Erro ao carregar todas as atléticas: $e');
     }
   }
+
+  /// CRUD methods for admin panel
+  
+  /// Get all athletics (raw data for CRUD)
+  Future<List<Map<String, dynamic>>> getAllAthleticsForCrud() async {
+    try {
+      final response = await _client
+          .from('athletics')
+          .select()
+          .order('name');
+
+      return List<Map<String, dynamic>>.from(response as List);
+    } catch (e) {
+      throw Exception('Erro ao carregar atléticas: $e');
+    }
+  }
+
+  /// Create new athletic
+  Future<void> createAthletic({
+    required String name,
+    String? nickname,
+    required String series,
+    String? logoUrl,
+    String? description,
+    String? instagram,
+    String? twitter,
+    String? youtube,
+  }) async {
+    try {
+      await _client.from('athletics').insert({
+        'name': name,
+        'nickname': nickname,
+        'series': series,
+        'logo_url': logoUrl,
+        'description': description,
+        'instagram': instagram,
+        'twitter': twitter,
+        'youtube': youtube,
+      });
+    } catch (e) {
+      throw Exception('Erro ao criar atlética: $e');
+    }
+  }
+
+  /// Update athletic
+  Future<void> updateAthletic({
+    required String id,
+    required String name,
+    String? nickname,
+    required String series,
+    String? logoUrl,
+    String? description,
+    String? instagram,
+    String? twitter,
+    String? youtube,
+  }) async {
+    try {
+      await _client.from('athletics').update({
+        'name': name,
+        'nickname': nickname,
+        'series': series,
+        'logo_url': logoUrl,
+        'description': description,
+        'instagram': instagram,
+        'twitter': twitter,
+        'youtube': youtube,
+        'updated_at': DateTime.now().toIso8601String(),
+      }).eq('id', id);
+    } catch (e) {
+      throw Exception('Erro ao atualizar atlética: $e');
+    }
+  }
+
+  /// Delete athletic
+  Future<void> deleteAthletic(String id) async {
+    try {
+      await _client.from('athletics').delete().eq('id', id);
+    } catch (e) {
+      throw Exception('Erro ao excluir atlética: $e');
+    }
+  }
 }
