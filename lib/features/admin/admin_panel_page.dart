@@ -211,8 +211,7 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                   icon: FontAwesomeIcons.locationDot,
                   color: Colors.teal,
                   onTap: () {
-                    // TODO: Navigate to venues CRUD page
-                    _showComingSoonDialog(context, 'Locais');
+                    context.pushNamed('venues-crud');
                   },
                 ),
                 _buildCrudCard(
