@@ -4,6 +4,7 @@ import 'package:interufmt/core/data/atletica_model.dart';
 import 'package:interufmt/features/admin/admin_panel_page.dart';
 import 'package:interufmt/features/admin/auth/admin_login_page.dart';
 import 'package:interufmt/features/admin/home/admin_home_page.dart';
+import 'package:interufmt/features/admin/news_crud_page.dart';
 import 'package:interufmt/features/admin/venues_crud_page.dart';
 import 'package:interufmt/features/escolha_atletica_page.dart';
 import 'package:interufmt/features/rating_page.dart';
@@ -143,6 +144,11 @@ class AppRoutes {
           name: VenuesCrudPage.routename,
           path: '/admin-panel/venues',
           builder: (context, state) => const VenuesCrudPage(),
+        ),
+        GoRoute(
+          name: NewsCrudPage.routename,
+          path: '/admin-panel/news',
+          builder: (context, state) => const NewsCrudPage(),
         ),
         // Rotas admin
         GoRoute(

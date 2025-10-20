@@ -191,8 +191,7 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                   icon: FontAwesomeIcons.newspaper,
                   color: Colors.red,
                   onTap: () {
-                    // TODO: Navigate to news CRUD page
-                    _showComingSoonDialog(context, 'Notícias');
+                    context.pushNamed('news-crud');
                   },
                 ),
                 _buildCrudCard(
@@ -238,36 +237,6 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
               ],
             ),
             const SizedBox(height: 32),
-
-            // Statistics Section (optional)
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.analytics_outlined, color: Colors.grey[700]),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Estatísticas Rápidas',
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'As estatísticas detalhadas estarão disponíveis em breve.',
-                    style: TextStyle(color: Colors.grey[600]),
-                  ),
-                ],
-              ),
-            ),
           ],
         ),
       ),
