@@ -171,8 +171,7 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                   icon: FontAwesomeIcons.trophy,
                   color: Colors.orange,
                   onTap: () {
-                    // TODO: Navigate to modalities CRUD page
-                    _showComingSoonDialog(context, 'Modalidades');
+                    context.pushNamed('modalities-crud');
                   },
                 ),
                 _buildCrudCard(
