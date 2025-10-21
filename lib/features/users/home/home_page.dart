@@ -6,9 +6,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/data/atletica_model.dart'; // Importa a classe Atletica
 import 'package:interufmt/core/data/services/athletics_service.dart';
+import 'package:interufmt/core/data/services/auth_service.dart';
 import 'package:interufmt/core/theme/app_colors.dart';
 import 'package:interufmt/core/theme/app_icons.dart';
 import 'package:interufmt/core/widgets/tabela_classificacao.dart';
+import 'package:interufmt/features/admin/admin_panel_page.dart';
 import 'package:interufmt/features/users/athletics/athletics_page.dart';
 import 'package:interufmt/features/users/calendar/calendar_page.dart';
 import 'package:interufmt/features/users/home/widgets/sections_social_media_widget.dart';
@@ -156,15 +158,59 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class _HomeContent extends StatelessWidget {
+class _HomeContent extends StatefulWidget {
   const _HomeContent();
+
+  @override
+  State<_HomeContent> createState() => _HomeContentState();
+}
+
+class _HomeContentState extends State<_HomeContent> {
+  bool _isAdminOrModerator = false;
+  bool _isCheckingRole = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkUserRole();
+  }
+
+  Future<void> _checkUserRole() async {
+    final authService = context.read<AuthService>();
+
+    if (!authService.isAuthenticated) {
+      setState(() {
+        _isCheckingRole = false;
+        _isAdminOrModerator = false;
+      });
+      return;
+    }
+
+    final isAuthorized = await authService.isAdminOrModerator();
+    setState(() {
+      _isCheckingRole = false;
+      _isAdminOrModerator = isAuthorized;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final athleticsService = context.read<AthleticsService>();
 
     return Scaffold(
-      appBar: AppBar(title: Text('Início')),
+      appBar: AppBar(
+        title: const Text('Início'),
+        actions: [
+          if (!_isCheckingRole && _isAdminOrModerator)
+            IconButton(
+              icon: const Icon(Icons.admin_panel_settings),
+              tooltip: 'Painel Administrativo',
+              onPressed: () {
+                context.pushNamed(AdminPanelPage.routename);
+              },
+            ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

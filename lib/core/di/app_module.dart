@@ -11,6 +11,7 @@ import '../data/services/athletics_service.dart';
 import '../data/services/auth_service.dart';
 import '../data/services/news_service.dart';
 import '../data/services/profile_service.dart';
+import '../services/voting_service.dart';
 
 class AppModule {
   /// Initializes .env/Supabase and returns the list of app providers.
@@ -34,6 +35,7 @@ class AppModule {
       Provider<ProfileService>(create: (_) => ProfileService(client)),
       Provider<AthleticsService>(create: (_) => AthleticsService(client)),
       Provider<NewsService>(create: (_) => NewsService(client)),
+      Provider<VotingService>(create: (_) => VotingService(client)),
 
       // Repository depends on the service
       Provider<AuthRepository>(

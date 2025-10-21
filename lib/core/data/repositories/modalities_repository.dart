@@ -104,4 +104,47 @@ class ModalitiesRepository {
 
     return groupedModalities;
   }
+
+  // Admin CRUD methods
+  Future<List<Map<String, dynamic>>> getAllModalities() async {
+    final response = await _client
+        .from('modalities')
+        .select()
+        .order('name', ascending: true);
+    return List<Map<String, dynamic>>.from(response);
+  }
+
+  Future<Map<String, dynamic>> createModality({
+    required String name,
+    required String gender,
+    String? icon,
+  }) async {
+    final response = await _client
+        .from('modalities')
+        .insert({'name': name, 'gender': gender, 'icon': icon})
+        .select()
+        .single();
+
+    return response;
+  }
+
+  Future<Map<String, dynamic>> updateModality({
+    required String id,
+    required String name,
+    required String gender,
+    String? icon,
+  }) async {
+    final response = await _client
+        .from('modalities')
+        .update({'name': name, 'gender': gender, 'icon': icon})
+        .eq('id', id)
+        .select()
+        .single();
+
+    return response;
+  }
+
+  Future<void> deleteModality(String id) async {
+    await _client.from('modalities').delete().eq('id', id);
+  }
 }

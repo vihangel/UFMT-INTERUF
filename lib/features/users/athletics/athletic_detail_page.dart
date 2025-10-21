@@ -2,18 +2,22 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/theme/app_colors.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:interufmt/core/widgets/card_game_widget.dart';
 import 'package:intl/intl.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/data/athletics_item_model.dart';
 import '../../../core/data/models/athletic_detail_model.dart';
 import '../../../core/data/models/athletic_game_model.dart';
 import '../../../core/data/models/modality_with_status_model.dart';
 import '../../../core/data/repositories/athletic_detail_repository.dart';
-import '../games/games_page.dart';
 import '../games/game_detail_page.dart';
+import '../games/games_page.dart';
 import '../games/tournament_game_detail_page.dart';
+
+import 'package:interufmt/features/torcidometro_page.dart';
 
 class AthleticDetailPage extends StatefulWidget {
   final AthleticsItem athletic;
@@ -124,10 +128,18 @@ class AthleticDetailPageState extends State<AthleticDetailPage>
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.bar_chart,
+              color: Colors.black,
+            ), // Ícone de barras
+            onPressed: () {
+              context.goNamed(TorcidometroPage.routename);
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
         bottom: _athleticDetail != null
             ? TabBar(
                 controller: _mainTabController,
@@ -294,264 +306,60 @@ class AthleticDetailPageState extends State<AthleticDetailPage>
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: games.length,
-      itemBuilder: (context, index) => _buildGameCard(games[index]),
-    );
-  }
+      itemBuilder: (context, index) => Padding(
+        padding: const EdgeInsets.only(bottom: 15),
+        child: CardGame(
+          status: games[index].status,
+          startTimeDateFormatted: games[index].startTimeDateFormatted,
+          // statusDisplayText: games[index].statusDisplayText,
+          gameIcon: games[index].gameIcon,
+          modalityPhase: games[index].modalityPhase,
+          venueName: games[index].venueName,
+          gameId: games[index].gameId,
+          modalityId: games[index].modalityId ?? '',
+          series: games[index].series ?? '',
+          isTwoTeamGame: games[index].isTwoTeamGame,
+          isMultiTeamGame: games[index].isMultiTeamGame,
+          multiTeamLogos: games[index].multiTeamLogos,
+          teamALogo: games[index].teamALogo,
+          teamBLogo: games[index].teamBLogo,
+          scoreA: games[index].scoreA,
+          scoreB: games[index].scoreB,
+          displayScoreA: games[index].scoreA,
+          displayScoreB: games[index].scoreB,
+          extraTextScore: games[index].statusDisplayText,
+          onTap: () {
+            if (games[index].isTwoTeamGame) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      TournamentGameDetailPage(gameId: games[index].gameId),
+                ),
+              );
+            } else if (games[index].isMultiTeamGame) {
+              final modalityName = games[index].modalityPhase
+                  .split(' - ')
+                  .first;
 
-  Widget _buildGameCard(AthleticGame game) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: InkWell(
-        onTap: () {
-          // Navigate based on game type
-          if (game.isTwoTeamGame) {
-            // Navigate to tournament game detail page for two-team games
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    TournamentGameDetailPage(gameId: game.gameId),
-              ),
-            );
-          } else if (game.isMultiTeamGame) {
-            // Navigate to game detail page for multi-team games (standings)
-            // Extract modality info from modalityPhase
-            // Format: "Modality Gender - Phase" or just "Modality Gender"
-            final modalityName = game.modalityPhase.split(' - ').first;
-
-            // We need to get the modality ID and series from the game
-            // Since we don't have these in AthleticGame, we'll need to find them
-            final modality = _modalities.firstWhere(
-              (m) => game.modalityPhase.contains(m.name),
-              orElse: () => _modalities.first,
-            );
-
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => GameDetailPage(
-                  modalityId: modality.id,
-                  modalityName: modalityName,
-                  series: modality.series,
-                ),
-              ),
-            );
-          }
-        },
-        borderRadius: BorderRadius.circular(6),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Game info
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      game.modalityPhase,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primaryText,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    _formatGameTime(game.startAt),
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.secondaryText,
-                    ),
-                  ),
-                ],
-              ),
-              if (game.venueName != null) ...[
-                const SizedBox(height: 4),
-                Text(
-                  'Local: ${game.venueName!}',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppColors.secondaryText,
+              final modality = _modalities.firstWhere(
+                (m) => games[index].modalityPhase.contains(m.name),
+                orElse: () => _modalities.first,
+              );
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => GameDetailPage(
+                    modalityId: modality.id,
+                    modalityName: modalityName,
+                    series: modality.series,
                   ),
                 ),
-              ],
-              const SizedBox(height: 12),
-              // Teams and scores - conditional rendering based on game type
-              if (game.isTwoTeamGame)
-                _buildTwoTeamGameContent(game)
-              else if (game.isMultiTeamGame)
-                _buildMultiTeamGameContent(game)
-              else
-                _buildUnknownGameContent(game),
-              const SizedBox(height: 8),
-              // Status
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: _getStatusColor(game.status),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  _getStatusText(game.status),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
+              );
+            }
+          },
         ),
       ),
-    );
-  }
-
-  Widget _buildTwoTeamGameContent(AthleticGame game) {
-    return Row(
-      children: [
-        // Team A
-        Expanded(
-          child: _buildTeamInfo(
-            teamId: game.teamAId,
-            teamLogo: game.teamALogo,
-            score: game.scoreA,
-            isTeamA: true,
-          ),
-        ),
-        const SizedBox(width: 16),
-        // VS
-        Text(
-          'VS',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: AppColors.secondaryText,
-          ),
-        ),
-        const SizedBox(width: 16),
-        // Team B
-        Expanded(
-          child: _buildTeamInfo(
-            teamId: game.teamBId,
-            teamLogo: game.teamBLogo,
-            score: game.scoreB,
-            isTeamA: false,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMultiTeamGameContent(AthleticGame game) {
-    final logos = game.multiTeamLogos;
-
-    return Wrap(
-      spacing: -2,
-      runSpacing: -2,
-      children: logos.map((logo) {
-        return Container(
-          width: 48,
-          height: 48,
-          margin: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2),
-            image: DecorationImage(
-              image: AssetImage('assets/images/$logo'),
-              fit: BoxFit.cover,
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildUnknownGameContent(AthleticGame game) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: const Row(
-        children: [
-          Icon(Icons.info_outline, color: Colors.grey),
-          SizedBox(width: 8),
-          Text(
-            'Informações do jogo indisponíveis',
-            style: TextStyle(color: Colors.grey),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTeamInfo({
-    required String? teamId,
-    required String? teamLogo,
-    required int? score,
-    required bool isTeamA,
-  }) {
-    final isCurrentTeam = teamId == widget.athletic.id;
-
-    return Column(
-      children: [
-        // Team logo
-        ClipRRect(
-          borderRadius: BorderRadius.circular(30),
-          child: Container(
-            height: 60,
-            width: 60,
-            color: AppColors.background,
-            child: teamLogo != null
-                ? Image.asset(
-                    'assets/images/$teamLogo',
-                    height: 60,
-                    width: 60,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: const Icon(
-                          Icons.sports,
-                          size: 30,
-                          color: Colors.grey,
-                        ),
-                      );
-                    },
-                  )
-                : Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: const Icon(
-                      Icons.sports,
-                      size: 30,
-                      color: Colors.grey,
-                    ),
-                  ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        // Score
-        Text(
-          score?.toString() ?? '-',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: isCurrentTeam ? AppColors.primary : AppColors.primaryText,
-          ),
-        ),
-      ],
     );
   }
 
@@ -649,19 +457,6 @@ class AthleticDetailPageState extends State<AthleticDetailPage>
         ),
       ),
     );
-  }
-
-  Color _getStatusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'finished':
-        return Colors.green;
-      case 'live':
-        return Colors.red;
-      case 'scheduled':
-        return Colors.blue;
-      default:
-        return Colors.grey;
-    }
   }
 
   String _getStatusText(String status) {

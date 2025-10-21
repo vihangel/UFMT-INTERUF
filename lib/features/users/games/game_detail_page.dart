@@ -364,7 +364,7 @@ class GameDetailPageState extends State<GameDetailPage> {
   }
 
   Widget _buildAthleteStandings() {
-    if (_gameDetail!.standings.isEmpty) {
+    if (_gameDetail!.standings.isEmpty || _gameDetail!.status != 'finished') {
       return Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(

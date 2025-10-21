@@ -7,14 +7,16 @@ class Atletica {
   final int prata;
   final int bronze;
   final int pontos;
+  final String? logo;
 
   const Atletica({
     required this.posicao,
-    required this.nome,
+    required this.nome, 
     required this.ouro,
     required this.prata,
     required this.bronze,
     required this.pontos,
+    this.logo,
   });
 
   Map<String, dynamic> toMap() {
