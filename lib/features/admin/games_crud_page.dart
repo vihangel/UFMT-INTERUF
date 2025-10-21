@@ -1483,7 +1483,7 @@ class _AthletesTab extends StatefulWidget {
 class _AthletesTabState extends State<_AthletesTab> {
   late GamesRepository _gamesRepository;
   late AthletesRepository _athletesRepository;
-  
+
   List<Map<String, dynamic>> _gameAthletes = [];
   List<Map<String, dynamic>> _availableAthletes = [];
   bool _isLoading = true;
@@ -1501,10 +1501,10 @@ class _AthletesTabState extends State<_AthletesTab> {
 
     try {
       final athletes = await _gamesRepository.getGameAthletes(widget.gameId);
-      
+
       // Get all available athletes
       final allAthletes = await _athletesRepository.getAllAthletes();
-      
+
       setState(() {
         _gameAthletes = athletes;
         _availableAthletes = allAthletes;
@@ -1528,7 +1528,7 @@ class _AthletesTabState extends State<_AthletesTab> {
     final athletesInGame = _gameAthletes
         .map((a) => (a['athletes'] as Map<String, dynamic>)['id'] as String)
         .toSet();
-    
+
     final availableToAdd = _availableAthletes
         .where((a) => !athletesInGame.contains(a['id']))
         .toList();
@@ -1565,7 +1565,8 @@ class _AthletesTabState extends State<_AthletesTab> {
                 ),
                 isExpanded: true,
                 items: availableToAdd.map((athlete) {
-                  final athletic = athlete['athletics'] as Map<String, dynamic>?;
+                  final athletic =
+                      athlete['athletics'] as Map<String, dynamic>?;
                   return DropdownMenuItem<String>(
                     value: athlete['id'] as String,
                     child: Text(
@@ -1735,8 +1736,10 @@ class _AthletesTabState extends State<_AthletesTab> {
                   itemCount: _gameAthletes.length,
                   itemBuilder: (context, index) {
                     final athleteGame = _gameAthletes[index];
-                    final athlete = athleteGame['athletes'] as Map<String, dynamic>;
-                    final athletic = athlete['athletics'] as Map<String, dynamic>?;
+                    final athlete =
+                        athleteGame['athletes'] as Map<String, dynamic>;
+                    final athletic =
+                        athlete['athletics'] as Map<String, dynamic>?;
 
                     return Card(
                       margin: const EdgeInsets.only(bottom: 8),
@@ -1744,12 +1747,16 @@ class _AthletesTabState extends State<_AthletesTab> {
                         leading: CircleAvatar(
                           backgroundColor: Colors.grey[200],
                           backgroundImage: athletic?['logo_url'] != null
-                              ? AssetImage('assets/images/${athletic!['logo_url']}')
+                              ? AssetImage(
+                                  'assets/images/${athletic!['logo_url']}',
+                                )
                               : null,
                           child: athletic?['logo_url'] == null
                               ? Text(
                                   '${athleteGame['shirt_number']}',
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 )
                               : null,
                         ),
@@ -1787,13 +1794,13 @@ class _StatisticsTab extends StatefulWidget {
 
 class _StatisticsTabState extends State<_StatisticsTab> {
   late GamesRepository _repository;
-  
+
   List<Map<String, dynamic>> _gameStats = [];
   List<Map<String, dynamic>> _statDefinitions = [];
   Map<String, Map<String, Map<String, dynamic>>> _athleteStats = {};
   List<Map<String, dynamic>> _gameAthletes = [];
   bool _isLoading = true;
-  
+
   @override
   void initState() {
     super.initState();
@@ -1828,13 +1835,13 @@ class _StatisticsTabState extends State<_StatisticsTab> {
       }
 
       final athleteStatsResults = await Future.wait(athleteStatsFutures);
-      
+
       // Organize athlete stats by athlete ID and stat code
       for (int i = 0; i < _gameAthletes.length; i++) {
         final athlete = _gameAthletes[i]['athletes'] as Map<String, dynamic>;
         final athleteId = athlete['id'] as String;
         _athleteStats[athleteId] = {};
-        
+
         for (final stat in athleteStatsResults[i]) {
           final statCode = stat['stat_code'] as String;
           _athleteStats[athleteId]![statCode] = stat;
@@ -1857,7 +1864,7 @@ class _StatisticsTabState extends State<_StatisticsTab> {
 
   Future<void> _updateGameStat(String statCode, int currentValue) async {
     final controller = TextEditingController(text: currentValue.toString());
-    
+
     final result = await showDialog<int>(
       context: context,
       builder: (context) => AlertDialog(
@@ -1925,7 +1932,7 @@ class _StatisticsTabState extends State<_StatisticsTab> {
     int currentValue,
   ) async {
     final controller = TextEditingController(text: currentValue.toString());
-    
+
     final result = await showDialog<int>(
       context: context,
       builder: (context) => AlertDialog(
@@ -2033,10 +2040,7 @@ class _StatisticsTabState extends State<_StatisticsTab> {
           ),
           Expanded(
             child: TabBarView(
-              children: [
-                _buildGameStatsView(),
-                _buildAthleteStatsView(),
-              ],
+              children: [_buildGameStatsView(), _buildAthleteStatsView()],
             ),
           ),
         ],
