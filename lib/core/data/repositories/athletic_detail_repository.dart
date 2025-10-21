@@ -30,22 +30,22 @@ class AthleticDetailRepository {
     String athleticId,
     String date,
   ) async {
-    try {
-      // Try using the custom RPC function first
-      final response = await _client.rpc(
-        'get_athletic_games',
-        params: {'athletic_id_param': athleticId, 'date_param': date},
-      );
+    // try {
+    //   // Try using the custom RPC function first
+    //   final response = await _client.rpc(
+    //     'get_athletic_games',
+    //     params: {'athletic_id_param': athleticId, 'date_param': date},
+    //   );
 
-      if (response != null) {
-        return (response as List<dynamic>)
-            .map((item) => AthleticGame.fromJson(item as Map<String, dynamic>))
-            .toList();
-      }
-    } catch (e) {
-      // If RPC function doesn't exist, fallback to direct query
-      // print('RPC function not available, using fallback query: $e');
-    }
+    //   if (response != null) {
+    //     return (response as List<dynamic>)
+    //         .map((item) => AthleticGame.fromJson(item as Map<String, dynamic>))
+    //         .toList();
+    //   }
+    // } catch (e) {
+    //   // If RPC function doesn't exist, fallback to direct query
+    //   // print('RPC function not available, using fallback query: $e');
+    // }
 
     // Fallback: use direct table query with raw SQL for better control
     try {
@@ -55,6 +55,9 @@ class AthleticDetailRepository {
           g.id AS game_id,
           g.start_at,
           g.status,
+          m.id AS modality_id,
+          g.series,
+          
           -- Update athletics_standings to include logo URLs
           CASE 
             WHEN g.athletics_standings IS NOT NULL THEN

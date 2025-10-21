@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/theme/app_colors.dart';
 import 'package:interufmt/core/widgets/card_game_widget.dart';
 import 'package:intl/intl.dart';
@@ -15,6 +16,8 @@ import '../../../core/data/repositories/athletic_detail_repository.dart';
 import '../games/game_detail_page.dart';
 import '../games/games_page.dart';
 import '../games/tournament_game_detail_page.dart';
+
+import 'package:interufmt/features/torcidometro_page.dart';
 
 class AthleticDetailPage extends StatefulWidget {
   final AthleticsItem athletic;
@@ -125,10 +128,18 @@ class AthleticDetailPageState extends State<AthleticDetailPage>
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.bar_chart,
+              color: Colors.black,
+            ), // Ícone de barras
+            onPressed: () {
+              context.goNamed(TorcidometroPage.routename);
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
         bottom: _athleticDetail != null
             ? TabBar(
                 controller: _mainTabController,

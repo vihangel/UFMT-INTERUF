@@ -71,4 +71,24 @@ class VenuesRepository {
       throw Exception('Erro ao carregar locais sem coordenadas: $e');
     }
   }
+
+  /// Get all venues as raw maps (for CRUD operations)
+  Future<List<Map<String, dynamic>>> getAllVenuesForCrud() async {
+    try {
+      final response = await _client
+          .from('venues')
+          .select('id, name, address, lat, lng, created_at, updated_at')
+          .order('name');
+
+      if (response.isEmpty) {
+        return [];
+      }
+
+      return (response as List<dynamic>)
+          .map((item) => item as Map<String, dynamic>)
+          .toList();
+    } catch (e) {
+      throw Exception('Erro ao carregar locais: $e');
+    }
+  }
 }
