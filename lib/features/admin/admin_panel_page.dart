@@ -179,8 +179,7 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                   icon: FontAwesomeIcons.futbol,
                   color: Colors.green,
                   onTap: () {
-                    // TODO: Navigate to games CRUD page
-                    _showComingSoonDialog(context, 'Jogos');
+                    context.pushNamed('games-crud');
                   },
                 ),
                 _buildCrudCard(

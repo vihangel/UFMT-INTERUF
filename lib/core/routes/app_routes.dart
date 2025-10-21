@@ -5,6 +5,7 @@ import 'package:interufmt/features/admin/admin_panel_page.dart';
 import 'package:interufmt/features/admin/athletes_crud_page.dart';
 import 'package:interufmt/features/admin/athletics_crud_page.dart';
 import 'package:interufmt/features/admin/auth/admin_login_page.dart';
+import 'package:interufmt/features/admin/games_crud_page.dart';
 import 'package:interufmt/features/admin/home/admin_home_page.dart';
 import 'package:interufmt/features/admin/modalities_crud_page.dart';
 import 'package:interufmt/features/admin/news_crud_page.dart';
@@ -167,6 +168,11 @@ class AppRoutes {
           name: AthletesCrudPage.routename,
           path: '/admin-panel/athletes',
           builder: (context, state) => const AthletesCrudPage(),
+        ),
+        GoRoute(
+          name: GamesCrudPage.routename,
+          path: '/admin-panel/games',
+          builder: (context, state) => const GamesCrudPage(),
         ),
         // Rotas admin
         GoRoute(
