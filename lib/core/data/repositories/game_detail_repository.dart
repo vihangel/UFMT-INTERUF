@@ -153,17 +153,42 @@ class GameDetailRepository {
   /// Get athlete standings for a game
   Future<List<AthleteStanding>> _getAthleteStandings(String gameId) async {
     try {
-      // Get athletes who participated in this game with their athletics info
+      // Get athletes who participated in this game with their athletics info and stats
       final response = await _client
           .from('athlete_game')
           .select('''
-            athletes!inner(id, full_name, athletic_id),
-            athletics:athletes!inner(athletic_id)
+            athlete_id,
+            athletes!inner(id, full_name, athletic_id)
           ''')
           .eq('game_id', gameId);
 
       if (response.isEmpty) {
         return [];
+      }
+
+      // Get athlete IDs
+      final athleteIds = response
+          .map((item) => item['athlete_id'] as String)
+          .toList();
+
+      // Get athlete game stats for all athletes in this game
+      final statsResponse = await _client
+          .from('athlete_game_stats')
+          .select('athlete_id, stat_code, value')
+          .eq('game_id', gameId)
+          .inFilter('athlete_id', athleteIds);
+
+      // Create a map of athlete stats
+      final athleteStatsMap = <String, Map<String, int>>{};
+      for (final stat in statsResponse) {
+        final athleteId = stat['athlete_id'] as String;
+        final statCode = stat['stat_code'] as String;
+        final value = stat['value'] as int;
+
+        if (!athleteStatsMap.containsKey(athleteId)) {
+          athleteStatsMap[athleteId] = {};
+        }
+        athleteStatsMap[athleteId]![statCode] = value;
       }
 
       // Get athletics info for the athletes
@@ -189,40 +214,54 @@ class GameDetailRepository {
 
       final standings = <AthleteStanding>[];
 
-      for (int i = 0; i < response.length; i++) {
-        final athleteData = response[i]['athletes'] as Map<String, dynamic>;
+      for (final item in response) {
+        final athleteData = item['athletes'] as Map<String, dynamic>;
+        final athleteId = athleteData['id'] as String;
         final athleticId = athleteData['athletic_id'] as String;
         final athleticData = athleticsMap[athleticId] ?? {};
+        final stats = athleteStatsMap[athleteId];
+
+        // Get COL (placement) value if it exists
+        final colValue = stats?['COL'];
 
         standings.add(
           AthleteStanding(
-            position: i + 1, // Position based on order
-            athleteId: athleteData['id'] as String,
+            position:
+                colValue ??
+                standings.length +
+                    1, // Use COL value or next position if not available
+            athleteId: athleteId,
             athleteName: athleteData['full_name'] as String,
             athleticId: athleticId,
             athleticName: athleticData['name'] as String? ?? '',
             athleticLogoUrl: athleticData['logo_url'] as String?,
+            stats: stats != null
+                ? stats.map((key, value) => MapEntry(key, value as dynamic))
+                : null,
           ),
         );
       }
 
-      // Sort by athlete name for consistent ordering
-      standings.sort((a, b) => a.athleteName.compareTo(b.athleteName));
+      // Sort by position (COL value)
+      standings.sort((a, b) => a.position.compareTo(b.position));
 
-      // Reassign positions after sorting
+      // Reassign positions sequentially (1, 2, 3, ...) after sorting
+      final sortedStandings = <AthleteStanding>[];
       for (int i = 0; i < standings.length; i++) {
-        standings[i] = AthleteStanding(
-          position: i + 1,
-          athleteId: standings[i].athleteId,
-          athleteName: standings[i].athleteName,
-          athleticId: standings[i].athleticId,
-          athleticName: standings[i].athleticName,
-          athleticLogoUrl: standings[i].athleticLogoUrl,
-          stats: standings[i].stats,
+        sortedStandings.add(
+          AthleteStanding(
+            position: i + 1,
+            athleteId: standings[i].athleteId,
+            athleteName: standings[i].athleteName,
+            athleticId: standings[i].athleticId,
+            athleticName: standings[i].athleticName,
+            athleticLogoUrl: standings[i].athleticLogoUrl,
+            stats: standings[i].stats,
+          ),
         );
       }
 
-      return standings;
+      return sortedStandings;
     } catch (e) {
       // Return empty list if error occurs
       return [];

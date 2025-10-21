@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:interufmt/core/data/repositories/athletes_repository.dart';
 import 'package:interufmt/core/data/repositories/athletics_repository.dart';
 import 'package:interufmt/core/data/repositories/games_repository.dart';
 import 'package:interufmt/core/data/repositories/modalities_repository.dart';
@@ -721,6 +722,10 @@ class _GameFormDialogState extends State<_GameFormDialog> {
   List<String> _selectedAthleticsForRanking = [];
   bool _isLoading = false;
 
+  // Score controllers
+  final _scoreAController = TextEditingController();
+  final _scoreBController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -738,6 +743,15 @@ class _GameFormDialogState extends State<_GameFormDialog> {
       _selectedSeries = game['series'];
       _selectedStatus = game['status'];
       _startAt = DateTime.parse(game['start_at']);
+
+      // Initialize scores
+      if (game['score_a'] != null) {
+        _scoreAController.text = game['score_a'].toString();
+      }
+      if (game['score_b'] != null) {
+        _scoreBController.text = game['score_b'].toString();
+      }
+
       // Determine if game is unique: a_athletic_id is null AND athletics_standings is not null
       _isUniqueGame =
           game['a_athletic_id'] == null && game['athletics_standings'] != null;
@@ -765,6 +779,13 @@ class _GameFormDialogState extends State<_GameFormDialog> {
         }
       }
     }
+  }
+
+  @override
+  void dispose() {
+    _scoreAController.dispose();
+    _scoreBController.dispose();
+    super.dispose();
   }
 
   Future<void> _selectDateTime() async {
@@ -842,6 +863,14 @@ class _GameFormDialogState extends State<_GameFormDialog> {
     setState(() => _isLoading = true);
 
     try {
+      // Parse scores
+      final scoreA = _scoreAController.text.isNotEmpty
+          ? int.tryParse(_scoreAController.text)
+          : null;
+      final scoreB = _scoreBController.text.isNotEmpty
+          ? int.tryParse(_scoreBController.text)
+          : null;
+
       if (widget.game == null) {
         // Create
         await widget.repository.createGame(
@@ -868,6 +897,9 @@ class _GameFormDialogState extends State<_GameFormDialog> {
           aAthleticId: _isUniqueGame ? null : _selectedAthleticA,
           bAthleticId: _isUniqueGame ? null : _selectedAthleticB,
           clearAthleticIds: _isUniqueGame,
+          // Include scores
+          scoreA: scoreA,
+          scoreB: scoreB,
           // For unique games, set standings. For bracket games, clear them
           athleticsStandings: _isUniqueGame
               ? {'id_atletics': _selectedAthleticsForRanking}
@@ -1016,14 +1048,14 @@ class _GameFormDialogState extends State<_GameFormDialog> {
                                 DropdownMenuItem(
                                   value: 'A',
                                   child: Text(
-                                    'Série A',
+                                    'A',
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                                 DropdownMenuItem(
                                   value: 'B',
                                   child: Text(
-                                    'Série B',
+                                    'B',
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
@@ -1149,6 +1181,72 @@ class _GameFormDialogState extends State<_GameFormDialog> {
                       ),
 
                       const SizedBox(height: 16),
+
+                      // Score fields (only for bracket games)
+                      if (!_isUniqueGame) ...[
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                controller: _scoreAController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Pontuação Time A',
+                                  border: OutlineInputBorder(),
+                                  prefixIcon: Icon(Icons.sports_score),
+                                  isDense: true,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 8,
+                                  ),
+                                ),
+                                keyboardType: TextInputType.number,
+                                validator: (value) {
+                                  if (value != null && value.isNotEmpty) {
+                                    final score = int.tryParse(value);
+                                    if (score == null) {
+                                      return 'Número inválido';
+                                    }
+                                    if (score < 0) {
+                                      return 'Deve ser positivo';
+                                    }
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: TextFormField(
+                                controller: _scoreBController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Pontuação Time B',
+                                  border: OutlineInputBorder(),
+                                  prefixIcon: Icon(Icons.sports_score),
+                                  isDense: true,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 8,
+                                  ),
+                                ),
+                                keyboardType: TextInputType.number,
+                                validator: (value) {
+                                  if (value != null && value.isNotEmpty) {
+                                    final score = int.tryParse(value);
+                                    if (score == null) {
+                                      return 'Número inválido';
+                                    }
+                                    if (score < 0) {
+                                      return 'Deve ser positivo';
+                                    }
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                      ],
 
                       if (_isUniqueGame) ...[
                         // Athletics for Ranking
@@ -1372,29 +1470,713 @@ class _GameManagementPageState extends State<GameManagementPage>
 }
 
 // Athletes Tab (placeholder - will be implemented next)
-class _AthletesTab extends StatelessWidget {
+class _AthletesTab extends StatefulWidget {
   final String gameId;
   final Map<String, dynamic> game;
 
   const _AthletesTab({required this.gameId, required this.game});
 
   @override
+  State<_AthletesTab> createState() => _AthletesTabState();
+}
+
+class _AthletesTabState extends State<_AthletesTab> {
+  late GamesRepository _gamesRepository;
+  late AthletesRepository _athletesRepository;
+  
+  List<Map<String, dynamic>> _gameAthletes = [];
+  List<Map<String, dynamic>> _availableAthletes = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _gamesRepository = GamesRepository(Supabase.instance.client);
+    _athletesRepository = AthletesRepository(Supabase.instance.client);
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final athletes = await _gamesRepository.getGameAthletes(widget.gameId);
+      
+      // Get all available athletes
+      final allAthletes = await _athletesRepository.getAllAthletes();
+      
+      setState(() {
+        _gameAthletes = athletes;
+        _availableAthletes = allAthletes;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao carregar atletas: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _showAddAthleteDialog() async {
+    // Filter out athletes already in the game
+    final athletesInGame = _gameAthletes
+        .map((a) => (a['athletes'] as Map<String, dynamic>)['id'] as String)
+        .toSet();
+    
+    final availableToAdd = _availableAthletes
+        .where((a) => !athletesInGame.contains(a['id']))
+        .toList();
+
+    if (availableToAdd.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Todos os atletas já estão no jogo'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+      return;
+    }
+
+    String? selectedAthleteId;
+    final shirtController = TextEditingController();
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Adicionar Atleta'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DropdownButtonFormField<String>(
+                value: selectedAthleteId,
+                decoration: const InputDecoration(
+                  labelText: 'Atleta *',
+                  border: OutlineInputBorder(),
+                  isDense: true,
+                ),
+                isExpanded: true,
+                items: availableToAdd.map((athlete) {
+                  final athletic = athlete['athletics'] as Map<String, dynamic>?;
+                  return DropdownMenuItem<String>(
+                    value: athlete['id'] as String,
+                    child: Text(
+                      '${athlete['full_name']} - ${athletic?['nickname'] ?? ''}',
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  selectedAthleteId = value;
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: shirtController,
+                decoration: const InputDecoration(
+                  labelText: 'Número da Camisa *',
+                  border: OutlineInputBorder(),
+                  isDense: true,
+                ),
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (selectedAthleteId == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Selecione um atleta'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+
+              final shirtNumber = int.tryParse(shirtController.text);
+              if (shirtNumber == null || shirtNumber < 0) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Número da camisa inválido'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+
+              try {
+                await _gamesRepository.addAthleteToGame(
+                  gameId: widget.gameId,
+                  athleteId: selectedAthleteId!,
+                  shirtNumber: shirtNumber,
+                );
+                Navigator.pop(context, true);
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Erro ao adicionar atleta: $e'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            child: const Text('Adicionar'),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true) {
+      await _loadData();
+    }
+  }
+
+  Future<void> _removeAthlete(String athleteId, String athleteName) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Remover Atleta'),
+        content: Text('Deseja remover $athleteName do jogo?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Remover'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        await _gamesRepository.removeAthleteFromGame(
+          gameId: widget.gameId,
+          athleteId: athleteId,
+        );
+        await _loadData();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Atleta removido com sucesso'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Erro ao remover atleta: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Athletes management - To be implemented'));
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Text(
+                'Atletas no Jogo (${_gameAthletes.length})',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const Spacer(),
+              ElevatedButton.icon(
+                onPressed: _showAddAthleteDialog,
+                icon: const Icon(Icons.add),
+                label: const Text('Adicionar Atleta'),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: _gameAthletes.isEmpty
+              ? const Center(
+                  child: Text(
+                    'Nenhum atleta adicionado ao jogo',
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: _gameAthletes.length,
+                  itemBuilder: (context, index) {
+                    final athleteGame = _gameAthletes[index];
+                    final athlete = athleteGame['athletes'] as Map<String, dynamic>;
+                    final athletic = athlete['athletics'] as Map<String, dynamic>?;
+
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.grey[200],
+                          backgroundImage: athletic?['logo_url'] != null
+                              ? AssetImage('assets/images/${athletic!['logo_url']}')
+                              : null,
+                          child: athletic?['logo_url'] == null
+                              ? Text(
+                                  '${athleteGame['shirt_number']}',
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                )
+                              : null,
+                        ),
+                        title: Text(athlete['full_name'] as String),
+                        subtitle: Text(
+                          '${athletic?['name'] ?? 'Sem atlética'} - Camisa #${athleteGame['shirt_number']}',
+                        ),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => _removeAthlete(
+                            athlete['id'] as String,
+                            athlete['full_name'] as String,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ],
+    );
   }
 }
 
 // Statistics Tab (placeholder - will be implemented next)
-class _StatisticsTab extends StatelessWidget {
+class _StatisticsTab extends StatefulWidget {
   final String gameId;
   final Map<String, dynamic> game;
 
   const _StatisticsTab({required this.gameId, required this.game});
 
   @override
+  State<_StatisticsTab> createState() => _StatisticsTabState();
+}
+
+class _StatisticsTabState extends State<_StatisticsTab> {
+  late GamesRepository _repository;
+  
+  List<Map<String, dynamic>> _gameStats = [];
+  List<Map<String, dynamic>> _statDefinitions = [];
+  Map<String, Map<String, Map<String, dynamic>>> _athleteStats = {};
+  List<Map<String, dynamic>> _gameAthletes = [];
+  bool _isLoading = true;
+  
+  @override
+  void initState() {
+    super.initState();
+    _repository = GamesRepository(Supabase.instance.client);
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final futures = await Future.wait([
+        _repository.getGameStats(widget.gameId),
+        _repository.getStatDefinitions(),
+        _repository.getGameAthletes(widget.gameId),
+      ]);
+
+      _gameStats = futures[0];
+      _statDefinitions = futures[1];
+      _gameAthletes = futures[2];
+
+      // Load athlete stats for each athlete
+      final athleteStatsFutures = <Future<List<Map<String, dynamic>>>>[];
+      for (final athleteGame in _gameAthletes) {
+        final athlete = athleteGame['athletes'] as Map<String, dynamic>;
+        athleteStatsFutures.add(
+          _repository.getAthleteGameStats(
+            gameId: widget.gameId,
+            athleteId: athlete['id'] as String,
+          ),
+        );
+      }
+
+      final athleteStatsResults = await Future.wait(athleteStatsFutures);
+      
+      // Organize athlete stats by athlete ID and stat code
+      for (int i = 0; i < _gameAthletes.length; i++) {
+        final athlete = _gameAthletes[i]['athletes'] as Map<String, dynamic>;
+        final athleteId = athlete['id'] as String;
+        _athleteStats[athleteId] = {};
+        
+        for (final stat in athleteStatsResults[i]) {
+          final statCode = stat['stat_code'] as String;
+          _athleteStats[athleteId]![statCode] = stat;
+        }
+      }
+
+      setState(() => _isLoading = false);
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao carregar estatísticas: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _updateGameStat(String statCode, int currentValue) async {
+    final controller = TextEditingController(text: currentValue.toString());
+    
+    final result = await showDialog<int>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Atualizar ${_getStatName(statCode)}'),
+        content: TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            labelText: 'Valor',
+            suffix: Text(_getStatUnit(statCode)),
+          ),
+          keyboardType: TextInputType.number,
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final value = int.tryParse(controller.text);
+              if (value != null) {
+                Navigator.pop(context, value);
+              }
+            },
+            child: const Text('Salvar'),
+          ),
+        ],
+      ),
+    );
+
+    if (result != null) {
+      try {
+        await _repository.updateGameStat(
+          gameId: widget.gameId,
+          statCode: statCode,
+          value: result,
+        );
+        await _loadData();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Estatística atualizada com sucesso'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Erro ao atualizar estatística: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  Future<void> _updateAthleteGameStat(
+    String athleteId,
+    String athleteName,
+    String statCode,
+    int currentValue,
+  ) async {
+    final controller = TextEditingController(text: currentValue.toString());
+    
+    final result = await showDialog<int>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('$athleteName - ${_getStatName(statCode)}'),
+        content: TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            labelText: 'Valor',
+            suffix: Text(_getStatUnit(statCode)),
+          ),
+          keyboardType: TextInputType.number,
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final value = int.tryParse(controller.text);
+              if (value != null) {
+                Navigator.pop(context, value);
+              }
+            },
+            child: const Text('Salvar'),
+          ),
+        ],
+      ),
+    );
+
+    if (result != null) {
+      try {
+        await _repository.updateAthleteGameStat(
+          gameId: widget.gameId,
+          athleteId: athleteId,
+          statCode: statCode,
+          value: result,
+        );
+        await _loadData();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Estatística atualizada com sucesso'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Erro ao atualizar estatística: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  String _getStatName(String statCode) {
+    final stat = _statDefinitions.firstWhere(
+      (s) => s['code'] == statCode,
+      orElse: () => {'name': statCode},
+    );
+    return stat['name'] as String;
+  }
+
+  String _getStatUnit(String statCode) {
+    final stat = _statDefinitions.firstWhere(
+      (s) => s['code'] == statCode,
+      orElse: () => {'unit': ''},
+    );
+    return stat['unit'] as String? ?? '';
+  }
+
+  int _getGameStatValue(String statCode) {
+    final stat = _gameStats.firstWhere(
+      (s) => s['stat_code'] == statCode,
+      orElse: () => {'value': 0},
+    );
+    return stat['value'] as int? ?? 0;
+  }
+
+  int _getAthleteStatValue(String athleteId, String statCode) {
+    return _athleteStats[athleteId]?[statCode]?['value'] as int? ?? 0;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Statistics management - To be implemented'),
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    return DefaultTabController(
+      length: 2,
+      child: Column(
+        children: [
+          const TabBar(
+            tabs: [
+              Tab(text: 'Estatísticas do Jogo'),
+              Tab(text: 'Estatísticas dos Atletas'),
+            ],
+          ),
+          Expanded(
+            child: TabBarView(
+              children: [
+                _buildGameStatsView(),
+                _buildAthleteStatsView(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGameStatsView() {
+    if (_statDefinitions.isEmpty) {
+      return const Center(
+        child: Text(
+          'Nenhuma definição de estatística disponível',
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: _statDefinitions.length,
+      itemBuilder: (context, index) {
+        final statDef = _statDefinitions[index];
+        final statCode = statDef['code'] as String;
+        final statName = statDef['name'] as String;
+        final statUnit = statDef['unit'] as String? ?? '';
+        final value = _getGameStatValue(statCode);
+
+        return Card(
+          margin: const EdgeInsets.only(bottom: 8),
+          child: ListTile(
+            title: Text(statName),
+            subtitle: statDef['description'] != null
+                ? Text(statDef['description'] as String)
+                : null,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '$value $statUnit',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () => _updateGameStat(statCode, value),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildAthleteStatsView() {
+    if (_gameAthletes.isEmpty) {
+      return const Center(
+        child: Text(
+          'Nenhum atleta adicionado ao jogo',
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+      );
+    }
+
+    if (_statDefinitions.isEmpty) {
+      return const Center(
+        child: Text(
+          'Nenhuma definição de estatística disponível',
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: _gameAthletes.length,
+      itemBuilder: (context, index) {
+        final athleteGame = _gameAthletes[index];
+        final athlete = athleteGame['athletes'] as Map<String, dynamic>;
+        final athleteId = athlete['id'] as String;
+        final athleteName = athlete['full_name'] as String;
+        final athletic = athlete['athletics'] as Map<String, dynamic>?;
+
+        return Card(
+          margin: const EdgeInsets.only(bottom: 16),
+          child: ExpansionTile(
+            leading: CircleAvatar(
+              backgroundColor: Colors.grey[200],
+              backgroundImage: athletic?['logo_url'] != null
+                  ? AssetImage('assets/images/${athletic!['logo_url']}')
+                  : null,
+              child: athletic?['logo_url'] == null
+                  ? Text(
+                      '${athleteGame['shirt_number']}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    )
+                  : null,
+            ),
+            title: Text(athleteName),
+            subtitle: Text(
+              '${athletic?['name'] ?? 'Sem atlética'} - Camisa #${athleteGame['shirt_number']}',
+            ),
+            children: _statDefinitions.map((statDef) {
+              final statCode = statDef['code'] as String;
+              final statName = statDef['name'] as String;
+              final statUnit = statDef['unit'] as String? ?? '';
+              final value = _getAthleteStatValue(athleteId, statCode);
+
+              return ListTile(
+                title: Text(statName),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '$value $statUnit',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      icon: const Icon(Icons.edit, size: 20),
+                      onPressed: () => _updateAthleteGameStat(
+                        athleteId,
+                        athleteName,
+                        statCode,
+                        value,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        );
+      },
     );
   }
 }
