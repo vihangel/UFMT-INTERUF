@@ -20,6 +20,8 @@ class VenuesPageState extends State<VenuesPage>
   late VenuesRepository _repository;
 
   List<Venue> _allVenues = [];
+  List<Venue> _venuesWithCoordinates = [];
+  List<Venue> _venuesWithoutCoordinates = [];
   bool _isLoading = true;
   String? _errorMessage;
 
@@ -46,6 +48,8 @@ class VenuesPageState extends State<VenuesPage>
 
       setState(() {
         _allVenues = futures[0];
+        _venuesWithCoordinates = futures[1];
+        _venuesWithoutCoordinates = futures[2];
         _isLoading = false;
       });
     } catch (error) {
@@ -90,6 +94,18 @@ class VenuesPageState extends State<VenuesPage>
         ),
         backgroundColor: Colors.white,
         elevation: 0,
+        bottom: TabBar(
+          isScrollable: true,
+          controller: _tabController,
+          labelColor: Colors.black,
+          unselectedLabelColor: Colors.grey,
+          indicatorColor: Colors.black,
+          tabs: const [
+            Tab(text: 'Todos'),
+            Tab(text: 'Com Coordenadas'),
+            Tab(text: 'Sem Coordenadas'),
+          ],
+        ),
         // leading: IconButton(
         //   icon: const Icon(Icons.arrow_back, color: Colors.black),
         //   onPressed: () => context.goNamed(HomePage.routename),
@@ -101,7 +117,11 @@ class VenuesPageState extends State<VenuesPage>
           ? _buildErrorState()
           : TabBarView(
               controller: _tabController,
-              children: [_buildVenuesList(_allVenues, showMapIcon: true)],
+              children: [
+                _buildVenuesList(_allVenues, showMapIcon: true),
+                _buildVenuesList(_venuesWithCoordinates, showMapIcon: true),
+                _buildVenuesList(_venuesWithoutCoordinates, showMapIcon: false),
+              ],
             ),
     );
   }
@@ -163,8 +183,7 @@ class VenuesPageState extends State<VenuesPage>
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
