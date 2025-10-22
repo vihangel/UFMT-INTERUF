@@ -36,7 +36,7 @@ class LoginPage extends StatelessWidget {
         },
         child: GestureDetector(
           onTap: () {
-            FocusScope.of(context).unfocus(); // Fecha o teclado ao tocar fora
+            FocusScope.of(context).unfocus();
           },
           child: Scaffold(
             resizeToAvoidBottomInset: true,

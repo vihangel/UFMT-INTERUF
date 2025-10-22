@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../core/services/voting_service.dart';
+
 import '../core/data/services/auth_service.dart';
+import '../core/services/voting_service.dart';
 
 class EscolhaAtleticaPage extends StatefulWidget {
   static const String routename = 'escolha_atletica';
