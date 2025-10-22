@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "32797416571",
+    "project_id": "interufmt-7861a",
+    "storage_bucket": "interufmt-7861a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:32797416571:android:38f6371ae1aa7791e2d6de",
+        "android_client_info": {
+          "package_name": "io.interufmt"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDwL_l14pLp7n0Ya9i1-HX7Vy9kKzRNLCw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,13 +1,15 @@
 import 'dart:async';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/config/url_strategy.dart';
+import 'package:interufmt/firebase_options.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
+import 'core/config/environment.dart';
 import 'core/data/services/local_storage_service.dart';
 import 'core/di/app_module.dart';
 import 'core/routes/app_routes.dart';
@@ -25,11 +27,12 @@ Future<void> main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  // Load environment variables first
-  await dotenv.load(fileName: ".env");
+  await Environment.init();
   final providers = await AppModule.init();
   final localStorageService = LocalStorageService();
   final chosenAthletic = await localStorageService.getChosenAthleticName();
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(
     MultiProvider(
