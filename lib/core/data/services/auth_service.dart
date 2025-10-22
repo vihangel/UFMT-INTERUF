@@ -138,7 +138,7 @@ class AuthService {
       // For mobile, use the deep link scheme
       final redirectUrl = kIsWeb
           ? '${Uri.base.origin}/auth/callback'
-          : 'interufmt://login-callback';
+          : 'interufmt://auth-callback';
 
       return await _c.auth.signUp(
         email: email,
@@ -205,7 +205,7 @@ class AuthService {
       // For mobile, use the deep link scheme
       final redirectUrl = kIsWeb
           ? '${Uri.base.origin}/auth/callback'
-          : 'interufmt://login-callback';
+          : 'interufmt://auth-callback';
 
       await _c.auth.signInWithOtp(email: email, emailRedirectTo: redirectUrl);
     } on AuthException {

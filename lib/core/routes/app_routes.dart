@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/data/atletica_model.dart';
@@ -12,6 +13,7 @@ import 'package:interufmt/features/admin/news_crud_page.dart';
 import 'package:interufmt/features/admin/venues_crud_page.dart';
 import 'package:interufmt/features/escolha_atletica_page.dart';
 import 'package:interufmt/features/rating_page.dart';
+import 'package:interufmt/features/torcidometro_page.dart';
 import 'package:interufmt/features/users/athletics/athletics_page.dart';
 import 'package:interufmt/features/users/calendar/calendar_page.dart';
 import 'package:interufmt/features/users/home/home_page.dart';
@@ -24,7 +26,6 @@ import 'package:interufmt/features/users/modalities/modalities_page.dart';
 import 'package:interufmt/features/users/news/news_page.dart';
 import 'package:interufmt/features/users/venues/venues_page.dart';
 import 'package:provider/provider.dart';
-import 'package:interufmt/features/torcidometro_page.dart';
 
 class AppRoutes {
   static GoRouter getRouter(
@@ -48,11 +49,10 @@ class AppRoutes {
           path: '/login',
           builder: (context, state) => const LoginPage(),
         ),
-        // Auth callback handler for web (magic links, email verification)
+
         GoRoute(
           path: '/auth/callback',
           builder: (context, state) {
-            // Show loading screen while Supabase processes the auth callback
             return const Scaffold(
               body: Center(
                 child: Column(
@@ -67,10 +67,8 @@ class AppRoutes {
             );
           },
           redirect: (context, state) async {
-            // Give Supabase a moment to process the callback
             await Future.delayed(const Duration(milliseconds: 800));
 
-            // After authentication is processed, redirect to home
             return '/home';
           },
         ),
@@ -85,7 +83,7 @@ class AppRoutes {
           builder: (context, state) => const NewsPage(),
         ),
         GoRoute(
-          name: TorcidometroPage.routename, // Usa a nova constante
+          name: TorcidometroPage.routename,
           path: '/torcidometro',
           builder: (context, state) => const TorcidometroPage(),
         ),
@@ -190,6 +188,13 @@ class AppRoutes {
         final isAdminLoggedIn = authViewModel.currentAdmin != null;
         final isAdminRoute = state.matchedLocation.startsWith('/admin');
         final isAdminLogin = state.matchedLocation == '/admin/login';
+
+        // Se estiver rodando na web e for a rota inicial ('/'), redireciona para o painel admin
+        if (kIsWeb &&
+            state.matchedLocation == initialLocation &&
+            (initialLocation == '/' || initialLocation.isEmpty)) {
+          return '/admin-panel';
+        }
 
         // Se for rota admin e não estiver logado como admin, redireciona para login admin
         if (isAdminRoute && !isAdminLoggedIn && !isAdminLogin) {

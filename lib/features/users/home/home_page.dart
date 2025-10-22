@@ -14,6 +14,7 @@ import 'package:interufmt/features/admin/admin_panel_page.dart';
 import 'package:interufmt/features/users/athletics/athletics_page.dart';
 import 'package:interufmt/features/users/calendar/calendar_page.dart';
 import 'package:interufmt/features/users/home/widgets/sections_social_media_widget.dart';
+import 'package:interufmt/features/users/home/widgets/tabela_classificacao_shimmer.dart';
 import 'package:interufmt/features/users/modalities/modalities_page.dart';
 import 'package:interufmt/features/users/news/news_page.dart';
 import 'package:interufmt/features/users/venues/venues_page.dart';
@@ -263,12 +264,7 @@ class _HomeContentState extends State<_HomeContent> {
               future: athleticsService.getAthleticsStandings('A'),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Card(
-                    child: Padding(
-                      padding: EdgeInsets.all(32),
-                      child: Center(child: CircularProgressIndicator()),
-                    ),
-                  );
+                  return const TabelaClassificacaoShimmer();
                 }
 
                 if (snapshot.hasError) {
@@ -317,12 +313,7 @@ class _HomeContentState extends State<_HomeContent> {
               future: athleticsService.getAthleticsStandings('B'),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Card(
-                    child: Padding(
-                      padding: EdgeInsets.all(32),
-                      child: Center(child: CircularProgressIndicator()),
-                    ),
-                  );
+                  return const TabelaClassificacaoShimmer();
                 }
 
                 if (snapshot.hasError) {
