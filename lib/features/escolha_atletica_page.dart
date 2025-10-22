@@ -1,4 +1,4 @@
-// lib/features/users/escolha_atletica_page.dart
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -32,6 +32,8 @@ class EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
   String? _errorMessage;
   bool _isVoting = false;
   bool _isAuthenticating = false;
+  bool _isAuthenticated = false;
+  StreamSubscription<AuthState>? _authSubscription;
 
   final Map<int, PageController> _tabPageControllers = {};
 
@@ -71,6 +73,28 @@ class EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
     _votingService = VotingService(Supabase.instance.client);
     _authService = AuthService(Supabase.instance.client);
     _loadAthletics();
+
+    _isAuthenticated = _authService.isAuthenticated;
+    _authSubscription = Supabase.instance.client.auth.onAuthStateChange.listen((
+      data,
+    ) {
+      if (mounted) {
+        setState(() {
+          _isAuthenticated = data.session != null;
+        });
+
+        if (data.event == AuthChangeEvent.signedIn) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Login realizado com sucesso! Agora você pode votar.',
+              ),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      }
+    });
 
     _tabController.addListener(() {
       setState(() {
@@ -128,6 +152,7 @@ class EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
   void dispose() {
     _tabController.dispose();
     _tabPageControllers.forEach((key, controller) => controller.dispose());
+    _authSubscription?.cancel();
     super.dispose();
   }
 
@@ -138,7 +163,7 @@ class EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
     final athleticId = chosenAtletica['id'] as String;
 
     // Check if user is authenticated
-    if (!_authService.isAuthenticated) {
+    if (!_isAuthenticated) {
       // Show login dialog
       await _showLoginDialog(athleticId, chosenAtletica['nickname']!);
       return;
@@ -151,7 +176,7 @@ class EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
   Future<void> _showLoginDialog(String athleticId, String nickname) async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Login necessário'),
@@ -198,17 +223,8 @@ class EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
       await _authService.signInWithMagicLink(email);
 
       if (mounted) {
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Um link de autenticação foi enviado para $email.\n'
-              'Verifique sua caixa de entrada e clique no link para fazer login.',
-            ),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 5),
-          ),
-        );
+        // Show dialog informing user to check email
+        await _showWaitingForMagicLinkDialog(email);
 
         // Save pending vote data to complete after authentication
         final prefs = await SharedPreferences.getInstance();
@@ -235,6 +251,37 @@ class EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
         });
       }
     }
+  }
+
+  Future<void> _showWaitingForMagicLinkDialog(String email) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // User must tap button to close
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Verifique seu Email'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Um link de autenticação foi enviado para $email.'),
+                const SizedBox(height: 10),
+                const Text(
+                  'Clique no link para fazer login e registrar seu voto.',
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<String?> _showEmailInputDialog() async {
@@ -448,6 +495,7 @@ class EscolhaAtleticaPageState extends State<EscolhaAtleticaPage>
                       ),
                       textAlign: TextAlign.center,
                     ),
+
                     const SizedBox(height: 20),
                     TabBar(
                       controller: _tabController,
