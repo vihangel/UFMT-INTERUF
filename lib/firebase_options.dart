@@ -85,4 +85,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'interufmt-7861a.firebasestorage.app',
     measurementId: 'G-YT3375Z7KC',
   );
+
 }
