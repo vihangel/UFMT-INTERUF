@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
-import 'package:interufmt/core/config/url_strategy_mobile.dart';
+import 'package:interufmt/core/config/url_strategy.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
@@ -12,9 +12,6 @@ import 'core/data/services/local_storage_service.dart';
 import 'core/di/app_module.dart';
 import 'core/routes/app_routes.dart';
 import 'core/theme/app_theme.dart';
-
-export 'package:interufmt/core/config/url_strategy_mobile.dart'
-    if (dart.library.html) 'package:interufmt/core/config/url_strategy_web.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
