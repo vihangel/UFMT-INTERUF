@@ -1,8 +1,8 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../core/config/environment.dart';
 import '../../features/users/login/auth/auth_viewmodel.dart';
 import '../../features/users/news/viewmodel/news_viewmodel.dart';
 import '../data/repositories/auth_repository.dart';
@@ -16,17 +16,10 @@ import '../services/voting_service.dart';
 class AppModule {
   /// Initializes .env/Supabase and returns the list of app providers.
   static Future<List<SingleChildWidget>> init() async {
-    await dotenv.load(fileName: ".env");
-
-    final url = dotenv.env['SUPABASE_URL'];
-    final anon = dotenv.env['SUPABASE_ANON_KEY'];
-    if (url == null || anon == null) {
-      throw Exception(
-        'SUPABASE_URL or SUPABASE_ANON_KEY are missing from .env',
-      );
-    }
-
-    await Supabase.initialize(url: url, anonKey: anon);
+    await Supabase.initialize(
+      url: Environment.supabaseUrl,
+      anonKey: Environment.supabaseAnonKey,
+    );
     final client = Supabase.instance.client;
 
     return [
