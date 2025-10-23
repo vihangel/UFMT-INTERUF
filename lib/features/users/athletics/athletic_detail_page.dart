@@ -31,13 +31,13 @@ class AthleticDetailPage extends StatefulWidget {
 class AthleticDetailPageState extends State<AthleticDetailPage>
     with TickerProviderStateMixin {
   late TabController _mainTabController;
-  late TabController _calendarTabController;
   late AthleticDetailRepository _repository;
 
   AthleticDetail? _athleticDetail;
   List<ModalityAggregated> _modalities = [];
-  final Map<String, List<AthleticGame>> _gamesByDate = {};
-  List<String> _availableDates = [];
+  List<DateTime> _availableDates = [];
+  DateTime? _selectedDate;
+  List<AthleticGame> _currentGames = [];
 
   bool _isLoading = true;
   String? _errorMessage;
@@ -63,22 +63,17 @@ class AthleticDetailPageState extends State<AthleticDetailPage>
       if (detail != null) {
         _athleticDetail = detail;
 
-        // Get available dates based on series
-        _availableDates = _repository.getSeriesDates(detail.series);
-
-        // Initialize calendar tab controller
-        _calendarTabController = TabController(
-          length: _availableDates.length,
-          vsync: this,
+        // Get available dates from database
+        _availableDates = await _repository.getDistinctDatesForAthletic(
+          widget.athletic.id,
         );
 
-        // Load games for each date
-        for (final date in _availableDates) {
-          final games = await _repository.getAthleticGames(
-            widget.athletic.id,
-            date,
-          );
-          _gamesByDate[date] = games;
+        // Set initial selected date
+        if (_availableDates.isNotEmpty) {
+          _selectedDate = _availableDates.first;
+
+          // Load games for initial date
+          await _loadGamesForDate(_selectedDate!);
         }
 
         // Load modalities
@@ -98,16 +93,37 @@ class AthleticDetailPageState extends State<AthleticDetailPage>
     }
   }
 
+  Future<void> _loadGamesForDate(DateTime date) async {
+    if (!mounted) return;
+    try {
+      final dateString = date.toIso8601String().split('T')[0];
+      final games = await _repository.getAthleticGames(
+        widget.athletic.id,
+        dateString,
+      );
+
+      if (mounted) {
+        setState(() {
+          _currentGames = games;
+        });
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Erro ao carregar jogos: $error';
+        });
+      }
+    }
+  }
+
   @override
   void dispose() {
     _mainTabController.dispose();
-    _calendarTabController.dispose();
     super.dispose();
   }
 
-  String _formatDate(String dateStr) {
-    final date = DateTime.parse(dateStr);
-    return DateFormat('dd/MM').format(date);
+  String _formatDate(DateTime date) {
+    return DateFormat('dd/MM/yyyy').format(date);
   }
 
   String _formatGameTime(DateTime dateTime) {
@@ -268,31 +284,52 @@ class AthleticDetailPageState extends State<AthleticDetailPage>
 
     return Column(
       children: [
-        // Date tabs
+        // Date Dropdown Filter
         Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           color: Colors.white,
-          child: TabBar(
-            controller: _calendarTabController,
-            tabs: _availableDates
-                .map((date) => Tab(text: _formatDate(date)))
-                .toList(),
+          child: Row(
+            children: [
+              const Icon(Icons.calendar_today, size: 20, color: Colors.grey),
+              const SizedBox(width: 12),
+              Expanded(
+                child: DropdownButtonFormField<DateTime>(
+                  value: _selectedDate,
+                  decoration: const InputDecoration(
+                    labelText: 'Selecione a data',
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                  ),
+                  items: _availableDates.map((date) {
+                    return DropdownMenuItem<DateTime>(
+                      value: date,
+                      child: Text(_formatDate(date)),
+                    );
+                  }).toList(),
+                  onChanged: (DateTime? newDate) {
+                    if (newDate != null) {
+                      setState(() {
+                        _selectedDate = newDate;
+                      });
+                      _loadGamesForDate(newDate);
+                    }
+                  },
+                ),
+              ),
+            ],
           ),
         ),
-        // Games for each date
-        Expanded(
-          child: TabBarView(
-            controller: _calendarTabController,
-            children: _availableDates
-                .map((date) => _buildGamesForDate(date))
-                .toList(),
-          ),
-        ),
+        // Games List
+        Expanded(child: _buildGamesForDate()),
       ],
     );
   }
 
-  Widget _buildGamesForDate(String date) {
-    final games = _gamesByDate[date] ?? [];
+  Widget _buildGamesForDate() {
+    final games = _currentGames;
 
     if (games.isEmpty) {
       return const Center(
@@ -311,7 +348,6 @@ class AthleticDetailPageState extends State<AthleticDetailPage>
         child: CardGame(
           status: games[index].status,
           startTimeDateFormatted: games[index].startTimeDateFormatted,
-          // statusDisplayText: games[index].statusDisplayText,
           gameIcon: games[index].gameIcon,
           modalityPhase: games[index].modalityPhase,
           venueName: games[index].venueName,

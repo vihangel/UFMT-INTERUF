@@ -189,12 +189,12 @@ class AppRoutes {
         final isAdminRoute = state.matchedLocation.startsWith('/admin');
         final isAdminLogin = state.matchedLocation == '/admin/login';
 
-        // Se estiver rodando na web e for a rota inicial ('/'), redireciona para o painel admin
-        if (kIsWeb &&
-            state.matchedLocation == initialLocation &&
-            (initialLocation == '/' || initialLocation.isEmpty)) {
-          return '/admin-panel';
-        }
+        // // Se estiver rodando na web e for a rota inicial ('/'), redireciona para o painel admin
+        // if (kIsWeb &&
+        //     state.matchedLocation == initialLocation &&
+        //     (initialLocation == '/' || initialLocation.isEmpty)) {
+        //   return '/admin-panel';
+        // }
 
         // Se for rota admin e não estiver logado como admin, redireciona para login admin
         if (isAdminRoute && !isAdminLoggedIn && !isAdminLogin) {
