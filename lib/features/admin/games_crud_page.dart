@@ -621,6 +621,44 @@ class _GamesCrudPageState extends State<GamesCrudPage> {
                                         ],
                                       ),
                                     ],
+
+                                    // Winner display (for non-unique games)
+                                    if (!isUniqueGame &&
+                                        game['winner_athletic_id'] != null) ...[
+                                      const SizedBox(height: 12),
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: Colors.amber.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                          border: Border.all(
+                                            color: Colors.amber,
+                                            width: 2,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Icon(
+                                              Icons.emoji_events,
+                                              color: Colors.amber,
+                                              size: 20,
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              'Vencedor: ${game['winner_athletic']?['nickname'] ?? 'N/A'}',
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.amber,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+
                                     const SizedBox(height: 16),
                                     Wrap(
                                       spacing: 8,
@@ -720,6 +758,7 @@ class _GameFormDialogState extends State<_GameFormDialog> {
   DateTime? _startAt;
   bool _isUniqueGame = false;
   List<String> _selectedAthleticsForRanking = [];
+  String? _selectedWinnerAthleticId;
   bool _isLoading = false;
 
   // Score controllers
@@ -755,6 +794,9 @@ class _GameFormDialogState extends State<_GameFormDialog> {
       // Determine if game is unique: a_athletic_id is null AND athletics_standings is not null
       _isUniqueGame =
           game['a_athletic_id'] == null && game['athletics_standings'] != null;
+
+      // Initialize winner athletic ID
+      _selectedWinnerAthleticId = game['winner_athletic_id'];
 
       if (_isUniqueGame && game['athletics_standings'] != null) {
         try {
@@ -900,6 +942,8 @@ class _GameFormDialogState extends State<_GameFormDialog> {
           // Include scores
           scoreA: scoreA,
           scoreB: scoreB,
+          // Winner athletic (only for non-unique games)
+          winnerAthleticId: !_isUniqueGame ? _selectedWinnerAthleticId : null,
           // For unique games, set standings. For bracket games, clear them
           athleticsStandings: _isUniqueGame
               ? {'id_atletics': _selectedAthleticsForRanking}
@@ -1244,6 +1288,64 @@ class _GameFormDialogState extends State<_GameFormDialog> {
                               ),
                             ),
                           ],
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Winner Athletic Dropdown (only shows Team A and Team B)
+                        DropdownButtonFormField<String>(
+                          value: _selectedWinnerAthleticId,
+                          decoration: const InputDecoration(
+                            labelText: 'Vencedor',
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.emoji_events),
+                            isDense: true,
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                          ),
+                          isExpanded: true,
+                          items: [
+                            const DropdownMenuItem<String>(
+                              value: null,
+                              child: Text(
+                                'Nenhum (Empate/Não finalizado)',
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            // Only show Team A and Team B as options
+                            if (_selectedAthleticA != null)
+                              ...widget.athletics
+                                  .where((a) => a['id'] == _selectedAthleticA)
+                                  .map(
+                                    (athletic) => DropdownMenuItem<String>(
+                                      value: athletic['id'],
+                                      child: Text(
+                                        'Time A: ${athletic['nickname'] ?? athletic['name']}',
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                            if (_selectedAthleticB != null)
+                              ...widget.athletics
+                                  .where((a) => a['id'] == _selectedAthleticB)
+                                  .map(
+                                    (athletic) => DropdownMenuItem<String>(
+                                      value: athletic['id'],
+                                      child: Text(
+                                        'Time B: ${athletic['nickname'] ?? athletic['name']}',
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedWinnerAthleticId = value;
+                            });
+                          },
                         ),
                         const SizedBox(height: 16),
                       ],

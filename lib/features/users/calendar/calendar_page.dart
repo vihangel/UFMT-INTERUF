@@ -16,28 +16,16 @@ class CalendarPage extends StatefulWidget {
 class CalendarPageState extends State<CalendarPage>
     with TickerProviderStateMixin {
   late TabController _seriesTabController;
-  late TabController _serieADaysController;
-  late TabController _serieBDaysController;
   late CalendarGamesRepository _repository;
 
-  // Competition dates for each series
-  final Map<String, List<DateTime>> _competitionDates = {
-    'A': [
-      DateTime(2025, 10, 31), // October 31
-      DateTime(2025, 11, 1), // November 1
-      DateTime(2025, 11, 2), // November 2
-    ],
-    'B': [
-      DateTime(2025, 11, 14), // November 14
-      DateTime(2025, 11, 15), // November 15
-      DateTime(2025, 11, 16), // November 16
-    ],
-  };
+  // Dynamic dates loaded from database
+  final Map<String, List<DateTime>> _availableDates = {'A': [], 'B': []};
 
-  final Map<String, Map<String, List<CalendarGame>>> _gamesData = {
-    'A': {'Dia 1': [], 'Dia 2': [], 'Dia 3': []},
-    'B': {'Dia 1': [], 'Dia 2': [], 'Dia 3': []},
-  };
+  // Selected date for each series
+  DateTime? _selectedDateA;
+  DateTime? _selectedDateB;
+
+  final Map<String, List<CalendarGame>> _currentGames = {'A': [], 'B': []};
 
   bool _isLoading = true;
   String? _errorMessage;
@@ -46,13 +34,11 @@ class CalendarPageState extends State<CalendarPage>
   void initState() {
     super.initState();
     _seriesTabController = TabController(length: 2, vsync: this);
-    _serieADaysController = TabController(length: 3, vsync: this);
-    _serieBDaysController = TabController(length: 3, vsync: this);
     _repository = CalendarGamesRepository(Supabase.instance.client);
-    _loadAllGames();
+    _loadAvailableDates();
   }
 
-  Future<void> _loadAllGames() async {
+  Future<void> _loadAvailableDates() async {
     if (!mounted) return;
     try {
       setState(() {
@@ -60,28 +46,60 @@ class CalendarPageState extends State<CalendarPage>
         _errorMessage = null;
       });
 
-      // Load games for both series with their specific dates
-      for (String series in ['A', 'B']) {
-        final seriesDates = _competitionDates[series]!;
-        for (int dayIndex = 0; dayIndex < seriesDates.length; dayIndex++) {
-          final dayLabel = 'Dia ${dayIndex + 1}';
-          final games = await _repository.getGamesBySeriesAndDate(
-            series: series,
-            date: seriesDates[dayIndex],
-          );
-          _gamesData[series]![dayLabel] = games;
-        }
-      }
+      // Load available dates for both series
+      final datesA = await _repository.getDistinctDatesForSeries('A');
+      final datesB = await _repository.getDistinctDatesForSeries('B');
 
       if (mounted) {
         setState(() {
+          _availableDates['A'] = datesA;
+          _availableDates['B'] = datesB;
+
+          // Set initial selected dates
+          if (datesA.isNotEmpty) {
+            _selectedDateA = datesA.first;
+          }
+          if (datesB.isNotEmpty) {
+            _selectedDateB = datesB.first;
+          }
+
           _isLoading = false;
         });
+
+        // Load games for initial dates
+        if (_selectedDateA != null) {
+          await _loadGamesForDate('A', _selectedDateA!);
+        }
+        if (_selectedDateB != null) {
+          await _loadGamesForDate('B', _selectedDateB!);
+        }
       }
     } catch (error) {
       if (mounted) {
         setState(() {
           _isLoading = false;
+          _errorMessage = 'Erro ao carregar datas disponíveis: $error';
+        });
+      }
+    }
+  }
+
+  Future<void> _loadGamesForDate(String series, DateTime date) async {
+    if (!mounted) return;
+    try {
+      final games = await _repository.getGamesBySeriesAndDate(
+        series: series,
+        date: date,
+      );
+
+      if (mounted) {
+        setState(() {
+          _currentGames[series] = games;
+        });
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
           _errorMessage = 'Erro ao carregar jogos: $error';
         });
       }
@@ -91,8 +109,6 @@ class CalendarPageState extends State<CalendarPage>
   @override
   void dispose() {
     _seriesTabController.dispose();
-    _serieADaysController.dispose();
-    _serieBDaysController.dispose();
     super.dispose();
   }
 
@@ -107,13 +123,8 @@ class CalendarPageState extends State<CalendarPage>
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        // leading: IconButton(
-        //   icon: const Icon(Icons.arrow_back, color: Colors.black),
-        //   onPressed: () => context.goNamed(HomePage.routename),
-        // ),
         bottom: TabBar(
           controller: _seriesTabController,
-
           tabs: const [
             Tab(text: 'Série A'),
             Tab(text: 'Série B'),
@@ -127,10 +138,7 @@ class CalendarPageState extends State<CalendarPage>
           : TabBarView(
               physics: const NeverScrollableScrollPhysics(),
               controller: _seriesTabController,
-              children: [
-                _buildSeriesContent('A', _serieADaysController),
-                _buildSeriesContent('B', _serieBDaysController),
-              ],
+              children: [_buildSeriesContent('A'), _buildSeriesContent('B')],
             ),
     );
   }
@@ -149,7 +157,7 @@ class CalendarPageState extends State<CalendarPage>
           ),
           const SizedBox(height: 16),
           ElevatedButton(
-            onPressed: _loadAllGames,
+            onPressed: _loadAvailableDates,
             child: const Text('Tentar novamente'),
           ),
         ],
@@ -157,52 +165,75 @@ class CalendarPageState extends State<CalendarPage>
     );
   }
 
-  String _formatDateForTab(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}';
+  String _formatDateForDropdown(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   }
 
-  List<Tab> _getTabsForSeries(String series) {
-    final dates = _competitionDates[series]!;
-    return [
-      Tab(text: 'Dia 1\n${_formatDateForTab(dates[0])}'),
-      Tab(text: 'Dia 2\n${_formatDateForTab(dates[1])}'),
-      Tab(text: 'Dia 3\n${_formatDateForTab(dates[2])}'),
-    ];
-  }
+  Widget _buildSeriesContent(String series) {
+    final availableDates = _availableDates[series]!;
+    final selectedDate = series == 'A' ? _selectedDateA : _selectedDateB;
+    final games = _currentGames[series]!;
 
-  Widget _buildSeriesContent(String series, TabController daysController) {
+    if (availableDates.isEmpty) {
+      return const Center(
+        child: Text(
+          'Nenhuma data disponível para esta série',
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+      );
+    }
+
     return Column(
       children: [
-        // Days TabBar
+        // Date Dropdown Filter
         Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           color: Colors.grey.withValues(alpha: 0.1),
-          child: TabBar(
-            controller: daysController,
-            labelColor: Colors.black,
-            unselectedLabelColor: Colors.grey,
-            indicatorColor: Colors.blue,
-            indicatorSize: TabBarIndicatorSize.tab,
-            tabs: _getTabsForSeries(series),
-          ),
-        ),
-        // Days TabBarView
-        Expanded(
-          child: TabBarView(
-            controller: daysController,
+          child: Row(
             children: [
-              _buildDayContent(series, 'Dia 1'),
-              _buildDayContent(series, 'Dia 2'),
-              _buildDayContent(series, 'Dia 3'),
+              const Icon(Icons.calendar_today, size: 20, color: Colors.grey),
+              const SizedBox(width: 12),
+              Expanded(
+                child: DropdownButtonFormField<DateTime>(
+                  value: selectedDate,
+                  decoration: const InputDecoration(
+                    labelText: 'Selecione a data',
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                  ),
+                  items: availableDates.map((date) {
+                    return DropdownMenuItem<DateTime>(
+                      value: date,
+                      child: Text(_formatDateForDropdown(date)),
+                    );
+                  }).toList(),
+                  onChanged: (DateTime? newDate) {
+                    if (newDate != null) {
+                      setState(() {
+                        if (series == 'A') {
+                          _selectedDateA = newDate;
+                        } else {
+                          _selectedDateB = newDate;
+                        }
+                      });
+                      _loadGamesForDate(series, newDate);
+                    }
+                  },
+                ),
+              ),
             ],
           ),
         ),
+        // Games List
+        Expanded(child: _buildGamesList(games)),
       ],
     );
   }
 
-  Widget _buildDayContent(String series, String day) {
-    final games = _gamesData[series]![day] ?? [];
-
+  Widget _buildGamesList(List<CalendarGame> games) {
     if (games.isEmpty) {
       return Center(
         child: Column(
@@ -219,7 +250,7 @@ class CalendarPageState extends State<CalendarPage>
             ),
             const SizedBox(height: 16),
             Text(
-              'Nenhum jogo agendado\npara $day',
+              'Nenhum jogo agendado\npara esta data',
               style: TextStyle(
                 color: Colors.grey.withValues(alpha: 0.7),
                 fontSize: 16,
@@ -232,7 +263,13 @@ class CalendarPageState extends State<CalendarPage>
     }
 
     return RefreshIndicator(
-      onRefresh: _loadAllGames,
+      onRefresh: () async {
+        final series = _seriesTabController.index == 0 ? 'A' : 'B';
+        final selectedDate = series == 'A' ? _selectedDateA : _selectedDateB;
+        if (selectedDate != null) {
+          await _loadGamesForDate(series, selectedDate);
+        }
+      },
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: games.length,

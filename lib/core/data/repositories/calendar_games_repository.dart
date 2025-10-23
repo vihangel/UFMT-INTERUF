@@ -124,4 +124,33 @@ class CalendarGamesRepository {
 
     return groupedGames;
   }
+
+  /// Get distinct dates for games in a specific series
+  Future<List<DateTime>> getDistinctDatesForSeries(String series) async {
+    try {
+      final query =
+          '''
+        SELECT DISTINCT DATE(start_at) as game_date
+        FROM games
+        WHERE series = '$series'
+        ORDER BY game_date ASC
+      ''';
+
+      final response = await _client.rpc(
+        'execute_raw_sql',
+        params: {'query': query},
+      );
+
+      if (response == null) return [];
+
+      final List<dynamic> datesList = response as List<dynamic>;
+
+      return datesList.map((item) {
+        final dateStr = item['game_date'] as String;
+        return DateTime.parse(dateStr);
+      }).toList();
+    } catch (error) {
+      throw Exception('Failed to fetch distinct dates: $error');
+    }
+  }
 }
