@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:interufmt/core/data/atletica_model.dart';
@@ -12,6 +11,7 @@ import 'package:interufmt/features/admin/modalities_crud_page.dart';
 import 'package:interufmt/features/admin/news_crud_page.dart';
 import 'package:interufmt/features/admin/venues_crud_page.dart';
 import 'package:interufmt/features/escolha_atletica_page.dart';
+import 'package:interufmt/features/landing/landing_page.dart';
 import 'package:interufmt/features/rating_page.dart';
 import 'package:interufmt/features/torcidometro_page.dart';
 import 'package:interufmt/features/users/athletics/athletics_page.dart';
@@ -43,6 +43,11 @@ class AppRoutes {
           name: EscolhaAtleticaPage.routename,
           path: '/',
           builder: (context, state) => const EscolhaAtleticaPage(),
+        ),
+        GoRoute(
+          name: LandingPage.routename,
+          path: '/baixar-app',
+          builder: (context, state) => const LandingPage(),
         ),
         GoRoute(
           name: LoginPage.routename,
